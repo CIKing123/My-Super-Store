@@ -8,31 +8,20 @@ export function Login() {
         <div className="section flex items-center justify-center min-h-[70vh]">
             <div className="card-black max-w-md w-full p-8">
 
-                {/* Tabs */}
-                <div className="flex mb-8 border-b border-white/10">
-                    <button
-                        className={`flex-1 pb-4 font-bold transition-all ${activeTab === 'login' ? 'text-[var(--gold-primary)] border-b-2 border-[var(--gold-primary)]' : 'text-gray-500'}`}
-                        onClick={() => setActiveTab('login')}
-                    >
-                        Login
-                    </button>
-                    <button
-                        className={`flex-1 pb-4 font-bold transition-all ${activeTab === 'register' ? 'text-[var(--gold-primary)] border-b-2 border-[var(--gold-primary)]' : 'text-gray-500'}`}
-                        onClick={() => setActiveTab('register')}
-                    >
-                        Register
-                    </button>
-                </div>
+
 
                 {activeTab === 'login' ? (
                     <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
                         <div>
+                            <h2 className="text-2xl font-bold mb-4">Sign In</h2>
+                        </div>
+                        <div>
                             <label className="block text-gray-400 mb-2 text-sm">Email Address</label>
-                            <input type="email" className="w-full bg-white/5 border border-white/10 rounded p-3 text-white focus:border-[var(--gold-primary)] outline-none transition-colors" />
+                            <input type="email" className="input-field" />
                         </div>
                         <div>
                             <label className="block text-gray-400 mb-2 text-sm">Password</label>
-                            <input type="password" className="w-full bg-white/5 border border-white/10 rounded p-3 text-white focus:border-[var(--gold-primary)] outline-none transition-colors" />
+                            <input type="password" className="input-field" />
                         </div>
                         <div className="flex justify-between items-center text-sm">
                             <label className="flex items-center gap-2 text-gray-400 cursor-pointer">
@@ -44,22 +33,41 @@ export function Login() {
                         <Link to="/account" className="btn-primary w-full text-center block no-underline">
                             Sign In
                         </Link>
+                        <div>
+                            <p className="text-center text-gray-400 text-sm">Don't have an account? <p
+                                className="link-text underline cursor-pointer"
+                                onClick={() => setActiveTab('register')}
+                            >
+                                Register
+                            </p>
+                            </p>
+                        </div>
                     </form>
                 ) : (
                     <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+                        <div style={{ textAlign: 'center', margin: '0 auto' }}>
+                            <h2 className="text-2xl font-bold mb-4">Sign Up</h2>
+                        </div>
                         <div>
                             <label className="block text-gray-400 mb-2 text-sm">Full Name</label>
-                            <input type="text" className="w-full bg-white/5 border border-white/10 rounded p-3 text-white focus:border-[var(--gold-primary)] outline-none transition-colors" />
+                            <input type="text" className="input-field" />
                         </div>
                         <div>
                             <label className="block text-gray-400 mb-2 text-sm">Email Address</label>
-                            <input type="email" className="w-full bg-white/5 border border-white/10 rounded p-3 text-white focus:border-[var(--gold-primary)] outline-none transition-colors" />
+                            <input type="email" className="input-field" />
                         </div>
                         <div>
                             <label className="block text-gray-400 mb-2 text-sm">Password</label>
-                            <input type="password" className="w-full bg-white/5 border border-white/10 rounded p-3 text-white focus:border-[var(--gold-primary)] outline-none transition-colors" />
+                            <input type="password" className="input-field" />
                         </div>
                         <button className="btn-primary w-full">Create Account</button>
+                        <p className="text-center text-gray-400 text-sm">Already have an account? <p
+                            className="login-link-text underline cursor-pointer"
+                            onClick={() => setActiveTab('login')}
+                        >
+                            Login
+                        </p>
+                        </p>
                     </form>
                 )}
             </div>
