@@ -1,27 +1,26 @@
-import { Minus, Plus, X } from 'lucide-react';
+import { Minus, Plus, X, Loader2 } from 'lucide-react';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
-
-interface CartItem {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-  quantity: number;
-  category: string;
-}
+import { useCart } from '../context/CartContext';
 
 interface CartProps {
-  cartItems: CartItem[];
-  onUpdateQuantity: (id: number, quantity: number) => void;
-  onRemoveItem: (id: number) => void;
   onNavigate: (page: string) => void;
 }
 
-export function Cart({ cartItems, onUpdateQuantity, onRemoveItem, onNavigate }: CartProps) {
+export function Cart({ onNavigate }: CartProps) {
+  const { cartItems, updateQuantity, removeItem, loading } = useCart();
+
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const shipping = subtotal > 500 ? 0 : 50;
   const tax = subtotal * 0.08;
   const total = subtotal + shipping + tax;
+
+  if (loading && cartItems.length === 0) {
+    return (
+      <div className="section min-h-[50vh] flex items-center justify-center">
+        <Loader2 className="animate-spin text-[var(--gold-primary)]" size={48} />
+      </div>
+    );
+  }
 
   return (
     <div className="section">
@@ -65,7 +64,7 @@ export function Cart({ cartItems, onUpdateQuantity, onRemoveItem, onNavigate }: 
                       </div>
                     </div>
                     <button
-                      onClick={() => onRemoveItem(item.id)}
+                      onClick={() => removeItem(item.id)}
                       className="text-muted hover:text-white transition-colors bg-transparent border-none cursor-pointer p-0"
                     >
                       <X size={24} strokeWidth={2.5} />
@@ -76,7 +75,7 @@ export function Cart({ cartItems, onUpdateQuantity, onRemoveItem, onNavigate }: 
                   <div className="flex items-center justify-between mt-4">
                     <div className="flex items-center gap-4">
                       <button
-                        onClick={() => onUpdateQuantity(item.id, Math.max(1, item.quantity - 1))}
+                        onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
                         className="qty-btn"
                         style={{ width: '32px', height: '32px' }}
                       >
@@ -84,7 +83,7 @@ export function Cart({ cartItems, onUpdateQuantity, onRemoveItem, onNavigate }: 
                       </button>
                       <span className="text-white w-8 text-center">{item.quantity}</span>
                       <button
-                        onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
                         className="qty-btn"
                         style={{ width: '32px', height: '32px' }}
                       >
@@ -130,6 +129,7 @@ export function Cart({ cartItems, onUpdateQuantity, onRemoveItem, onNavigate }: 
               <button
                 className="btn-primary"
                 style={{ width: '100%', marginBottom: '1rem', padding: '1rem' }}
+                onClick={() => onNavigate('checkout')}
               >
                 Proceed to Checkout
               </button>

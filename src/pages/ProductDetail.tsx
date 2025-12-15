@@ -1,9 +1,12 @@
-import { useState } from 'react';
-import { Heart, Truck, Shield, RotateCcw, Star, Minus, Plus } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { Heart, Truck, Shield, RotateCcw, Star, Minus, Plus, Loader2 } from 'lucide-react';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
+import { supabase } from '../lib/supabase';
+import { useCart } from '../context/CartContext';
 
 interface Product {
-  id: number;
+  id: any;
   name: string;
   price: number;
   image: string;
@@ -11,20 +14,79 @@ interface Product {
   description?: string;
 }
 
-interface ProductDetailProps {
-  product: Product;
-  onAddToCart: (productId: number, quantity: number) => void;
-}
+export function ProductDetail() {
+  const { id } = useParams<{ id: string }>();
+  const { addToCart } = useCart();
 
-export function ProductDetail({ product, onAddToCart }: ProductDetailProps) {
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState('One Size');
 
   const sizes = ['Small', 'Medium', 'Large', 'One Size'];
 
-  const handleAddToCart = () => {
-    onAddToCart(product.id, quantity);
+  useEffect(() => {
+    if (id) fetchProduct(id);
+  }, [id]);
+
+  const fetchProduct = async (productId: string) => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .select(`
+                *,
+                product_categories (
+                    categories ( name )
+                ),
+                product_images ( url )
+            `)
+        .eq('id', productId)
+        .single();
+
+      if (error) throw error;
+
+      if (data) {
+        const cats = data.product_categories?.map((pc: any) => pc.categories?.name) || [];
+
+        setProduct({
+          id: data.id,
+          name: data.name,
+          price: data.price,
+          description: data.description,
+          image: data.product_images?.[0]?.url || '',
+          category: cats[0] || 'Uncategorized'
+        });
+      }
+    } catch (err) {
+      console.error('Error fetching product:', err);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const handleAddToCart = () => {
+    if (product) {
+      addToCart(product, quantity);
+      alert('Added to cart!'); // Ideally replace with a toast
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="section min-h-[50vh] flex items-center justify-center">
+        <Loader2 className="animate-spin text-[var(--gold-primary)]" size={48} />
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div className="section min-h-[50vh] flex items-center justify-center">
+        <h2 className="text-white">Product not found</h2>
+      </div>
+    );
+  }
 
   return (
     <div className="section">
@@ -86,12 +148,12 @@ export function ProductDetail({ product, onAddToCart }: ProductDetailProps) {
 
           {/* Price */}
           <span className="detail-price">
-            ${product.price.toLocaleString()}
+            ${product.price ? product.price.toLocaleString() : '0'}
           </span>
 
           {/* Description */}
           <p className="detail-desc">
-            {product.description || 'An exquisite piece crafted with unparalleled attention to detail. This luxury item represents the pinnacle of design and quality, perfect for those who appreciate the finer things in life.'}
+            {product.description || 'An exquisite piece crafted with unparalleled attention to detail.'}
           </p>
 
           {/* Size Selection */}

@@ -1,5 +1,7 @@
-import { ArrowRight, Star, Shield, Truck } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { ArrowRight, Star, Shield, Truck, Loader2 } from 'lucide-react';
 import { ProductCard } from '../components/ProductCard';
+import { supabase } from '../lib/supabase';
 
 interface Product {
   id: number;
@@ -10,12 +12,52 @@ interface Product {
 }
 
 interface HomeProps {
-  products: Product[];
+  products: Product[]; // Legacy, ignored
   onNavigate: (page: string, productId?: number) => void;
 }
 
-export function Home({ products, onNavigate }: HomeProps) {
-  const featuredProducts = products.slice(0, 4);
+export function Home({ onNavigate }: HomeProps) {
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchFeatured();
+  }, []);
+
+  const fetchFeatured = async () => {
+    try {
+      // Fetch 4 featured products (e.g. random or just latest)
+      const { data, error } = await supabase
+        .from('products')
+        .select(`
+                *,
+                product_images ( url ),
+                product_categories (
+                    categories ( name )
+                )
+            `)
+        .limit(4);
+
+      if (error) throw error;
+
+      const formatted = (data || []).map((item: any) => {
+        const cats = item.product_categories?.map((pc: any) => pc.categories?.name) || [];
+        return {
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          image: item.product_images?.[0]?.url || '',
+          category: cats[0] || 'Uncategorized'
+        };
+      });
+
+      setFeaturedProducts(formatted);
+    } catch (err) {
+      console.error('Error fetching featured products:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div>
@@ -39,7 +81,7 @@ export function Home({ products, onNavigate }: HomeProps) {
       {/* Features */}
       <section className="features-section">
         <div className="container">
-          <div className="grid grid-cols-3 gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
             <div className="feature-item">
               <div className="feature-icon-box">
                 <Star size={32} strokeWidth={2.5} />
@@ -78,15 +120,22 @@ export function Home({ products, onNavigate }: HomeProps) {
           </button>
         </div>
 
-        <div className="grid grid-cols-4 gap-6">
-          {featuredProducts.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              onProductClick={(id) => onNavigate('product', id)}
-            />
-          ))}
-        </div>
+        {loading ? (
+          <div className="flex justify-center py-12">
+            <Loader2 className="animate-spin text-[var(--gold-primary)]" size={48} />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {featuredProducts.map((product) => (
+              <div key={product.id} className="glass-border">
+                <ProductCard
+                  product={product as any}
+                  onProductClick={(id) => onNavigate('product', id)}
+                />
+              </div>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* CTA Section */}
@@ -96,13 +145,13 @@ export function Home({ products, onNavigate }: HomeProps) {
           <p className="cta-text">
             Subscribe to receive exclusive access to limited editions, private sales, and curated recommendations.
           </p>
-          <div className="cta-form">
+          <div className="cta-form flex flex-col md:flex-row gap-4 justify-center items-center">
             <input
               type="email"
               placeholder="Enter your email"
-              className="input-field"
+              className="input-field p-4 rounded w-full md:w-96 text-black"
             />
-            <button className="btn-primary">
+            <button className="btn-primary w-full md:w-auto">
               Subscribe
             </button>
           </div>
