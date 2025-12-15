@@ -1,8 +1,17 @@
 @import "tailwindcss";
 
 @font-face {
+  font-family: 'Qubiko';
+  src: url('./fonts/qubiko/Qubiko-Regular.ttf') format('truetype');
+
   font-family: 'Transcity';
-  src: url('./fonts/Transcity.ttf');
+  src: url('./fonts/transcity/Transcity-Regular.ttf') format('truetype');
+
+  font-family: 'Manbow';
+  src: url('./fonts/manbow/Manbow Clear.otf') format('opentype');
+
+  font-family: 'Dosis';
+  src: url('./fonts/dosis/Dosis-Regular.ttf') format('truetype');
 }
 
 
@@ -20,9 +29,7 @@
 body {
   margin: 0;
   padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: 'Dosis';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--color-white);
@@ -31,7 +38,7 @@ body {
 
 h1 {
   font-size: 3rem;
-  
+
   font-weight: 700;
   line-height: 1.1;
 }
