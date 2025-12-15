@@ -26,7 +26,7 @@ export function Header({ cartItemCount }: HeaderProps) {
       <div className="container flex items-center justify-between">
         {/* Mobile Menu Button */}
         <button
-          className="md:hidden text-white"
+          className="md:hidden menu-toggle-btn"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
         >
           {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
