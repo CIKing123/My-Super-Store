@@ -1,21 +1,42 @@
-import { ArrowRight, Star, Shield, Truck } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { ProductCard } from '../components/ProductCard';
-
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-  category: string;
-}
+import { supabase } from '../lib/supabase';
+import { ArrowRight, Star, Shield, Truck } from 'lucide-react';
 
 interface HomeProps {
-  products: Product[];
-  onNavigate: (page: string, productId?: number) => void;
+  onNavigate: (page: string, productId?: any) => void;
 }
 
-export function Home({ products, onNavigate }: HomeProps) {
-  const featuredProducts = products.slice(0, 4);
+export function Home({ onNavigate }: HomeProps) {
+  const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchFeatured = async () => {
+      try {
+        const { data } = await supabase
+          .from('products')
+          .select('*, product_images(url), product_categories(categories(name))')
+          .limit(4);
+
+        if (data) {
+          setFeaturedProducts(data.map(p => ({
+            id: p.id,
+            name: p.name,
+            price: p.price,
+            image: p.product_images?.[0]?.url || 'https://via.placeholder.com/500',
+            category: p.product_categories?.[0]?.categories?.name
+          })));
+        }
+      } catch (error) {
+        console.error('Error loading featured products:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFeatured();
+  }, []);
 
   return (
     <div>
@@ -35,6 +56,40 @@ export function Home({ products, onNavigate }: HomeProps) {
           Explore Collection
         </button>
       </section>
+
+      {/* Featured Section */}
+      <div className="section">
+        <div className="flex justify-between items-end mb-12">
+          <div>
+            <h2 className="text-3xl font-serif text-white mb-4">Featured Collection</h2>
+            <p className="text-muted max-w-xl">
+              Curated selection of our most exclusive pieces, designed for the discerning few.
+            </p>
+          </div>
+          <button
+            onClick={() => onNavigate('shop')}
+            className="link-gold"
+          >
+            View All Collection
+          </button>
+        </div>
+
+        <div className="grid grid-cols-4 gap-6">
+          {loading ? (
+            // Simple skeleton loading
+            [1, 2, 3, 4].map(i => <div key={i} className="h-96 bg-white/5 rounded-lg animate-pulse" />)
+          ) : (
+            featuredProducts.map((product) => (
+              <div className='glass-border' key={product.id}>
+                <ProductCard
+                  product={product}
+                  onProductClick={(id) => onNavigate('product', id)}
+                />
+              </div>
+            ))
+          )}
+        </div>
+      </div>
 
       {/* Features */}
       <section className="features-section">
@@ -62,30 +117,6 @@ export function Home({ products, onNavigate }: HomeProps) {
               <p className="feature-desc">Complimentary luxury shipping worldwide</p>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Featured Products */}
-      <section className="section">
-        <div className="section-header">
-          <h2 className="section-title">Featured Collection</h2>
-          <button
-            onClick={() => onNavigate('shop')}
-            className="link-gold"
-          >
-            View All
-            <ArrowRight size={20} strokeWidth={3} />
-          </button>
-        </div>
-
-        <div className="grid grid-cols-4 gap-6">
-          {featuredProducts.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              onProductClick={(id) => onNavigate('product', id)}
-            />
-          ))}
         </div>
       </section>
 

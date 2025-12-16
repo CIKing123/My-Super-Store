@@ -1,29 +1,82 @@
-import { useState } from 'react';
-import { ChevronDown, SlidersHorizontal } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { ChevronDown, SlidersHorizontal, Loader2 } from 'lucide-react';
 import { ProductCard } from '../components/ProductCard';
+import { supabase } from '../lib/supabase';
 
 interface Product {
-  id: number;
+  id: any;
   name: string;
   price: number;
-  image: string;
-  category: string;
+  image: string; // Will map from product_images table if needed, or url
+  category: string; // Mapped from category logic or table
+  description?: string;
 }
 
 interface ShopProps {
-  products: Product[];
-  onNavigate: (page: string, productId?: number) => void;
+  onNavigate: (page: string, productId?: any) => void;
 }
 
-export function Shop({ products, onNavigate }: ShopProps) {
+export function Shop({ onNavigate }: ShopProps) {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [sortBy, setSortBy] = useState<string>('featured');
 
   const categories = ['All', 'Cosmetics', 'Construction', 'Furniture', 'Clothing and Fashion', 'Events Tools', 'Electrical Appliances'];
 
-  const filteredProducts = selectedCategory === 'All'
-    ? products
-    : products.filter(p => p.category === selectedCategory);
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      // Fetch products with their images and categories
+      const { data, error } = await supabase
+        .from('products')
+        .select(`
+          *,
+          product_images ( url ),
+          product_categories (
+            categories ( name )
+          )
+        `);
+
+      if (error) throw error;
+
+      // Transform data to match component needs
+      const transformedProducts = data?.map((p: any) => ({
+        id: p.id,
+        name: p.name,
+        price: p.price,
+        image: p.product_images?.[0]?.url || 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&q=80', // Fallback
+        category: p.product_categories?.[0]?.categories?.name || 'Uncategorized',
+        description: p.description
+      })) || [];
+
+      setProducts(transformedProducts);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredProducts = products
+    .filter(p => selectedCategory === 'All' || p.category === selectedCategory)
+    .sort((a, b) => {
+      if (sortBy === 'price-low') return a.price - b.price;
+      if (sortBy === 'price-high') return b.price - a.price;
+      return 0; // 'featured' or 'newest' (assuming default order is fine for now)
+    });
+
+  if (loading) {
+    return (
+      <div className="section flex items-center justify-center min-h-[50vh]">
+        <Loader2 className="animate-spin text-[var(--gold-primary)]" size={48} />
+      </div>
+    );
+  }
 
   return (
     <div className="section">
@@ -79,9 +132,8 @@ export function Shop({ products, onNavigate }: ShopProps) {
       {/* Products Grid */}
       <div className="grid grid-cols-4 gap-6">
         {filteredProducts.map((product) => (
-          <div className='glass-border'>
+          <div className='glass-border' key={product.id}>
             <ProductCard
-              key={product.id}
               product={product}
               onProductClick={(id) => onNavigate('product', id)}
             />

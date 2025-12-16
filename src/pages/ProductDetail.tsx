@@ -1,30 +1,71 @@
-import { useState } from 'react';
-import { Heart, Truck, Shield, RotateCcw, Star, Minus, Plus } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { Heart, Truck, Shield, RotateCcw, Star, Minus, Plus, Loader2 } from 'lucide-react';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
+import { supabase } from '../lib/supabase';
+import { useCart } from '../context/CartContext';
 
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-  category: string;
-  description?: string;
-}
-
-interface ProductDetailProps {
-  product: Product;
-  onAddToCart: (productId: number, quantity: number) => void;
-}
-
-export function ProductDetail({ product, onAddToCart }: ProductDetailProps) {
+export function ProductDetail() {
+  const { id } = useParams<{ id: string }>();
+  const { addToCart } = useCart();
+  const [product, setProduct] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState('One Size');
 
   const sizes = ['Small', 'Medium', 'Large', 'One Size'];
 
-  const handleAddToCart = () => {
-    onAddToCart(product.id, quantity);
+  useEffect(() => {
+    if (id) fetchProduct();
+  }, [id]);
+
+  const fetchProduct = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('products')
+        .select(`
+          *,
+          product_images ( url, alt_text ),
+          product_categories (
+            categories ( name )
+          )
+        `)
+        .eq('id', id)
+        .single();
+
+      if (error) throw error;
+
+      setProduct({
+        ...data,
+        image: data.product_images?.[0]?.url,
+        category: data.product_categories?.[0]?.categories?.name || 'Uncategorized'
+      });
+    } catch (error) {
+      console.error('Error fetching product:', error);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const handleAddToCart = async () => {
+    if (product) {
+      await addToCart(product, quantity);
+      alert('Product added to cart');
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="section flex items-center justify-center min-h-[50vh]">
+        <Loader2 className="animate-spin text-[var(--gold-primary)]" size={48} />
+      </div>
+    );
+  }
+
+  if (!product) {
+    return <div className="section text-center text-white">Product not found</div>;
+  }
 
   return (
     <div className="section">
@@ -33,21 +74,27 @@ export function ProductDetail({ product, onAddToCart }: ProductDetailProps) {
         <div>
           <div className="gallery-main">
             <ImageWithFallback
-              src={product.image}
+              src={product.image || 'https://via.placeholder.com/800'}
               alt={product.name}
               className="product-image"
             />
           </div>
           <div className="gallery-thumbnails">
-            {[1, 2, 3, 4].map((i) => (
+            {product.product_images?.map((img: any, i: number) => (
               <div key={i} className="gallery-thumb">
                 <ImageWithFallback
-                  src={product.image}
-                  alt={`${product.name} view ${i}`}
+                  src={img.url}
+                  alt={img.alt_text || product.name}
                   className="product-image"
                 />
               </div>
-            ))}
+            )) || (
+                [1, 2, 3].map(i => (
+                  <div key={i} className="gallery-thumb">
+                    <div className="w-full h-full bg-gray-200" />
+                  </div>
+                ))
+              )}
           </div>
         </div>
 
@@ -86,7 +133,7 @@ export function ProductDetail({ product, onAddToCart }: ProductDetailProps) {
 
           {/* Price */}
           <span className="detail-price">
-            ${product.price.toLocaleString()}
+            ${product.price?.toLocaleString()}
           </span>
 
           {/* Description */}
