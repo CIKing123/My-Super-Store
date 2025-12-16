@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ProductCard } from '../components/ProductCard';
 import TypingText from '../components/TypingText';
-import ParticlesBackground from '../components/ParticlesBackground';
+import LottieParticles from '../components/LottieParticles';
 import Reveal from '../components/Reveal';
 import { supabase } from '../lib/supabase';
 import { Star, Shield, Truck } from 'lucide-react';
@@ -46,7 +46,7 @@ export function Home({ onNavigate }: HomeProps) {
     <div>
       {/* Hero Section */}
       <section className="hero-section">
-        <ParticlesBackground />
+        <LottieParticles />
         <h1 className="hero-title">
           <TypingText texts={["Redefine Luxury.", "Embrace Excellence.", "Collect the Exceptional."]} />
         </h1>
