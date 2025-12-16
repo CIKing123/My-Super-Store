@@ -33,6 +33,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--color-white);
+
   color: var(--color-black);
 }
 
@@ -70,3 +71,4 @@ button {
   font-size: 1rem;
   font-weight: 600;
 }
+

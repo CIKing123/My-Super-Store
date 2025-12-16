@@ -9,6 +9,7 @@ import { Checkout } from './pages/Checkout';
 import { OrderConfirmation } from './pages/OrderConfirmation';
 import { Login } from './pages/Login';
 import { Account } from './pages/Account';
+import { About } from './pages/About';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider, useCart } from './context/CartContext';
 
@@ -45,6 +46,7 @@ export default function App() {
               <Route path="/order-confirmation" element={<OrderConfirmation />} />
               <Route path="/login" element={<Login />} />
               <Route path="/account" element={<Account />} />
+              <Route path="/about" element={<About />} />
               <Route path="*" element={<Home onNavigate={handleNavigate} />} />
             </Routes>
           </main>
