@@ -5,6 +5,7 @@ import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 import { supabase } from '../lib/supabase';
 import { useCart } from '../context/CartContext';
 
+<<<<<<< HEAD
 interface Product {
   id: any;
   name: string;
@@ -19,6 +20,12 @@ export function ProductDetail() {
   const { addToCart } = useCart();
 
   const [product, setProduct] = useState<Product | null>(null);
+=======
+export function ProductDetail() {
+  const { id } = useParams<{ id: string }>();
+  const { addToCart } = useCart();
+  const [product, setProduct] = useState<any>(null);
+>>>>>>> f995c4147209a2d4e3b058401cbf6907ab8e3ad2
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState('One Size');
@@ -26,6 +33,7 @@ export function ProductDetail() {
   const sizes = ['Small', 'Medium', 'Large', 'One Size'];
 
   useEffect(() => {
+<<<<<<< HEAD
     if (id) fetchProduct(id);
   }, [id]);
 
@@ -42,10 +50,29 @@ export function ProductDetail() {
                 product_images ( url )
             `)
         .eq('id', productId)
+=======
+    if (id) fetchProduct();
+  }, [id]);
+
+  const fetchProduct = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('products')
+        .select(`
+          *,
+          product_images ( url, alt_text ),
+          product_categories (
+            categories ( name )
+          )
+        `)
+        .eq('id', id)
+>>>>>>> f995c4147209a2d4e3b058401cbf6907ab8e3ad2
         .single();
 
       if (error) throw error;
 
+<<<<<<< HEAD
       if (data) {
         const cats = data.product_categories?.map((pc: any) => pc.categories?.name) || [];
 
@@ -60,32 +87,56 @@ export function ProductDetail() {
       }
     } catch (err) {
       console.error('Error fetching product:', err);
+=======
+      setProduct({
+        ...data,
+        image: data.product_images?.[0]?.url,
+        category: data.product_categories?.[0]?.categories?.name || 'Uncategorized'
+      });
+    } catch (error) {
+      console.error('Error fetching product:', error);
+>>>>>>> f995c4147209a2d4e3b058401cbf6907ab8e3ad2
     } finally {
       setLoading(false);
     }
   };
 
+<<<<<<< HEAD
   const handleAddToCart = () => {
     if (product) {
       addToCart(product, quantity);
       alert('Added to cart!'); // Ideally replace with a toast
+=======
+  const handleAddToCart = async () => {
+    if (product) {
+      await addToCart(product, quantity);
+      alert('Product added to cart');
+>>>>>>> f995c4147209a2d4e3b058401cbf6907ab8e3ad2
     }
   };
 
   if (loading) {
     return (
+<<<<<<< HEAD
       <div className="section min-h-[50vh] flex items-center justify-center">
+=======
+      <div className="section flex items-center justify-center min-h-[50vh]">
+>>>>>>> f995c4147209a2d4e3b058401cbf6907ab8e3ad2
         <Loader2 className="animate-spin text-[var(--gold-primary)]" size={48} />
       </div>
     );
   }
 
   if (!product) {
+<<<<<<< HEAD
     return (
       <div className="section min-h-[50vh] flex items-center justify-center">
         <h2 className="text-white">Product not found</h2>
       </div>
     );
+=======
+    return <div className="section text-center text-white">Product not found</div>;
+>>>>>>> f995c4147209a2d4e3b058401cbf6907ab8e3ad2
   }
 
   return (
@@ -95,21 +146,27 @@ export function ProductDetail() {
         <div>
           <div className="gallery-main">
             <ImageWithFallback
-              src={product.image}
+              src={product.image || 'https://via.placeholder.com/800'}
               alt={product.name}
               className="product-image"
             />
           </div>
           <div className="gallery-thumbnails">
-            {[1, 2, 3, 4].map((i) => (
+            {product.product_images?.map((img: any, i: number) => (
               <div key={i} className="gallery-thumb">
                 <ImageWithFallback
-                  src={product.image}
-                  alt={`${product.name} view ${i}`}
+                  src={img.url}
+                  alt={img.alt_text || product.name}
                   className="product-image"
                 />
               </div>
-            ))}
+            )) || (
+                [1, 2, 3].map(i => (
+                  <div key={i} className="gallery-thumb">
+                    <div className="w-full h-full bg-gray-200" />
+                  </div>
+                ))
+              )}
           </div>
         </div>
 
@@ -148,7 +205,11 @@ export function ProductDetail() {
 
           {/* Price */}
           <span className="detail-price">
+<<<<<<< HEAD
             ${product.price ? product.price.toLocaleString() : '0'}
+=======
+            ${product.price?.toLocaleString()}
+>>>>>>> f995c4147209a2d4e3b058401cbf6907ab8e3ad2
           </span>
 
           {/* Description */}

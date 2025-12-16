@@ -4,9 +4,10 @@ import { ProductCard } from '../components/ProductCard';
 import { supabase } from '../lib/supabase';
 
 interface Product {
-  id: number;
+  id: any;
   name: string;
   price: number;
+<<<<<<< HEAD
   image: string; // We'll map product_images[0].url to this
   category: string;
 }
@@ -17,6 +18,15 @@ interface ShopProps {
   // App.tsx passes it, so we keep it.
   onNavigate: (page: string, productId?: number) => void;
   products?: any[]; // Legacy prop, ignored
+=======
+  image: string; // Will map from product_images table if needed, or url
+  category: string; // Mapped from category logic or table
+  description?: string;
+}
+
+interface ShopProps {
+  onNavigate: (page: string, productId?: any) => void;
+>>>>>>> f995c4147209a2d4e3b058401cbf6907ab8e3ad2
 }
 
 export function Shop({ onNavigate }: ShopProps) {
@@ -29,6 +39,7 @@ export function Shop({ onNavigate }: ShopProps) {
 
   useEffect(() => {
     fetchProducts();
+<<<<<<< HEAD
   }, [selectedCategory, sortBy]);
 
   const fetchProducts = async () => {
@@ -41,12 +52,25 @@ export function Shop({ onNavigate }: ShopProps) {
           name,
           price,
           description,
+=======
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      // Fetch products with their images and categories
+      const { data, error } = await supabase
+        .from('products')
+        .select(`
+          *,
+>>>>>>> f995c4147209a2d4e3b058401cbf6907ab8e3ad2
           product_images ( url ),
           product_categories (
             categories ( name )
           )
         `);
 
+<<<<<<< HEAD
       // Filter by category
       if (selectedCategory !== 'All') {
         // This is a bit complex with many-to-many, simplified if products has 'category' column?
@@ -107,10 +131,46 @@ export function Shop({ onNavigate }: ShopProps) {
       setProducts(filtered);
     } catch (err) {
       console.error('Error loading products:', err);
+=======
+      if (error) throw error;
+
+      // Transform data to match component needs
+      const transformedProducts = data?.map((p: any) => ({
+        id: p.id,
+        name: p.name,
+        price: p.price,
+        image: p.product_images?.[0]?.url || 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&q=80', // Fallback
+        category: p.product_categories?.[0]?.categories?.name || 'Uncategorized',
+        description: p.description
+      })) || [];
+
+      setProducts(transformedProducts);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+>>>>>>> f995c4147209a2d4e3b058401cbf6907ab8e3ad2
     } finally {
       setLoading(false);
     }
   };
+<<<<<<< HEAD
+=======
+
+  const filteredProducts = products
+    .filter(p => selectedCategory === 'All' || p.category === selectedCategory)
+    .sort((a, b) => {
+      if (sortBy === 'price-low') return a.price - b.price;
+      if (sortBy === 'price-high') return b.price - a.price;
+      return 0; // 'featured' or 'newest' (assuming default order is fine for now)
+    });
+
+  if (loading) {
+    return (
+      <div className="section flex items-center justify-center min-h-[50vh]">
+        <Loader2 className="animate-spin text-[var(--gold-primary)]" size={48} />
+      </div>
+    );
+  }
+>>>>>>> f995c4147209a2d4e3b058401cbf6907ab8e3ad2
 
   return (
     <div className="section">
@@ -163,6 +223,7 @@ export function Shop({ onNavigate }: ShopProps) {
         </div>
       </div>
 
+<<<<<<< HEAD
       {loading ? (
         <div className="flex justify-center py-20">
           <Loader2 className="animate-spin text-[var(--gold-primary)]" size={48} />
@@ -186,6 +247,19 @@ export function Shop({ onNavigate }: ShopProps) {
           No products found under this category.
         </div>
       )}
+=======
+      {/* Products Grid */}
+      <div className="grid grid-cols-4 gap-6">
+        {filteredProducts.map((product) => (
+          <div className='glass-border' key={product.id}>
+            <ProductCard
+              product={product}
+              onProductClick={(id) => onNavigate('product', id)}
+            />
+          </div>
+        ))}
+      </div>
+>>>>>>> f995c4147209a2d4e3b058401cbf6907ab8e3ad2
 
       {/* Load More */}
       <div style={{ textAlign: 'center', marginTop: '4rem' }}>

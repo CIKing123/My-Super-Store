@@ -12,8 +12,18 @@ import { Account } from './pages/Account';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider, useCart } from './context/CartContext';
 
+<<<<<<< HEAD
 function AppContent() {
   const { cartItems } = useCart();
+=======
+// Header Wrapper to use Cart Context
+const HeaderWrapper = () => {
+  const { itemCount } = useCart();
+  return <Header cartItemCount={itemCount} />;
+};
+
+export default function App() {
+>>>>>>> f995c4147209a2d4e3b058401cbf6907ab8e3ad2
   const navigate = useNavigate();
 
   const handleNavigate = (page: string, productId?: number) => {
@@ -25,11 +35,12 @@ function AppContent() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header
-        cartItemCount={cartItems.reduce((sum, item) => sum + item.quantity, 0)}
-      />
+    <AuthProvider>
+      <CartProvider>
+        <div className="min-h-screen flex flex-col">
+          <HeaderWrapper />
 
+<<<<<<< HEAD
       <main className="flex-grow">
         <Routes>
           <Route path="/" element={<Home products={[]} onNavigate={handleNavigate} />} />
@@ -44,9 +55,26 @@ function AppContent() {
           <Route path="*" element={<Home products={[]} onNavigate={handleNavigate} />} />
         </Routes>
       </main>
+=======
+          <main className="flex-grow">
+            <Routes>
+              <Route path="/" element={<Home onNavigate={handleNavigate} />} />
+              <Route path="/shop" element={<Shop onNavigate={handleNavigate} />} />
+              <Route path="/product/:id" element={<ProductDetail />} />
+              <Route path="/cart" element={<Cart onNavigate={handleNavigate} />} />
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/order-confirmation" element={<OrderConfirmation />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/account" element={<Account />} />
+              <Route path="*" element={<Home onNavigate={handleNavigate} />} />
+            </Routes>
+          </main>
+>>>>>>> f995c4147209a2d4e3b058401cbf6907ab8e3ad2
 
-      <Footer />
-    </div>
+          <Footer />
+        </div>
+      </CartProvider>
+    </AuthProvider>
   );
 }
 

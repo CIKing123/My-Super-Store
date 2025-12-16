@@ -7,12 +7,26 @@ interface CartProps {
 }
 
 export function Cart({ onNavigate }: CartProps) {
+<<<<<<< HEAD
   const { cartItems, updateQuantity, removeItem, loading } = useCart();
 
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+=======
+  const { items, total, removeFromCart, updateQuantity, loading } = useCart();
+
+  const subtotal = total;
+>>>>>>> f995c4147209a2d4e3b058401cbf6907ab8e3ad2
   const shipping = subtotal > 500 ? 0 : 50;
   const tax = subtotal * 0.08;
-  const total = subtotal + shipping + tax;
+  const finalTotal = subtotal + shipping + tax;
+
+  if (loading) {
+    return (
+      <div className="section flex items-center justify-center min-h-[50vh]">
+        <Loader2 className="animate-spin text-[var(--gold-primary)]" size={48} />
+      </div>
+    );
+  }
 
   if (loading && cartItems.length === 0) {
     return (
@@ -26,7 +40,7 @@ export function Cart({ onNavigate }: CartProps) {
     <div className="section">
       <h1 className="page-title mb-12">Shopping Cart</h1>
 
-      {cartItems.length === 0 ? (
+      {items.length === 0 ? (
         <div className="card-black p-24 text-center">
           <h3 className="text-white mb-6">Your cart is empty</h3>
           <p className="text-muted mb-12">Discover our exceptional collection</p>
@@ -42,13 +56,13 @@ export function Cart({ onNavigate }: CartProps) {
         <div className="cart-grid">
           {/* Cart Items */}
           <div className="col-span-2 space-y-6">
-            {cartItems.map((item) => (
+            {items.map((item) => (
               <div key={item.id} className="card-black p-6 flex gap-6">
                 {/* Image */}
                 <div className="cart-thumb">
                   <ImageWithFallback
-                    src={item.image}
-                    alt={item.name}
+                    src={item.products?.product_images?.[0]?.url || 'https://via.placeholder.com/150'}
+                    alt={item.products?.name}
                     className="product-image"
                   />
                 </div>
@@ -57,14 +71,17 @@ export function Cart({ onNavigate }: CartProps) {
                 <div className="cart-details">
                   <div className="flex justify-between items-start">
                     <div>
-                      <p className="text-muted mb-2">{item.category}</p>
-                      <h4 className="text-white mb-2">{item.name}</h4>
+                      <h4 className="text-white mb-2">{item.products?.name}</h4>
                       <div className="text-white font-bold">
-                        ${item.price.toLocaleString()}
+                        ${item.products?.price?.toLocaleString()}
                       </div>
                     </div>
                     <button
+<<<<<<< HEAD
                       onClick={() => removeItem(item.id)}
+=======
+                      onClick={() => removeFromCart(item.id)}
+>>>>>>> f995c4147209a2d4e3b058401cbf6907ab8e3ad2
                       className="text-muted hover:text-white transition-colors bg-transparent border-none cursor-pointer p-0"
                     >
                       <X size={24} strokeWidth={2.5} />
@@ -91,7 +108,7 @@ export function Cart({ onNavigate }: CartProps) {
                       </button>
                     </div>
                     <div className="bg-gradient-to-r from-[#FFE55C] via-[#D4AF37] to-[#B8941F] bg-clip-text text-transparent font-bold">
-                      ${(item.price * item.quantity).toLocaleString()}
+                      ${((item.products?.price || 0) * item.quantity).toLocaleString()}
                     </div>
                   </div>
                 </div>
@@ -121,7 +138,7 @@ export function Cart({ onNavigate }: CartProps) {
                 <div className="summary-total">
                   <span>Total</span>
                   <div className="total-price">
-                    ${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    ${finalTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </div>
                 </div>
               </div>
