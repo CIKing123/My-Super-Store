@@ -5,27 +5,10 @@ import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 import { supabase } from '../lib/supabase';
 import { useCart } from '../context/CartContext';
 
-<<<<<<< HEAD
-interface Product {
-  id: any;
-  name: string;
-  price: number;
-  image: string;
-  category: string;
-  description?: string;
-}
-
-export function ProductDetail() {
-  const { id } = useParams<{ id: string }>();
-  const { addToCart } = useCart();
-
-  const [product, setProduct] = useState<Product | null>(null);
-=======
 export function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const { addToCart } = useCart();
   const [product, setProduct] = useState<any>(null);
->>>>>>> f995c4147209a2d4e3b058401cbf6907ab8e3ad2
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState('One Size');
@@ -33,24 +16,6 @@ export function ProductDetail() {
   const sizes = ['Small', 'Medium', 'Large', 'One Size'];
 
   useEffect(() => {
-<<<<<<< HEAD
-    if (id) fetchProduct(id);
-  }, [id]);
-
-  const fetchProduct = async (productId: string) => {
-    setLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('products')
-        .select(`
-                *,
-                product_categories (
-                    categories ( name )
-                ),
-                product_images ( url )
-            `)
-        .eq('id', productId)
-=======
     if (id) fetchProduct();
   }, [id]);
 
@@ -67,27 +32,10 @@ export function ProductDetail() {
           )
         `)
         .eq('id', id)
->>>>>>> f995c4147209a2d4e3b058401cbf6907ab8e3ad2
         .single();
 
       if (error) throw error;
 
-<<<<<<< HEAD
-      if (data) {
-        const cats = data.product_categories?.map((pc: any) => pc.categories?.name) || [];
-
-        setProduct({
-          id: data.id,
-          name: data.name,
-          price: data.price,
-          description: data.description,
-          image: data.product_images?.[0]?.url || '',
-          category: cats[0] || 'Uncategorized'
-        });
-      }
-    } catch (err) {
-      console.error('Error fetching product:', err);
-=======
       setProduct({
         ...data,
         image: data.product_images?.[0]?.url,
@@ -95,48 +43,28 @@ export function ProductDetail() {
       });
     } catch (error) {
       console.error('Error fetching product:', error);
->>>>>>> f995c4147209a2d4e3b058401cbf6907ab8e3ad2
     } finally {
       setLoading(false);
     }
   };
 
-<<<<<<< HEAD
-  const handleAddToCart = () => {
-    if (product) {
-      addToCart(product, quantity);
-      alert('Added to cart!'); // Ideally replace with a toast
-=======
   const handleAddToCart = async () => {
     if (product) {
       await addToCart(product, quantity);
       alert('Product added to cart');
->>>>>>> f995c4147209a2d4e3b058401cbf6907ab8e3ad2
     }
   };
 
   if (loading) {
     return (
-<<<<<<< HEAD
-      <div className="section min-h-[50vh] flex items-center justify-center">
-=======
       <div className="section flex items-center justify-center min-h-[50vh]">
->>>>>>> f995c4147209a2d4e3b058401cbf6907ab8e3ad2
         <Loader2 className="animate-spin text-[var(--gold-primary)]" size={48} />
       </div>
     );
   }
 
   if (!product) {
-<<<<<<< HEAD
-    return (
-      <div className="section min-h-[50vh] flex items-center justify-center">
-        <h2 className="text-white">Product not found</h2>
-      </div>
-    );
-=======
     return <div className="section text-center text-white">Product not found</div>;
->>>>>>> f995c4147209a2d4e3b058401cbf6907ab8e3ad2
   }
 
   return (
@@ -205,16 +133,12 @@ export function ProductDetail() {
 
           {/* Price */}
           <span className="detail-price">
-<<<<<<< HEAD
-            ${product.price ? product.price.toLocaleString() : '0'}
-=======
             ${product.price?.toLocaleString()}
->>>>>>> f995c4147209a2d4e3b058401cbf6907ab8e3ad2
           </span>
 
           {/* Description */}
           <p className="detail-desc">
-            {product.description || 'An exquisite piece crafted with unparalleled attention to detail.'}
+            {product.description || 'An exquisite piece crafted with unparalleled attention to detail. This luxury item represents the pinnacle of design and quality, perfect for those who appreciate the finer things in life.'}
           </p>
 
           {/* Size Selection */}

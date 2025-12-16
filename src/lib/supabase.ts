@@ -1,17 +1,3 @@
-<<<<<<< HEAD
-import { createClient } from '@supabase/supabase-js'
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseKey = import.meta.env.VITE_SUPABASE_KEY
-
-if (!supabaseUrl || !supabaseKey) {
-    console.error('Supabase URL or Key is missing from environment variables!')
-    console.log('VITE_SUPABASE_URL:', supabaseUrl)
-    console.log('VITE_SUPABASE_KEY:', supabaseKey ? 'Set' : 'Not Set')
-}
-
-export const supabase = createClient(supabaseUrl || '', supabaseKey || '')
-=======
 import { createClient } from '@supabase/supabase-js';
 
 // Credentials provided by user
@@ -23,4 +9,3 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
->>>>>>> f995c4147209a2d4e3b058401cbf6907ab8e3ad2

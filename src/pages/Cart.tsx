@@ -7,15 +7,9 @@ interface CartProps {
 }
 
 export function Cart({ onNavigate }: CartProps) {
-<<<<<<< HEAD
-  const { cartItems, updateQuantity, removeItem, loading } = useCart();
-
-  const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-=======
   const { items, total, removeFromCart, updateQuantity, loading } = useCart();
 
   const subtotal = total;
->>>>>>> f995c4147209a2d4e3b058401cbf6907ab8e3ad2
   const shipping = subtotal > 500 ? 0 : 50;
   const tax = subtotal * 0.08;
   const finalTotal = subtotal + shipping + tax;
@@ -23,14 +17,6 @@ export function Cart({ onNavigate }: CartProps) {
   if (loading) {
     return (
       <div className="section flex items-center justify-center min-h-[50vh]">
-        <Loader2 className="animate-spin text-[var(--gold-primary)]" size={48} />
-      </div>
-    );
-  }
-
-  if (loading && cartItems.length === 0) {
-    return (
-      <div className="section min-h-[50vh] flex items-center justify-center">
         <Loader2 className="animate-spin text-[var(--gold-primary)]" size={48} />
       </div>
     );
@@ -77,11 +63,7 @@ export function Cart({ onNavigate }: CartProps) {
                       </div>
                     </div>
                     <button
-<<<<<<< HEAD
-                      onClick={() => removeItem(item.id)}
-=======
                       onClick={() => removeFromCart(item.id)}
->>>>>>> f995c4147209a2d4e3b058401cbf6907ab8e3ad2
                       className="text-muted hover:text-white transition-colors bg-transparent border-none cursor-pointer p-0"
                     >
                       <X size={24} strokeWidth={2.5} />
@@ -146,7 +128,6 @@ export function Cart({ onNavigate }: CartProps) {
               <button
                 className="btn-primary"
                 style={{ width: '100%', marginBottom: '1rem', padding: '1rem' }}
-                onClick={() => onNavigate('checkout')}
               >
                 Proceed to Checkout
               </button>

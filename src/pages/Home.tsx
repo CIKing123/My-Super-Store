@@ -1,65 +1,4 @@
 import { useEffect, useState } from 'react';
-<<<<<<< HEAD
-import { ArrowRight, Star, Shield, Truck, Loader2 } from 'lucide-react';
-import { ProductCard } from '../components/ProductCard';
-import { supabase } from '../lib/supabase';
-
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-  category: string;
-}
-
-interface HomeProps {
-  products: Product[]; // Legacy, ignored
-  onNavigate: (page: string, productId?: number) => void;
-}
-
-export function Home({ onNavigate }: HomeProps) {
-  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchFeatured();
-  }, []);
-
-  const fetchFeatured = async () => {
-    try {
-      // Fetch 4 featured products (e.g. random or just latest)
-      const { data, error } = await supabase
-        .from('products')
-        .select(`
-                *,
-                product_images ( url ),
-                product_categories (
-                    categories ( name )
-                )
-            `)
-        .limit(4);
-
-      if (error) throw error;
-
-      const formatted = (data || []).map((item: any) => {
-        const cats = item.product_categories?.map((pc: any) => pc.categories?.name) || [];
-        return {
-          id: item.id,
-          name: item.name,
-          price: item.price,
-          image: item.product_images?.[0]?.url || '',
-          category: cats[0] || 'Uncategorized'
-        };
-      });
-
-      setFeaturedProducts(formatted);
-    } catch (err) {
-      console.error('Error fetching featured products:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-=======
 import { ProductCard } from '../components/ProductCard';
 import { supabase } from '../lib/supabase';
 import { ArrowRight, Star, Shield, Truck } from 'lucide-react';
@@ -98,7 +37,6 @@ export function Home({ onNavigate }: HomeProps) {
 
     fetchFeatured();
   }, []);
->>>>>>> f995c4147209a2d4e3b058401cbf6907ab8e3ad2
 
   return (
     <div>
@@ -156,7 +94,7 @@ export function Home({ onNavigate }: HomeProps) {
       {/* Features */}
       <section className="features-section">
         <div className="container">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+          <div className="grid grid-cols-3 gap-12">
             <div className="feature-item">
               <div className="feature-icon-box">
                 <Star size={32} strokeWidth={2.5} />
@@ -182,40 +120,6 @@ export function Home({ onNavigate }: HomeProps) {
         </div>
       </section>
 
-<<<<<<< HEAD
-      {/* Featured Products */}
-      <section className="section">
-        <div className="section-header">
-          <h2 className="section-title">Featured Collection</h2>
-          <button
-            onClick={() => onNavigate('shop')}
-            className="link-gold"
-          >
-            View All
-            <ArrowRight size={20} strokeWidth={3} />
-          </button>
-        </div>
-
-        {loading ? (
-          <div className="flex justify-center py-12">
-            <Loader2 className="animate-spin text-[var(--gold-primary)]" size={48} />
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredProducts.map((product) => (
-              <div key={product.id} className="glass-border">
-                <ProductCard
-                  product={product as any}
-                  onProductClick={(id) => onNavigate('product', id)}
-                />
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
-
-=======
->>>>>>> f995c4147209a2d4e3b058401cbf6907ab8e3ad2
       {/* CTA Section */}
       <section className="cta-section">
         <div className="container">
@@ -223,13 +127,13 @@ export function Home({ onNavigate }: HomeProps) {
           <p className="cta-text">
             Subscribe to receive exclusive access to limited editions, private sales, and curated recommendations.
           </p>
-          <div className="cta-form flex flex-col md:flex-row gap-4 justify-center items-center">
+          <div className="cta-form">
             <input
               type="email"
               placeholder="Enter your email"
-              className="input-field p-4 rounded w-full md:w-96 text-black"
+              className="input-field"
             />
-            <button className="btn-primary w-full md:w-auto">
+            <button className="btn-primary">
               Subscribe
             </button>
           </div>
