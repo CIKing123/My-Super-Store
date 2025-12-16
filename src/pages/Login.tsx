@@ -64,7 +64,7 @@ export function Login() {
     };
 
     return (
-        <div className="section flex items-center justify-center min-h-[70vh]">
+        <div className="page-fade section flex items-center justify-center min-h-[70vh]">
             <div className="card-black max-w-md w-full p-8 border border-[#FFC92E]/20 shadow-[0_0_40px_rgba(255,201,46,0.1)]">
                 <div className="flex border-b border-white/10 mb-8">
                     <button

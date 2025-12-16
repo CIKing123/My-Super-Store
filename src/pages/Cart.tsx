@@ -23,7 +23,7 @@ export function Cart({ onNavigate }: CartProps) {
   }
 
   return (
-    <div className="section">
+    <div className="page-fade section">
       <h1 className="page-title mb-12">Shopping Cart</h1>
 
       {items.length === 0 ? (

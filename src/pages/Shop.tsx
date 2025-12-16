@@ -81,7 +81,7 @@ export function Shop({ onNavigate }: ShopProps) {
   }
 
   return (
-    <div className="section">
+    <div className="page-fade section">
       {/* Page Header */}
       <div className="page-header">
         <h1 className="page-title">Luxury Collection</h1>

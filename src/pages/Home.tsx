@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
 import { ProductCard } from '../components/ProductCard';
+import TypingText from '../components/TypingText';
+import ParticlesBackground from '../components/ParticlesBackground';
+import Reveal from '../components/Reveal';
 import { supabase } from '../lib/supabase';
-import { ArrowRight, Star, Shield, Truck } from 'lucide-react';
+import { Star, Shield, Truck } from 'lucide-react';
 
 interface HomeProps {
   onNavigate: (page: string, productId?: any) => void;
@@ -43,11 +46,11 @@ export function Home({ onNavigate }: HomeProps) {
     <div>
       {/* Hero Section */}
       <section className="hero-section">
+        <ParticlesBackground />
         <h1 className="hero-title">
-          Redefine Luxury.<br />
-          Embrace Excellence.
+          <TypingText texts={["Redefine Luxury.", "Embrace Excellence.", "Collect the Exceptional."]} />
         </h1>
-        <p className="hero-text">
+        <p className="hero-text reveal">
           Discover our curated collection of exceptional pieces that transcend time and trends. Each item is meticulously selected to elevate your lifestyle.
         </p>
         <button
@@ -95,29 +98,31 @@ export function Home({ onNavigate }: HomeProps) {
       {/* Features */}
       <section className="features-section">
         <div className="container">
-          <div className="grid grid-cols-3 gap-12">
-            <div className="feature-item">
-              <div className="feature-icon-box">
-                <Star size={32} strokeWidth={2.5} />
-              </div>
-              <h4 className="feature-title">Premium Quality</h4>
-              <p className="feature-desc">Only the finest materials and craftsmanship</p>
+            <div className="grid grid-cols-3 gap-12">
+              <Reveal className="feature-item">
+                <div className="feature-icon-box">
+                  <Star size={32} strokeWidth={2.5} />
+                </div>
+                <h4 className="feature-title">Premium Quality</h4>
+                <p className="feature-desc">Only the finest materials and craftsmanship</p>
+              </Reveal>
+
+              <Reveal className="feature-item">
+                <div className="feature-icon-box">
+                  <Shield size={32} strokeWidth={2.5} />
+                </div>
+                <h4 className="feature-title">Authenticity Guaranteed</h4>
+                <p className="feature-desc">Every piece is verified and certified</p>
+              </Reveal>
+
+              <Reveal className="feature-item">
+                <div className="feature-icon-box">
+                  <Truck size={32} strokeWidth={2.5} />
+                </div>
+                <h4 className="feature-title">White Glove Delivery</h4>
+                <p className="feature-desc">Complimentary luxury shipping worldwide</p>
+              </Reveal>
             </div>
-            <div className="feature-item">
-              <div className="feature-icon-box">
-                <Shield size={32} strokeWidth={2.5} />
-              </div>
-              <h4 className="feature-title">Authenticity Guaranteed</h4>
-              <p className="feature-desc">Every piece is verified and certified</p>
-            </div>
-            <div className="feature-item">
-              <div className="feature-icon-box">
-                <Truck size={32} strokeWidth={2.5} />
-              </div>
-              <h4 className="feature-title">White Glove Delivery</h4>
-              <p className="feature-desc">Complimentary luxury shipping worldwide</p>
-            </div>
-          </div>
         </div>
       </section>
 
