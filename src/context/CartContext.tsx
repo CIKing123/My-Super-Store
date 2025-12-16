@@ -125,10 +125,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
                     quantity,
                     price_at_time: product.price
                 });
+                console.log('Item added to cart_items table in Supabase');
                 await fetchCart();
             }
         } catch (error) {
             console.error('Error adding to cart:', error);
+            alert('Error adding to cart');
         }
     };
 

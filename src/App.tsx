@@ -13,6 +13,8 @@ import { About } from './pages/About';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider, useCart } from './context/CartContext';
 
+import { GlobalNotifications } from './components/GlobalNotifications';
+
 // Header Wrapper to use Cart Context
 const HeaderWrapper = () => {
   const { itemCount } = useCart();
@@ -33,10 +35,11 @@ export default function App() {
   return (
     <AuthProvider>
       <CartProvider>
+        <GlobalNotifications />
         <div className="min-h-screen flex flex-col">
           <HeaderWrapper />
 
-          <main className="flex-grow">
+          <main className="grow">
             <Routes>
               <Route path="/" element={<Home onNavigate={handleNavigate} />} />
               <Route path="/shop" element={<Shop onNavigate={handleNavigate} />} />
