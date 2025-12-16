@@ -61,7 +61,7 @@ export function Home({ onNavigate }: HomeProps) {
       <div className="section">
         <div className="flex justify-between items-end mb-12">
           <div>
-            <h2 className="text-3xl font-serif text-white mb-4">Featured Collection</h2>
+            <h2 className="text-3xl font-serif text-[#D4AF37] mb-4">Featured Collection</h2>
             <p className="text-muted max-w-xl">
               Curated selection of our most exclusive pieces, designed for the discerning few.
             </p>

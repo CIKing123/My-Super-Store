@@ -74,7 +74,7 @@ export function Header({ cartItemCount }: HeaderProps) {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 w-full bg-black border-t border-white/10 z-50" style={{ boxShadow: '0 8px 24px rgba(0,0,0,0.3)' }}>
+        <div className=" absolute top-full left-0 w-full bg-transparent border-t border-white/10 z-50" style={{ boxShadow: '0 10px 24px rgba(0,0,0,0.3)' }}>
           <nav className="flex flex-col p-6 gap-4">
             {navItems.map((item) => (
               <Link

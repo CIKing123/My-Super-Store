@@ -100,7 +100,7 @@ export function Login() {
                             <label className="block text-gray-400 mb-2 text-sm uppercase tracking-wider font-medium">Email Address</label>
                             <input
                                 type="email"
-                                className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-[#FFC92E]/50 transition-colors"
+                                className="w-full  bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-[#FFC92E]/50 transition-colors"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
@@ -123,11 +123,10 @@ export function Login() {
                             </label>
                             <a href="#" className="text-[#FFC92E] hover:text-[#FFE55C] transition-colors">Forgot Password?</a>
                         </div>
-
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full bg-white text-black font-bold py-3 rounded-lg hover:bg-gray-100 transition-colors"
+                            className="btn-gold"
                         >
                             {loading && <Loader2 className="animate-spin inline mr-2" size={16} />}
                             Sign In
@@ -181,7 +180,7 @@ export function Login() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full bg-white text-black font-bold py-3 rounded-lg hover:bg-gray-100 transition-colors"
+                            className="btn-gold2"
                         >
                             {loading && <Loader2 className="animate-spin inline mr-2" size={16} />}
                             Create Account
@@ -198,6 +197,11 @@ export function Login() {
                         </p>
                     </form>
                 )}
+                <div className="mt-6 flex items-center justify-center gap-2">
+                    <div className="h-px w-12 bg-gradient-to-r from-transparent to-[#FFC92E]/30" />
+                    <span className="text-xs uppercase tracking-widest text-[#FFC92E]/50 font-medium">Or</span>
+                    <div className="h-px w-12 bg-gradient-to-l from-transparent to-[#FFC92E]/30" />
+                </div>
 
                 <div className="mt-8 pt-6 border-t border-white/10">
                     <button
@@ -227,12 +231,7 @@ export function Login() {
                         </svg>
                         <span className="text-gray-300 group-hover:text-white transition-colors">Sign in with Google</span>
                     </button>
-                    {/* Gold text divider */}
-                    <div className="mt-6 flex items-center justify-center gap-2">
-                        <div className="h-px w-12 bg-gradient-to-r from-transparent to-[#FFC92E]/30" />
-                        <span className="text-xs uppercase tracking-widest text-[#FFC92E]/50 font-medium">Or</span>
-                        <div className="h-px w-12 bg-gradient-to-l from-transparent to-[#FFC92E]/30" />
-                    </div>
+
                 </div>
             </div>
         </div>
