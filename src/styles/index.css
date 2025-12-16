@@ -1,5 +1,3 @@
-
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap');
 @import "tailwindcss";
 
@@ -35,7 +33,7 @@
 * {
     box-sizing: border-box;
     margin: 0;
-    
+
 }
 
 body {
@@ -759,7 +757,13 @@ h6 {
 
 .feature-item {
     text-align: center;
-    padding: 1rem;
+    padding: 3rem;
+    margin-left: 2rem;
+    width: 30rem;
+    border: solid var(--gold-dark);
+    border-radius: 1rem;
+    border-width: 0.1rem;
+    border-spacing: 5rem;
 }
 
 .feature-icon-box {
@@ -771,6 +775,7 @@ h6 {
     justify-content: center;
     background: var(--gold-gradient);
     box-shadow: 0 4px 16px rgba(212, 175, 55, 0.4);
+    border: 2px solid var(--gold-gradient);
     border-radius: 50%;
     color: var(--black);
 }
@@ -939,7 +944,7 @@ h6 {
     border-radius: 12px;
     /* sharp edges */
     border: 2px solid rgba(212, 175, 55, 0.8);
-      color: #050505;
+    color: #050505;
     font-weight: 600;
     font-size: 0.875rem;
     cursor: pointer;
@@ -1061,6 +1066,8 @@ h6 {
     gap: 4rem;
     align-items: start;
 }
+
+
 
 @media (max-width: 1024px) {
     .detail-grid {
@@ -1308,26 +1315,22 @@ select:focus-visible {
 
 .btn-gold {
     background-image: linear-gradient(135deg, #5d4300, #8b5e00, #b67f00, #f6dd6a, #b67f00, #8b5e00, #5d4300);
-    min-width: 15vw;
+    width: 55%;
+    display: block;
+    margin: 2rem auto 1rem;
     border-radius: 1.8rem;
     border-width: 1px;
     padding: 0.7rem;
-    margin-top: 2rem;
-    margin-left: 7.5rem;
-    margin-bottom: 0.3rem;
-    margin-right: 7.5rem;
     color: black;
 }
 
 .btn-gold2 {
     background-image: linear-gradient(135deg, #5d4300, #8b5e00, #b67f00, #f6dd6a, #b67f00, #8b5e00, #5d4300);
-    min-width: 25vw;
+    width: 55%;
+    display: block;
+    margin: 1rem auto;
     border-radius: 1.8rem;
     border-width: 1px;
     padding: 0.7rem;
-    margin-top: 2rem;
-    margin-left: 5rem;
-    margin-bottom: 0.3rem;
-    margin-right: 5.0rem;
     color: black;
 }
