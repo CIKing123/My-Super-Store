@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Heart, Truck, Shield, RotateCcw, Star, Minus, Plus, Loader2 } from 'lucide-react';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
+import { LoginPrompt } from '../components/LoginPrompt';
 import { supabase } from '../lib/supabase';
 import { useCart } from '../context/CartContext';
 
@@ -12,6 +13,7 @@ export function ProductDetail() {
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState('One Size');
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
   const sizes = ['Small', 'Medium', 'Large', 'One Size'];
 
@@ -49,6 +51,13 @@ export function ProductDetail() {
   };
 
   const handleAddToCart = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (!session) {
+      setShowLoginPrompt(true);
+      return;
+    }
+
     if (product) {
       await addToCart(product, quantity);
       alert('Product added to cart');
@@ -208,6 +217,7 @@ export function ProductDetail() {
           </div>
         </div>
       </div>
-    </div>
+      <LoginPrompt isOpen={showLoginPrompt} onClose={() => setShowLoginPrompt(false)} />
+    </div >
   );
 }

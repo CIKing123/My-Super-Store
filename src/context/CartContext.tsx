@@ -2,16 +2,24 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from './AuthContext';
 
+interface Product {
+    id: number;
+    name: string;
+    price: number;
+    description: string;
+    product_images?: { url: string }[];
+}
+
 interface CartItem {
     id: string;
-    product_id: string;
+    product_id: number;
     quantity: number;
-    products: any;
+    products: Product;
 }
 
 interface CartContextType {
     items: CartItem[];
-    addToCart: (product: any, quantity?: number) => Promise<void>;
+    addToCart: (product: Product, quantity?: number) => Promise<void>;
     removeFromCart: (itemId: string) => Promise<void>;
     updateQuantity: (itemId: string, quantity: number) => Promise<void>;
     total: number;
@@ -36,30 +44,61 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        if (user) fetchCart();
-        else setItems([]);
+        if (user) {
+            fetchCart();
+        } else {
+            setItems([]);
+            setCartId(null);
+        }
     }, [user]);
+
+    useEffect(() => {
+        if (!cartId) return;
+
+        const channel = supabase
+            .channel('cart_subscription')
+            .on(
+                'postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'cart_items',
+                    filter: `cart_id=eq.${cartId}`
+                },
+                () => {
+                    fetchCart();
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [cartId]);
 
     const fetchCart = async () => {
         if (!user) return;
         setLoading(true);
         try {
             // Get or create cart
-            let { data: cart } = await supabase.from('carts').select('id').eq('user_id', user.id).single();
+            let currentCartId: string;
+            const { data: cart } = await supabase.from('carts').select('id').eq('user_id', user.id).single();
 
-            if (!cart) {
+            if (cart) {
+                currentCartId = cart.id;
+            } else {
                 const { data: newCart, error } = await supabase.from('carts').insert({ user_id: user.id }).select().single();
                 if (error || !newCart) throw error;
-                cart = newCart;
+                currentCartId = newCart.id;
             }
 
-            setCartId(cart.id);
+            setCartId(currentCartId);
 
             // Fetch items
             const { data: cartItems } = await supabase
                 .from('cart_items')
                 .select(`*, products ( id, name, price, description, product_images ( url ) )`)
-                .eq('cart_id', cart.id);
+                .eq('cart_id', currentCartId);
 
             setItems(cartItems || []);
         } catch (error) {
@@ -69,7 +108,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
-    const addToCart = async (product: any, quantity = 1) => {
+    const addToCart = async (product: Product, quantity = 1) => {
         if (!user || !cartId) {
             alert('Please login to add to cart');
             return;

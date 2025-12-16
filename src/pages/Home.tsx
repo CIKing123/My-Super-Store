@@ -24,7 +24,8 @@ export function Home({ onNavigate }: HomeProps) {
             id: p.id,
             name: p.name,
             price: p.price,
-            image: p.product_images?.[0]?.url || 'https://via.placeholder.com/500',
+            image: undefined,
+            product_images: p.product_images,
             category: p.product_categories?.[0]?.categories?.name
           })));
         }

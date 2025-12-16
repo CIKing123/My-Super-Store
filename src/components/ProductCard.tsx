@@ -5,7 +5,8 @@ interface Product {
   id: number;
   name: string;
   price: number;
-  image: string;
+  image?: string;
+  product_images?: { url: string }[];
   category: string;
 }
 
@@ -16,6 +17,8 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, onProductClick, variant = 'default' }: ProductCardProps) {
+  const displayImage = product.product_images?.[0]?.url || product.image || 'https://via.placeholder.com/500';
+
   return (
     <div
       onClick={() => onProductClick(product.id)}
@@ -24,7 +27,7 @@ export function ProductCard({ product, onProductClick, variant = 'default' }: Pr
       {/* Image Container */}
       <div className="product-image-container">
         <ImageWithFallback
-          src={product.image}
+          src={displayImage}
           alt={product.name}
           className="product-image"
         />

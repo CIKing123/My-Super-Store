@@ -7,7 +7,8 @@ interface Product {
   id: any;
   name: string;
   price: number;
-  image: string; // Will map from product_images table if needed, or url
+  image?: string;
+  product_images?: { url: string }[];
   category: string; // Mapped from category logic or table
   description?: string;
 }
@@ -49,7 +50,8 @@ export function Shop({ onNavigate }: ShopProps) {
         id: p.id,
         name: p.name,
         price: p.price,
-        image: p.product_images?.[0]?.url || 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800&q=80', // Fallback
+        image: undefined,
+        product_images: p.product_images,
         category: p.product_categories?.[0]?.categories?.name || 'Uncategorized',
         description: p.description
       })) || [];

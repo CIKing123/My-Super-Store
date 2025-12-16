@@ -11,6 +11,7 @@ export function Account() {
     const [orders, setOrders] = useState<any[]>([]);
     const [profile, setProfile] = useState<any>(null);
     const [loading, setLoading] = useState(false);
+    //bool isProfileShowing = false;
 
     useEffect(() => {
         if (!authLoading && !user) navigate('/login');
@@ -144,8 +145,8 @@ export function Account() {
                                             <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-[#FFC92E] to-[#DE9D0D]"></div>
                                         )}
                                         <div className={`relative z-10 p-2 rounded-lg transition-all duration-300 ${activeSection === item.id
-                                                ? 'bg-gradient-to-br from-[#FFC92E] to-[#DE9D0D] text-black shadow-[0_0_15px_rgba(255,201,46,0.3)]'
-                                                : 'bg-white/5 text-gray-400 group-hover:text-[#FFC92E] group-hover:bg-[#FFC92E]/10'
+                                            ? 'bg-gradient-to-br from-[#FFC92E] to-[#DE9D0D] text-black shadow-[0_0_15px_rgba(255,201,46,0.3)]'
+                                            : 'bg-white/5 text-gray-400 group-hover:text-[#FFC92E] group-hover:bg-[#FFC92E]/10'
                                             }`}>
                                             <item.icon size={18} strokeWidth={activeSection === item.id ? 2.5 : 2} />
                                         </div>
@@ -160,8 +161,8 @@ export function Account() {
                                         <ChevronRight
                                             size={16}
                                             className={`relative z-10 transition-all duration-300 ${activeSection === item.id
-                                                    ? 'text-[#FFC92E] translate-x-0'
-                                                    : 'text-gray-600 -translate-x-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-0'
+                                                ? 'text-[#FFC92E] translate-x-0'
+                                                : 'text-gray-600 -translate-x-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-0'
                                                 }`}
                                         />
                                     </button>
