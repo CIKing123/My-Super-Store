@@ -60,7 +60,7 @@ export function Header({ cartItemCount }: HeaderProps) {
           </Link>
 
           {/* Desktop Nav Links - Between Logo and Icons */}
-          <nav className=" md:flex gap-6 lg:gap-8 md:ml-6 lg:ml-12">
+          <nav style={{ display: window.innerWidth >= 768 ? 'flex' : 'none', gap: '24px', marginLeft: '48px' }} className="items-center">
             {navItems.map((item) => (
               <Link
                 key={item.name}
