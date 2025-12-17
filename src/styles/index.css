@@ -759,13 +759,27 @@ h6 {
 .typing-text {
     white-space: nowrap;
     display: inline-block;
+    background: linear-gradient(135deg, #D4AF37 0%, #FFD700 50%, #B8860B 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5)) drop-shadow(0 0 16px rgba(255, 215, 0, 0.3));
+    font-weight: 700;
+    letter-spacing: 0.5px;
+   
+    border-bottom: 2px solid #D4AF37;
+    padding-bottom: 4px;
 }
 
 .typing-caret {
     margin-left: 6px;
-    color: var(--gold-solid);
+    background: linear-gradient(135deg, #D4AF37 0%, #FFD700 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
     opacity: 0.95;
     animation: blink 1s steps(2, start) infinite;
+    filter: drop-shadow(0 0 4px rgba(212, 175, 55, 0.7));
 }
 
 @keyframes blink {

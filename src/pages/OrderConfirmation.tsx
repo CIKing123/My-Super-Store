@@ -1,9 +1,11 @@
 import { CheckCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import LottieParticles from '../components/LottieParticles';
 
 export function OrderConfirmation() {
     return (
-        <div className="section flex items-center justify-center min-h-[60vh]">
+        <div className="section flex items-center justify-center min-h-[60vh] relative">
+            <LottieParticles />
             <div className="card-black max-w-2xl w-full text-center p-16">
                 <div className="flex justify-center mb-8">
                     <CheckCircle size={80} className="text-[var(--gold-primary)]" strokeWidth={1} />

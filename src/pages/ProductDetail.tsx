@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { Heart, Truck, Shield, RotateCcw, Star, Minus, Plus, Loader2 } from 'lucide-react';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 import { LoginPrompt } from '../components/LoginPrompt';
+import LottieParticles from '../components/LottieParticles';
 import { supabase } from '../lib/supabase';
 import { useCart } from '../context/CartContext';
 
@@ -77,8 +78,9 @@ export function ProductDetail() {
   }
 
   return (
-    <div className="section">
-      <div className="detail-grid">
+    <div className="section relative">
+      <LottieParticles />
+      <div className="detail-grid relative z-10">
         {/* Product Images - Left Column on White */}
         <div>
           <div className="gallery-main">
