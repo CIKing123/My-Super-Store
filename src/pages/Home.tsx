@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ProductCard } from '../components/ProductCard';
+import { ProductCarousel } from '../components/ProductCarousel';
 import TypingText from '../components/TypingText';
 import LottieParticles from '../components/LottieParticles';
 import Reveal from '../components/Reveal';
@@ -61,7 +62,7 @@ export function Home({ onNavigate }: HomeProps) {
         </button>
       </section>
 
-      {/* Featured Section */}
+      {/* Featured Section with Carousel */}
       <div className="section">
         <div className="flex justify-between items-end mb-12">
           <div>
@@ -78,21 +79,16 @@ export function Home({ onNavigate }: HomeProps) {
           </button>
         </div>
 
-        <div className="grid grid-cols-4 gap-6">
-          {loading ? (
-            // Simple skeleton loading
-            [1, 2, 3, 4].map(i => <div key={i} className="h-96 bg-white/5 rounded-lg animate-pulse" />)
-          ) : (
-            featuredProducts.map((product) => (
-              <div className='glass-border' key={product.id}>
-                <ProductCard
-                  product={product}
-                  onProductClick={(id) => onNavigate('product', id)}
-                />
-              </div>
-            ))
-          )}
-        </div>
+        {loading ? (
+          <div className="flex items-center justify-center min-h-[600px]">
+            <div className="text-center text-muted">Loading Products...</div>
+          </div>
+        ) : (
+          <ProductCarousel
+            products={featuredProducts}
+            onProductClick={(id) => onNavigate('product', id)}
+          />
+        )}
       </div>
 
       {/* Features */}

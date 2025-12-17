@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { CreditCard, LogOut, ChevronRight, ShoppingBag, Loader2, Sparkles, Crown, Star } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
+import { getAvatarUrl } from '../lib/avatarUtils';
 import { useNavigate } from 'react-router-dom';
 
 export function Account() {
@@ -10,8 +11,8 @@ export function Account() {
     const [activeSection, setActiveSection] = useState('orders');
     const [orders, setOrders] = useState<any[]>([]);
     const [profile, setProfile] = useState<any>(null);
+    const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
-    //bool isProfileShowing = false;
 
     useEffect(() => {
         if (!authLoading && !user) navigate('/login');
@@ -23,6 +24,12 @@ export function Account() {
         try {
             const { data: profileData } = await supabase.from('user_profiles').select('*').eq('user_id', user!.id).single();
             setProfile(profileData);
+
+            // Load avatar URL
+            if (profileData?.avatar_url || user?.user_metadata?.avatar_url) {
+                const url = await getAvatarUrl(profileData?.avatar_url || user?.user_metadata?.avatar_url);
+                setAvatarUrl(url);
+            }
 
             const { data: ordersData } = await supabase.from('orders').select(`*, order_items ( *, products ( name, product_images ( url ) ) )`).eq('user_id', user!.id).order('placed_at', { ascending: false });
             setOrders(ordersData || []);
@@ -105,8 +112,8 @@ export function Account() {
                                         <div className="absolute inset-0 bg-gradient-to-r from-[#FEFDFE] via-[#FFC92E] to-[#DE9D0D] rounded-full blur opacity-40 group-hover:opacity-60 transition-opacity duration-500"></div>
                                         <div className="relative w-24 h-24 rounded-full p-[2px] bg-gradient-to-r from-[#FEFDFE] via-[#FFC92E] to-[#DE9D0D]">
                                             <div className="w-full h-full rounded-full bg-[#0B0B0B] flex items-center justify-center overflow-hidden">
-                                                {profile?.avatar_url || user?.user_metadata?.avatar_url ? (
-                                                    <img src={profile?.avatar_url || user?.user_metadata?.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+                                                {avatarUrl ? (
+                                                    <img src={avatarUrl} alt="Profile" className="w-full h-full object-cover" />
                                                 ) : (
                                                     <span className="text-3xl font-bold bg-gradient-to-r from-[#FFC92E] to-[#DE9D0D] bg-clip-text text-transparent">
                                                         {(profile?.display_name?.[0] || user?.email?.[0] || 'U').toUpperCase()}
