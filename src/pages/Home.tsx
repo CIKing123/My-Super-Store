@@ -46,7 +46,7 @@ export function Home({ onNavigate }: HomeProps) {
     <div>
       {/* Hero Section */}
       <section className="hero-section">
-        <LottieParticles />
+        <LottieParticles  />
         <h1 className="hero-title">
           <TypingText texts={["Redefine Luxury.", "Embrace Excellence.", "Collect the Exceptional."]} />
         </h1>
