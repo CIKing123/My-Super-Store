@@ -37,7 +37,7 @@ export function Header({ cartItemCount }: HeaderProps) {
   // Header styling based on page
   const headerClass = isAccountPage
     ? 'sticky top-0 z-50 w-full bg-[#0A0A0A] border-b border-white/10'
-    : 'sticky top-0 z-50 w-full bg-white/90 backdrop-blur-md border-b border-[#f0f0f0]';
+    : 'sticky top-0 z-50 w-full bg-white/30 backdrop-blur-md border-b border-[#f0f0f0]';
 
   const textColorClass = isAccountPage ? 'text-white' : 'text-slate-900';
   const textMutedClass = isAccountPage ? 'text-white/60' : 'text-slate-900/70';
@@ -48,7 +48,7 @@ export function Header({ cartItemCount }: HeaderProps) {
   return (
     <header className={headerClass}>
       <div className="flex justify-center w-full">
-        <div className="flex w-full max-w-[1280px] items-center px-4 sm:px-6 md:px-8 lg:px-10 py-5 gap-4 sm:gap-6 md:gap-8">
+        <div className="flex justify-between w-full max-w-[1280px] items-center px-4 sm:px-6 md:px-8 lg:px-10 py-5 gap-4 sm:gap-6 md:gap-8">
           {/* Logo Area - Left */}
           <Link to="/" className="flex items-center gap-2 cursor-pointer no-underline flex-shrink-0">
             <div className={`flex items-center justify-center size-8 rounded-full transition-colors ${
