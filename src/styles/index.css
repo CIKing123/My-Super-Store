@@ -344,16 +344,7 @@ h6 {
     display: inline-block;
 }
 
-/* Responsive Display */
-@media (min-width: 768px) {
-    .md\\:flex {
-        display: flex;
-    }
 
-    .md\\:hidden {
-        display: none;
-    }
-}
 
 @media (min-width: 1024px) {
     .lg\\:col-span-2 {
@@ -757,7 +748,7 @@ h6 {
 
 /* Typing text animation */
 .typing-text {
-    white-space: nowrap;
+    white-space: pre-wrap;
     display: inline-block;
     background: linear-gradient(135deg, #D4AF37 0%, #FFD700 50%, #B8860B 100%);
     -webkit-background-clip: text;

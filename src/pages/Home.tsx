@@ -5,7 +5,7 @@ import TypingText from '../components/TypingText';
 import LottieParticles from '../components/LottieParticles';
 import Reveal from '../components/Reveal';
 import { supabase } from '../lib/supabase';
-import { Star, Shield, Truck } from 'lucide-react';
+import { Star, Shield, Truck, Search, User, ShoppingBag, ChevronRight, Gem } from 'lucide-react';
 
 interface HomeProps {
   onNavigate: (page: string, productId?: any) => void;
@@ -21,7 +21,7 @@ export function Home({ onNavigate }: HomeProps) {
         const { data } = await supabase
           .from('products')
           .select('*, product_images(url), product_categories(categories(name))')
-          .limit(4);
+          .limit(8);
 
         if (data) {
           setFeaturedProducts(data.map(p => ({
@@ -45,24 +45,114 @@ export function Home({ onNavigate }: HomeProps) {
 
   return (
     <div>
-      {/* Hero Section */}
-      <section className="hero-section">
-        <LottieParticles  />
-        <h1 className="hero-title">
-          <TypingText texts={["Redefine Luxury.", "Embrace Excellence.", "Collect the Exceptional."]} />
-        </h1>
-        <p className="hero-text reveal">
-          Discover our curated collection of exceptional pieces that transcend time and trends. Each item is meticulously selected to elevate your lifestyle.
-        </p>
-        <button
-          onClick={() => onNavigate('shop')}
-          className="btn-primary"
-        >
-          Explore Collection
-        </button>
-      </section>
+      {/* Hero Section - Luxury Design */}
+      <main className="flex-grow flex items-center justify-center w-full py-12 lg:py-20 px-6 lg:px-10">
+        <div className="w-full max-w-[1280px]">
 
-      {/* Featured Section with Carousel */}
+          <div className="flex flex-col-reverse lg:flex-row items-center gap-16 lg:gap-32">
+            {/* Content Column */}
+            <div className="flex flex-col gap-8 flex-1 w-full lg:max-w-[50%]">
+              <div className="flex flex-col gap-4 text-left">
+                {/* Badge */}
+                <div className="flex items-center gap-2">
+                  <span className="h-[1px] w-8 bg-[#d4af37]"></span>
+                  <span className="text-[#d4af37] text-xs font-bold uppercase tracking-widest">Est. 2024</span>
+                </div>
+                
+                {/* Main Title with Typing Animation */}
+                <h1 className="text-slate-900 text-5xl sm:text-6xl lg:text-7xl font-extrabold leading-[1.1] tracking-[-0.02em]">
+                  <TypingText texts={["Collect the Exceptional.", "Embrace Luxury.", "Redefine Excellence."]} />
+                </h1>
+                
+                {/* Description */}
+                <p className="text-slate-600 text-lg sm:text-xl font-medium leading-relaxed max-w-[540px]">
+                  Discover a curated selection of artifacts designed for the few, not the many. Elevate your everyday with unparalleled craftsmanship.
+                </p>
+              </div>
+
+              {/* CTAs */}
+              <div className="flex flex-wrap gap-4 pt-4">
+                {/* Primary CTA with Gold Gradient */}
+                <button
+                  onClick={() => onNavigate('shop')}
+                  className="group relative flex items-center justify-center overflow-hidden rounded-lg h-14 px-8 min-w-[180px] bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#B38728] shadow-lg shadow-[#d4af37]/20 transition-transform active:scale-95 hover:shadow-xl hover:shadow-[#d4af37]/30"
+                >
+                  <span className="relative z-10 text-white text-base font-bold tracking-wide uppercase">Shop Collection</span>
+                  {/* Shine effect overlay */}
+                  <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500 ease-in-out"></div>
+                </button>
+                
+                {/* Secondary CTA */}
+                <button
+                  onClick={() => onNavigate('shop')}
+                  className="flex items-center justify-center rounded-lg h-14 px-8 min-w-[180px] bg-white border border-slate-200 text-slate-900 text-base font-bold tracking-wide uppercase hover:bg-slate-50 hover:border-slate-300 transition-all"
+                >
+                  <span>Explore More</span>
+                </button>
+              </div>
+
+              {/* Trust Indicators */}
+              <div className="flex items-center gap-8 mt-4 pt-8 border-t border-slate-100">
+                <div className="flex flex-col">
+                  <span className="text-2xl font-bold text-slate-900">{featuredProducts.length}+</span>
+                  <span className="text-sm text-slate-500 font-medium">Exclusive Items</span>
+                </div>
+                <div className="w-[1px] h-10 bg-slate-200"></div>
+                <div className="flex flex-col">
+                  <span className="text-2xl font-bold text-slate-900">Global</span>
+                  <span className="text-sm text-slate-500 font-medium">Shipping Available</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Image Column with Featured Product */}
+            <div className="relative w-full lg:flex-1 h-auto aspect-[4/5] lg:aspect-square max-h-[700px]">
+              {/* Main Product Image Container */}
+              <div className="absolute inset-0 rounded-2xl overflow-hidden bg-slate-100 shadow-2xl">
+                {/* Animated Particles Behind */}
+                <div className="absolute inset-0 z-0">
+                  <LottieParticles />
+                </div>
+                
+                {/* Image or Placeholder */}
+                <div className="relative z-10 w-full h-full bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
+                  {featuredProducts.length > 0 && featuredProducts[0].product_images?.length > 0 ? (
+                    <img
+                      alt={featuredProducts[0].name}
+                      className="w-full h-full object-cover transform transition-transform duration-700 hover:scale-105"
+                      src={featuredProducts[0].product_images[0].url}
+                    />
+                  ) : (
+                    <div className="text-center">
+                      <div className="text-6xl mb-4">✨</div>
+                      <p className="text-slate-400">Premium Collection</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Floating Badge */}
+                <div className="absolute bottom-6 left-6 right-6 p-5 bg-white/95 backdrop-blur-sm rounded-xl shadow-lg border border-white/50 flex items-center justify-between z-20">
+                  <div>
+                    <p className="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Featured Collection</p>
+                    <p className="text-slate-900 font-bold text-lg">{featuredProducts.length > 0 ? featuredProducts[0].name : 'Luxury Items'}</p>
+                  </div>
+                  <button
+                    onClick={() => onNavigate('product', featuredProducts[0]?.id)}
+                    className="size-10 rounded-full bg-black text-white flex items-center justify-center hover:bg-slate-800 transition-colors"
+                  >
+                    <ChevronRight size={20} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Decorative Abstract Shape */}
+              <div className="absolute -z-10 -top-6 -right-6 w-full h-full border border-[#d4af37]/30 rounded-2xl hidden lg:block"></div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      {/* Featured Section */}
       <div className="section">
         <div className="flex justify-between items-end mb-12">
           <div>
@@ -75,7 +165,7 @@ export function Home({ onNavigate }: HomeProps) {
             onClick={() => onNavigate('shop')}
             className="link-gold"
           >
-            View All Collection
+            View All Collection →
           </button>
         </div>
 
@@ -94,31 +184,31 @@ export function Home({ onNavigate }: HomeProps) {
       {/* Features */}
       <section className="features-section">
         <div className="container">
-            <div className="grid grid-cols-3 gap-12">
-              <Reveal className="feature-item">
-                <div className="feature-icon-box">
-                  <Star size={32} strokeWidth={2.5} />
-                </div>
-                <h4 className="feature-title">Premium Quality</h4>
-                <p className="feature-desc">Only the finest materials and craftsmanship</p>
-              </Reveal>
+          <div className="grid grid-cols-3 gap-12">
+            <Reveal className="feature-item">
+              <div className="feature-icon-box">
+                <Star size={32} strokeWidth={2.5} />
+              </div>
+              <h4 className="feature-title">Premium Quality</h4>
+              <p className="feature-desc">Only the finest materials and craftsmanship</p>
+            </Reveal>
 
-              <Reveal className="feature-item">
-                <div className="feature-icon-box">
-                  <Shield size={32} strokeWidth={2.5} />
-                </div>
-                <h4 className="feature-title">Authenticity Guaranteed</h4>
-                <p className="feature-desc">Every piece is verified and certified</p>
-              </Reveal>
+            <Reveal className="feature-item">
+              <div className="feature-icon-box">
+                <Shield size={32} strokeWidth={2.5} />
+              </div>
+              <h4 className="feature-title">Authenticity Guaranteed</h4>
+              <p className="feature-desc">Every piece is verified and certified</p>
+            </Reveal>
 
-              <Reveal className="feature-item">
-                <div className="feature-icon-box">
-                  <Truck size={32} strokeWidth={2.5} />
-                </div>
-                <h4 className="feature-title">White Glove Delivery</h4>
-                <p className="feature-desc">Complimentary luxury shipping worldwide</p>
-              </Reveal>
-            </div>
+            <Reveal className="feature-item">
+              <div className="feature-icon-box">
+                <Truck size={32} strokeWidth={2.5} />
+              </div>
+              <h4 className="feature-title">White Glove Delivery</h4>
+              <p className="feature-desc">Complimentary luxury shipping worldwide</p>
+            </Reveal>
+          </div>
         </div>
       </section>
 

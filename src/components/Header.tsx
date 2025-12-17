@@ -1,5 +1,5 @@
-import { Search, ShoppingCart, User, Menu, X } from 'lucide-react';
-import { Link, useLocation } from 'react-router-dom';
+import { Search, ShoppingCart, User, Menu, X, Gem } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 
@@ -11,6 +11,7 @@ export function Header({ cartItemCount }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [user, setUser] = useState<any>(null); // eslint-disable-line @typescript-eslint/no-explicit-any
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -23,123 +24,108 @@ export function Header({ cartItemCount }: HeaderProps) {
 
     return () => subscription.unsubscribe();
   }, []);
+
   const navItems = [
     { name: 'Home', path: '/' },
     { name: 'Shop', path: '/shop' },
-    { name: 'Collections', path: '/collections' },
-    { name: 'About', path: '/about' }
+    { name: 'About', path: '/about' },
+    { name: 'Login', path: '/login' }
   ];
 
-  const isActive = (path: string) => {
-    if (path === '/' && location.pathname !== '/') return false;
-    return location.pathname.startsWith(path);
-  };
-
-
   const isAccountPage = location.pathname.startsWith('/account');
-  const headerStyle = isAccountPage ? {
-    background: '#0A0A0A',
-    boxShadow: 'none',
-    color: '#FFFFFF',
-    transition: 'background 0.3s ease, color 0.3s ease'
-  } : {
-    transition: 'background 0.3s ease, color 0.3s ease'
-  };
 
-  const textStyle = isAccountPage ? { color: '#FFFFFF' } : {};
+  // Header styling based on page
+  const headerClass = isAccountPage
+    ? 'sticky top-0 z-50 w-full bg-[#0A0A0A] border-b border-white/10'
+    : 'sticky top-0 z-50 w-full bg-white/90 backdrop-blur-md border-b border-[#f0f0f0]';
 
-  const navWrapperClass = `
-  absolute top-full left-0 w-full z-50
-  transition-all duration-300
-  ${isAccountPage
-      ? 'bg-[#0A0A0A] border-t border-white/10'
-      : 'bg-[rgb(10 9 0 / 60%)] border-t border-white/10'
-    }
-`;
+  const textColorClass = isAccountPage ? 'text-white' : 'text-slate-900';
+  const textMutedClass = isAccountPage ? 'text-white/60' : 'text-slate-900/70';
+  const hoverBgClass = isAccountPage ? 'hover:bg-white/10' : 'hover:bg-slate-100';
+  const linkHoverClass = isAccountPage ? 'hover:text-white' : 'hover:text-black';
+  const menuBgClass = isAccountPage ? 'bg-[#0A0A0A] border-t border-white/10' : 'bg-white/95';
 
   return (
-    <header className="header-bar" style={headerStyle}>
-      <div className="container flex items-center justify-between">
-        {/* Mobile Menu Button */}
-        <button
-          className="md:hidden menu-toggle-btn"
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-        >
-          {isMenuOpen ? <X size={24} color={isAccountPage ? 'white' : 'currentColor'} /> : <Menu size={24} color={isAccountPage ? 'white' : 'currentColor'} />}
-        </button>
+    <header className={headerClass}>
+      <div className="flex justify-center w-full">
+        <div className="flex w-full max-w-[1280px] items-center px-4 sm:px-6 md:px-8 lg:px-10 py-5 gap-4 sm:gap-6 md:gap-8">
+          {/* Logo Area - Left */}
+          <Link to="/" className="flex items-center gap-2 cursor-pointer no-underline flex-shrink-0">
+            <div className={`flex items-center justify-center size-8 rounded-full transition-colors ${
+              isAccountPage ? 'bg-white/10' : 'bg-black'
+            }`}>
+              <Gem size={20} strokeWidth={2} className={isAccountPage ? 'text-white' : 'text-white'} />
+            </div>
+            <h2 className={`${textColorClass} text-lg sm:text-xl font-extrabold tracking-tight transition-colors whitespace-nowrap`}>My Super Store</h2>
+          </Link>
 
-        {/* Logo */}
-        <Link to="/" className="logo-text no-underline flex items-center gap-3" style={textStyle}>
+          {/* Desktop Nav Links - Between Logo and Icons */}
+          <nav className=" md:flex gap-6 lg:gap-8 md:ml-6 lg:ml-12">
+            {navItems.map((item) => (
+              <Link
+                key={item.name}
+                to={item.path}
+                className={`${textMutedClass} ${linkHoverClass} transition-colors text-sm font-semibold tracking-wide no-underline`}
+              >
+                {item.name}
+              </Link>
+            ))}
+          </nav>
 
-          <span>My Super Store</span>
-        </Link>
-
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex gap-12">
-          {navItems.map((item) => (
-            <Link
-              key={item.name}
-              to={item.path}
-              className={`nav-link no-underline ${isActive(item.path) ? 'active' : ''}`}
-              style={textStyle}
+          {/* Icons / Actions - Right */}
+          <div className="flex items-center gap-3 sm:gap-4 md:gap-5 ml-auto">
+            <button 
+              onClick={() => navigate('/shop')}
+              className={` sm:flex items-center justify-center size-10 rounded-full ${hoverBgClass} transition-colors ${textColorClass}`}
             >
-              {item.name}
-            </Link>
-          ))}
-        </nav>
+              <Search size={20} strokeWidth={2} />
+            </button>
+            <button 
+              onClick={() => navigate(user ? '/account' : '/login')}
+              className={`flex items-center justify-center size-10 rounded-full ${hoverBgClass} transition-colors ${textColorClass}`}
+            >
+              <User size={20} strokeWidth={2} />
+            </button>
+            <button 
+              onClick={() => navigate('/cart')}
+              className={`flex items-center justify-center size-10 rounded-full ${hoverBgClass} transition-colors ${textColorClass} relative`}
+            >
+              <ShoppingCart size={20} strokeWidth={2} />
+              {cartItemCount > 0 && (
+                <span className="absolute top-2 right-2 size-2 bg-[#d4af37] rounded-full"></span>
+              )}
+            </button>
+          </div>
 
-        {/* Icons */}
-        <div className="flex items-center gap-6">
-          <Link to="/shop" className="icon-btn" style={textStyle}>
-            <Search size={24} strokeWidth={2.5} />
-          </Link>
-
-          <Link to={user ? "/account" : "/login"} className="icon-btn" style={textStyle}>
-            <User size={24} strokeWidth={2.5} />
-          </Link>
-
-          <Link to="/cart" className="icon-btn relative" style={textStyle}>
-            <ShoppingCart size={24} strokeWidth={2.5} />
-            {cartItemCount > 0 && (
-              <span className="cart-badge">
-                {cartItemCount}
-              </span>
-            )}
-          </Link>
+          {/* Mobile Menu Button - Only on Mobile */}
+          <button
+            className=" md:hidden items-center justify-center ml-2 sm:ml-3"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+          >
+            {isMenuOpen ? 
+              <X size={24} className={textColorClass} /> : 
+              <Menu size={24} className={textColorClass} />
+            }
+          </button>
         </div>
       </div>
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div
-          className={navWrapperClass}
-          style={{
-            background: isAccountPage ? 'rgb(10 9 0 / 60%)' : 'rgb(10 9 0 / 60%)',
-            boxShadow: isAccountPage
-              ? 'none'
-              : '0 10px 24px rgba(0,0,0,0.3)'
-          }}
-        >
-          <nav className="flex flex-col p-6 gap-4">
-            {navItems.map((item) => (
-              <Link
-                key={item.name}
-                to={item.path}
-                onClick={() => setIsMenuOpen(false)}
-                className={`
-          nav-link text-lg py-2 transition-colors
-          text-[var(--gold-primary)]
-          ${isActive(item.path) ? 'font-semibold' : ''}
-        `}
-                style={{
-                  borderBottom: isActive(item.path)
-                    ? '2px solid var(--gold-primary)'
-                    : 'none'
-                }}
-              >
-                {item.name}
-              </Link>
-            ))}
+        <div className={menuBgClass}>
+          <nav className="flex justify-center w-full">
+            <div className="w-full max-w-[1280px] flex flex-col p-6 gap-4 px-6 lg:px-10">
+              {navItems.map((item) => (
+                <Link
+                  key={item.name}
+                  to={item.path}
+                  onClick={() => setIsMenuOpen(false)}
+                  className={`${textColorClass} ${linkHoverClass} text-lg py-2 transition-colors font-semibold no-underline`}
+                >
+                  {item.name}
+                </Link>
+              ))}
+            </div>
           </nav>
         </div>
       )}
