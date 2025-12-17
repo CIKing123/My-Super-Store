@@ -634,9 +634,21 @@ h6 {
 /* Footer Styles */
 .site-footer {
     background: var(--card-black);
-    color: var(--white);
-    margin-top: 8rem;
-    padding: 4rem 1.5rem;
+    color: var(--white); 
+    padding: 4rem ;
+    border-top: 4px solid transparent;
+    border-image: linear-gradient(
+        90deg,
+        #5d4300 0%,
+        #8b5e00 15%,
+        #b8941f 30%,
+        #f6dd6a 45%,
+        #ffffff 50%,
+        #f6dd6a 55%,
+        #b8941f 70%,
+        #8b5e00 85%,
+        #5d4300 100%
+    ) 1;
 }
 
 .footer-grid {
