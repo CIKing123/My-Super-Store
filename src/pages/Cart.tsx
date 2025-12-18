@@ -1,7 +1,8 @@
 import { Minus, Plus, X, Loader2 } from 'lucide-react';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
-import LottieParticles from '../components/LottieParticles';
 import { useCart } from '../context/CartContext';
+import { Link } from 'react-router-dom';
+
 
 interface CartProps {
   onNavigate: (page: string) => void;
@@ -25,7 +26,6 @@ export function Cart({ onNavigate }: CartProps) {
 
   return (
     <div className="page-fade section relative">
-      <LottieParticles />
       <h1 className="page-title mb-12">Shopping Cart</h1>
 
       {items.length === 0 ? (
@@ -127,9 +127,11 @@ export function Cart({ onNavigate }: CartProps) {
                 </div>
               </div>
 
+              <Link to="/checkout" style={{ textDecoration: 'none' }}>
               <button
                 className="btn-primary"
                 style={{ width: '100%', marginBottom: '1rem', padding: '1rem' }}
+                
               >
                 Proceed to Checkout
               </button>
@@ -141,6 +143,7 @@ export function Cart({ onNavigate }: CartProps) {
               >
                 Continue Shopping
               </button>
+              </Link>
 
               {/* Free Shipping Message */}
               {subtotal < 500 && (
