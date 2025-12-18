@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { CreditCard, LogOut, ChevronRight, ShoppingBag, Loader2, Sparkles, Crown, Star } from 'lucide-react';
+import { CreditCard, LogOut, ChevronRight, ShoppingBag, Loader2, Sparkles, Crown, Star, Package } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
 import { getAvatarUrl } from '../lib/avatarUtils';
@@ -10,6 +10,7 @@ export function Account() {
     const navigate = useNavigate();
     const [activeSection, setActiveSection] = useState('orders');
     const [orders, setOrders] = useState<any[]>([]);
+    const [cartItems, setCartItems] = useState<any[]>([]);
     const [profile, setProfile] = useState<any>(null);
     const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
@@ -22,19 +23,51 @@ export function Account() {
     const fetchData = async () => {
         setLoading(true);
         try {
-            const { data: profileData } = await supabase.from('user_profiles').select('*').eq('user_id', user!.id).single();
+            // Fetch user profile from user_profiles table
+            const { data: profileData } = await supabase
+                .from('user_profiles')
+                .select('*')
+                .eq('user_id', user!.id)
+                .single();
+            
             setProfile(profileData);
 
-            // Load avatar URL
-            if (profileData?.avatar_url || user?.user_metadata?.avatar_url) {
-                const url = await getAvatarUrl(profileData?.avatar_url || user?.user_metadata?.avatar_url);
+            // Load avatar URL - prioritize user_profiles.avatar_url, then auth user metadata
+            if (profileData?.avatar_url) {
+                const url = await getAvatarUrl(profileData.avatar_url);
+                setAvatarUrl(url);
+            } else if (user?.user_metadata?.avatar_url) {
+                const url = await getAvatarUrl(user.user_metadata.avatar_url);
                 setAvatarUrl(url);
             }
 
-            const { data: ordersData } = await supabase.from('orders').select(`*, order_items ( *, products ( name, product_images ( url ) ) )`).eq('user_id', user!.id).order('placed_at', { ascending: false });
+            // Fetch orders from orders table with related order_items and products
+            const { data: ordersData } = await supabase
+                .from('orders')
+                .select(`*, order_items ( *, products ( name, product_images ( url ) ) )`)
+                .eq('user_id', user!.id)
+                .order('placed_at', { ascending: false });
             setOrders(ordersData || []);
+
+            // Fetch user's cart from carts table, then get cart_items with products
+            const { data: cartData } = await supabase
+                .from('carts')
+                .select('id')
+                .eq('user_id', user!.id)
+                .single();
+            
+            if (cartData?.id) {
+                const { data: cartItemsData } = await supabase
+                    .from('cart_items')
+                    .select(`*, products ( name, price, product_images ( url ) )`)
+                    .eq('cart_id', cartData.id);
+                setCartItems(cartItemsData || []);
+            } else {
+                setCartItems([]);
+            }
         } catch (error) {
             console.error('Error fetching data:', error);
+            setCartItems([]);
         } finally {
             setLoading(false);
         }
@@ -47,6 +80,7 @@ export function Account() {
 
     const menuItems = [
         { id: 'orders', label: 'Orders', icon: Crown, description: 'Track your purchases' },
+        { id: 'cart', label: 'Cart', icon: ShoppingBag, description: 'Items in your cart' },
         { id: 'addresses', label: 'Addresses', icon: Sparkles, description: 'Delivery locations' },
         { id: 'payment', label: 'Payment', icon: CreditCard, description: 'Cards & billing' },
         { id: 'profile', label: 'Profile', icon: Star, description: 'Personal info' },
@@ -268,6 +302,77 @@ export function Account() {
                                                 </div>
                                             </div>
                                         ))
+                                    )}
+                                </div>
+                            )}
+
+                            {activeSection === 'cart' && (
+                                <div className="space-y-6">
+                                    {cartItems.length === 0 ? (
+                                        <div className="relative overflow-hidden rounded-2xl bg-[#0F0F0F] p-16 text-center border border-dashed border-[#FFC92E]/20">
+                                            <div className="relative z-10">
+                                                <div className="w-20 h-20 bg-[#FFC92E]/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-[#FFC92E]/20">
+                                                    <Package size={32} className="text-[#FFC92E]" strokeWidth={1.5} />
+                                                </div>
+                                                <h3 className="text-xl font-bold text-white mb-3">Your cart is empty</h3>
+                                                <p className="text-gray-500 mb-8 max-w-md mx-auto">Add items to your cart to get started.</p>
+                                                <button
+                                                    onClick={() => navigate('/shop')}
+                                                    className="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-[#FFC92E] to-[#DE9D0D] text-black font-bold rounded-lg hover:shadow-[0_0_20px_rgba(255,201,46,0.3)] transition-all transform hover:-translate-y-0.5"
+                                                >
+                                                    <Sparkles size={18} />
+                                                    Start Shopping
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="relative overflow-hidden rounded-2xl bg-[#0F0F0F] border border-white/5 shadow-lg group">
+                                            <div className="absolute inset-0 bg-gradient-to-r from-[#FFC92E]/0 via-[#FFC92E]/5 to-[#FFC92E]/0 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+
+                                            <div className="relative z-10 p-6 border-b border-white/5 bg-white/[0.02]">
+                                                <div className="flex justify-between items-center">
+                                                    <h3 className="text-lg font-bold text-white">Cart Preview</h3>
+                                                    <span className="px-3 py-1 rounded bg-[#FFC92E]/10 border border-[#FFC92E]/30 text-[#FFC92E] text-sm font-bold">
+                                                        {cartItems.length} item{cartItems.length !== 1 ? 's' : ''}
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <div className="relative z-10 p-6 space-y-4">
+                                                {cartItems.map((item: any) => (
+                                                    <div key={item.id} className="flex gap-4 items-center p-3 rounded-lg hover:bg-white/5 transition-colors border border-transparent hover:border-white/5">
+                                                        <div className="w-16 h-16 bg-white/5 rounded overflow-hidden flex-shrink-0 border border-white/10">
+                                                            {item.products?.product_images?.[0]?.url && (
+                                                                <img src={item.products.product_images[0].url} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" alt="" />
+                                                            )}
+                                                        </div>
+                                                        <div className="flex-1">
+                                                            <h4 className="text-white font-medium mb-1">{item.products?.name}</h4>
+                                                            <p className="text-xs text-gray-500">Qty: {item.quantity} × ${parseFloat(item.price_at_time).toFixed(2)}</p>
+                                                        </div>
+                                                        <div className="text-right">
+                                                            <p className="font-bold text-white">${(item.quantity * parseFloat(item.price_at_time)).toLocaleString(undefined, { maximumFractionDigits: 2 })}</p>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+
+                                            <div className="relative z-10 p-6 border-t border-white/5 bg-white/[0.01]">
+                                                <div className="flex justify-between items-center mb-4">
+                                                    <p className="text-gray-400">Subtotal</p>
+                                                    <p className="text-white font-bold">
+                                                        ${cartItems.reduce((sum, item) => sum + (item.quantity * parseFloat(item.price_at_time)), 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                                                    </p>
+                                                </div>
+                                                <button
+                                                    onClick={() => navigate('/cart')}
+                                                    className="w-full py-3 bg-gradient-to-r from-[#FFC92E] to-[#DE9D0D] text-black font-bold rounded-lg hover:shadow-[0_0_20px_rgba(255,201,46,0.3)] transition-all flex items-center justify-center gap-2"
+                                                >
+                                                    <ShoppingBag size={18} />
+                                                    View Full Cart
+                                                </button>
+                                            </div>
+                                        </div>
                                     )}
                                 </div>
                             )}

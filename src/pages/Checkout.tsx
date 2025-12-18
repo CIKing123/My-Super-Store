@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Check, CreditCard, Truck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-
 export function Checkout() {
     const navigate = useNavigate();
     const [step, setStep] = useState(1);
