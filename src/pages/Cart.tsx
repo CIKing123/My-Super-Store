@@ -1,6 +1,6 @@
 import { Minus, Plus, X, Loader2 } from 'lucide-react';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
-import LottieParticles from '../components/LottieParticles';
+
 import { useCart } from '../context/CartContext';
 
 interface CartProps {
@@ -25,7 +25,7 @@ export function Cart({ onNavigate }: CartProps) {
 
   return (
     <div className="page-fade section relative">
-      <LottieParticles />
+   
       <h1 className="page-title mb-12">Shopping Cart</h1>
 
       {items.length === 0 ? (

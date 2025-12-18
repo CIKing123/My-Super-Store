@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Check, CreditCard, Truck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import LottieParticles from '../components/LottieParticles';
 
 export function Checkout() {
     const navigate = useNavigate();
@@ -15,7 +14,7 @@ export function Checkout() {
 
     return (
         <div className="section relative">
-            <LottieParticles />
+            
             <div className="max-w-6xl mx-auto">
                 <h1 className="page-title mb-12">Checkout</h1>
 

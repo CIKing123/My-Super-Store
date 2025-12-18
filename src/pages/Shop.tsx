@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ChevronDown, SlidersHorizontal, Loader2 } from 'lucide-react';
 import { ProductCard } from '../components/ProductCard';
-import LottieParticles from '../components/LottieParticles';
+
 import { supabase } from '../lib/supabase';
 
 interface Product {
@@ -86,7 +86,7 @@ export function Shop({ onNavigate }: ShopProps) {
       {/* Header with Particles Behind */}
       <div className="relative min-h-[300px] flex items-center justify-center -mx-8 -mt-8 px-8 pt-8 mb-8" style={{ overflow: 'hidden' }}>
         <div className="absolute inset-0 z-0">
-          <LottieParticles />
+          
         </div>
         <div className="relative z-10 text-center">
           <h1 className="page-title">Luxury Collection</h1>

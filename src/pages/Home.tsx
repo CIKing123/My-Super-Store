@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ProductCard } from '../components/ProductCard';
+
 import { ProductCarousel } from '../components/ProductCarousel';
 import TypingText from '../components/TypingText';
 import LottieParticles from '../components/LottieParticles';
@@ -111,7 +111,7 @@ export function Home({ onNavigate }: HomeProps) {
               <div className="absolute inset-0 rounded-2xl overflow-hidden bg-slate-100 shadow-2xl">
                 {/* Animated Particles Behind */}
                 <div className="absolute inset-0 z-0">
-                  <LottieParticles />
+                 
                 </div>
                 
                 {/* Image or Placeholder */}
