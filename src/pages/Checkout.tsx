@@ -14,7 +14,6 @@ export function Checkout() {
 
     return (
         <div className="section relative">
-            
             <div className="max-w-6xl mx-auto">
                 <h1 className="page-title mb-12">Checkout</h1>
 
