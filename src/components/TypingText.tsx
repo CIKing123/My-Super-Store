@@ -6,7 +6,7 @@ interface TypingTextProps {
   pause?: number; // ms between texts
 }
 
-export const TypingText: React.FC<TypingTextProps> = ({ texts, speed = 18, pause = 1200 }) => {
+export const TypingText: React.FC<TypingTextProps> = ({ texts, speed = 18, pause = 1300 }) => {
   const [index, setIndex] = useState(0);
   const [display, setDisplay] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);

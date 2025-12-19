@@ -43,7 +43,7 @@ export function Header({ cartItemCount }: HeaderProps) {
   const textMutedClass = isAccountPage ? 'text-white/60' : 'text-slate-900/70';
   const hoverBgClass = isAccountPage ? 'hover:bg-white/10' : 'hover:bg-slate-100';
   const linkHoverClass = isAccountPage ? 'hover:text-white' : 'hover:text-black';
-  const menuBgClass = isAccountPage ? 'bg-[#0A0A0A] border-t border-white/10' : 'bg-white/95';
+  const menuBgClass = isAccountPage ? 'bg-[#0A0A0A] border-t border-white/10' : 'bg-white/20';
 
   return (
     <header className={headerClass}>

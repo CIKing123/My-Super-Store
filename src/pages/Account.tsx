@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { CreditCard, LogOut, ChevronRight, ShoppingBag, Loader2, Sparkles, Crown, Star, Package } from 'lucide-react';
+import { CreditCard, LogOut, ChevronRight, ShoppingBag, Loader2, Sparkles, Crown, Star, Package, X, MapPin } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
 import { getAvatarUrl } from '../lib/avatarUtils';
 import { useNavigate } from 'react-router-dom';
+import { getAddressFromLocation } from '../lib/geolocationUtils';
 
 export function Account() {
     const { user, signOut, loading: authLoading } = useAuth();
@@ -12,8 +13,24 @@ export function Account() {
     const [orders, setOrders] = useState<any[]>([]);
     const [cartItems, setCartItems] = useState<any[]>([]);
     const [profile, setProfile] = useState<any>(null);
+    const [addresses, setAddresses] = useState<any[]>([]);
     const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [editFormData, setEditFormData] = useState<any>({
+        display_name: '',
+        email: '',
+    });
+    const [editAddressData, setEditAddressData] = useState<any>({
+        line1: '',
+        line2: '',
+        city: '',
+        state: '',
+        country: '',
+        postal_code: '',
+        label: 'Home',
+    });
+    const [isLoadingLocation, setIsLoadingLocation] = useState(false);
 
     useEffect(() => {
         if (!authLoading && !user) navigate('/login');
@@ -31,6 +48,10 @@ export function Account() {
                 .single();
             
             setProfile(profileData);
+            setEditFormData({
+                display_name: profileData?.display_name || '',
+                email: user?.email || '',
+            });
 
             // Load avatar URL - prioritize user_profiles.avatar_url, then auth user metadata
             if (profileData?.avatar_url) {
@@ -40,6 +61,13 @@ export function Account() {
                 const url = await getAvatarUrl(user.user_metadata.avatar_url);
                 setAvatarUrl(url);
             }
+
+            // Fetch addresses for user
+            const { data: addressesData } = await supabase
+                .from('addresses')
+                .select('*')
+                .eq('user_id', user!.id);
+            setAddresses(addressesData || []);
 
             // Fetch orders from orders table with related order_items and products
             const { data: ordersData } = await supabase
@@ -76,6 +104,91 @@ export function Account() {
     const handleSignOut = async () => {
         await signOut();
         navigate('/login');
+    };
+
+    const handleEditProfileClick = () => {
+        setEditFormData({
+            display_name: profile?.display_name || '',
+            email: user?.email || '',
+        });
+        setIsEditModalOpen(true);
+    };
+
+    const handleSaveProfile = async () => {
+        try {
+            setLoading(true);
+            const { error } = await supabase
+                .from('user_profiles')
+                .update({
+                    display_name: editFormData.display_name,
+                })
+                .eq('user_id', user!.id);
+
+            if (error) throw error;
+
+            console.log('[Profile] Profile updated successfully');
+            setProfile({ ...profile, display_name: editFormData.display_name });
+            setIsEditModalOpen(false);
+        } catch (error) {
+            console.error('[Profile] Error saving profile:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleGetLocation = async () => {
+        try {
+            setIsLoadingLocation(true);
+            console.log('[Delivery Tracking] Starting location acquisition...');
+            
+            const addressData = await getAddressFromLocation();
+            
+            console.log('[Delivery Tracking] Address data received:', addressData);
+            
+            setEditAddressData({
+                line1: addressData.line1,
+                city: addressData.city,
+                state: addressData.state,
+                country: addressData.country,
+                postal_code: addressData.postal_code,
+                label: 'Current Location',
+            });
+        } catch (error) {
+            console.error('[Delivery Tracking] Failed to get location:', error);
+            alert('Failed to get location. Please enable geolocation and try again.');
+        } finally {
+            setIsLoadingLocation(false);
+        }
+    };
+
+    const handleSaveAddress = async () => {
+        try {
+            setLoading(true);
+            console.log('[Address] Saving address:', editAddressData);
+
+            const { error } = await supabase
+                .from('addresses')
+                .insert({
+                    user_id: user!.id,
+                    label: editAddressData.label,
+                    line1: editAddressData.line1,
+                    line2: editAddressData.line2,
+                    city: editAddressData.city,
+                    state: editAddressData.state,
+                    country: editAddressData.country,
+                    postal_code: editAddressData.postal_code,
+                });
+
+            if (error) throw error;
+
+            console.log('[Address] Address saved successfully');
+            await fetchData();
+            setIsEditModalOpen(false);
+        } catch (error) {
+            console.error('[Address] Error saving address:', error);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const menuItems = [
@@ -164,7 +277,9 @@ export function Account() {
                                     </h3>
                                     <p className="text-xs text-gray-500 mb-6 font-mono">{user?.email}</p>
 
-                                    <button className="w-full py-2 rounded-lg bg-[#FFC92E]/10 border border-[#FFC92E]/30 text-[#FFC92E] text-xs font-bold uppercase tracking-widest hover:bg-[#FFC92E] hover:text-black transition-all duration-300">
+                                    <button 
+                                        onClick={handleEditProfileClick}
+                                        className="w-full py-2 rounded-lg bg-[#FFC92E]/10 border border-[#FFC92E]/30 text-[#FFC92E] text-xs font-bold uppercase tracking-widest hover:bg-[#FFC92E] hover:text-black transition-all duration-300">
                                         Edit Profile
                                     </button>
                                 </div>
@@ -433,6 +548,198 @@ export function Account() {
                     </div>
                 </div>
             </div>
+
+            {/* Edit Profile Modal */}
+            {isEditModalOpen && (
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="relative overflow-hidden rounded-2xl bg-[#0F0F0F] border border-[#FFC92E]/30 shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                        {/* Modal Header */}
+                        <div className="sticky top-0 p-6 border-b border-white/5 bg-gradient-to-r from-[#0B0B0B] via-[#111] to-[#0B0B0B] flex items-center justify-between">
+                            <h2 className="text-2xl font-bold text-white">Edit Profile & Addresses</h2>
+                            <button
+                                onClick={() => setIsEditModalOpen(false)}
+                                className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                            >
+                                <X size={24} className="text-white" />
+                            </button>
+                        </div>
+
+                        {/* Modal Body */}
+                        <div className="p-6 space-y-8">
+                            {/* Profile Section */}
+                            <div className="space-y-4">
+                                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                                    <Star size={20} className="text-[#FFC92E]" />
+                                    Personal Information
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="block text-gray-500 mb-2 text-[10px] uppercase tracking-widest font-bold">Full Name</label>
+                                        <input
+                                            type="text"
+                                            value={editFormData.display_name}
+                                            onChange={(e) => setEditFormData({ ...editFormData, display_name: e.target.value })}
+                                            className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-[#FFC92E]/50 transition-colors"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-gray-500 mb-2 text-[10px] uppercase tracking-widest font-bold">Email</label>
+                                        <input
+                                            type="email"
+                                            disabled
+                                            value={editFormData.email}
+                                            className="w-full bg-black/20 border border-white/5 rounded-lg p-3 text-gray-500 cursor-not-allowed"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Addresses Section */}
+                            <div className="space-y-4 border-t border-white/5 pt-8">
+                                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                                    <MapPin size={20} className="text-[#FFC92E]" />
+                                    Delivery Addresses
+                                </h3>
+
+                                {/* Current Addresses */}
+                                {addresses.length > 0 && (
+                                    <div className="space-y-3">
+                                        <p className="text-sm text-gray-400">Your saved addresses:</p>
+                                        {addresses.map((addr) => (
+                                            <div key={addr.id} className="p-3 rounded-lg bg-white/5 border border-white/10">
+                                                <p className="font-semibold text-white text-sm mb-1">{addr.label}</p>
+                                                <p className="text-xs text-gray-400">{addr.line1}</p>
+                                                {addr.line2 && <p className="text-xs text-gray-400">{addr.line2}</p>}
+                                                <p className="text-xs text-gray-400">{addr.city}, {addr.state} {addr.postal_code}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {/* Add New Address Form */}
+                                <div className="space-y-4 mt-6 p-4 rounded-lg bg-white/[0.02] border border-white/5">
+                                    <h4 className="text-sm font-bold text-white">Add New Address</h4>
+                                    <div>
+                                        <label className="block text-gray-500 mb-2 text-[10px] uppercase tracking-widest font-bold">Address Label</label>
+                                        <input
+                                            type="text"
+                                            value={editAddressData.label}
+                                            onChange={(e) => setEditAddressData({ ...editAddressData, label: e.target.value })}
+                                            placeholder="e.g., Home, Work, Apartment"
+                                            className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-[#FFC92E]/50 transition-colors"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-gray-500 mb-2 text-[10px] uppercase tracking-widest font-bold">Address Line 1</label>
+                                        <input
+                                            type="text"
+                                            value={editAddressData.line1}
+                                            onChange={(e) => setEditAddressData({ ...editAddressData, line1: e.target.value })}
+                                            className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-[#FFC92E]/50 transition-colors"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-gray-500 mb-2 text-[10px] uppercase tracking-widest font-bold">Address Line 2 (Optional)</label>
+                                        <input
+                                            type="text"
+                                            value={editAddressData.line2}
+                                            onChange={(e) => setEditAddressData({ ...editAddressData, line2: e.target.value })}
+                                            className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-[#FFC92E]/50 transition-colors"
+                                        />
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-gray-500 mb-2 text-[10px] uppercase tracking-widest font-bold">City</label>
+                                            <input
+                                                type="text"
+                                                value={editAddressData.city}
+                                                onChange={(e) => setEditAddressData({ ...editAddressData, city: e.target.value })}
+                                                className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-[#FFC92E]/50 transition-colors"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-gray-500 mb-2 text-[10px] uppercase tracking-widest font-bold">State/Province</label>
+                                            <input
+                                                type="text"
+                                                value={editAddressData.state}
+                                                onChange={(e) => setEditAddressData({ ...editAddressData, state: e.target.value })}
+                                                className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-[#FFC92E]/50 transition-colors"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-gray-500 mb-2 text-[10px] uppercase tracking-widest font-bold">Country</label>
+                                            <input
+                                                type="text"
+                                                value={editAddressData.country}
+                                                onChange={(e) => setEditAddressData({ ...editAddressData, country: e.target.value })}
+                                                className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-[#FFC92E]/50 transition-colors"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-gray-500 mb-2 text-[10px] uppercase tracking-widest font-bold">Postal Code</label>
+                                            <input
+                                                type="text"
+                                                value={editAddressData.postal_code}
+                                                onChange={(e) => setEditAddressData({ ...editAddressData, postal_code: e.target.value })}
+                                                className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-[#FFC92E]/50 transition-colors"
+                                            />
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={handleGetLocation}
+                                        disabled={isLoadingLocation}
+                                        className="w-full py-3 bg-white/5 border border-white/10 hover:border-[#FFC92E]/50 text-white font-bold rounded-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                                    >
+                                        {isLoadingLocation ? (
+                                            <>
+                                                <Loader2 size={18} className="animate-spin" />
+                                                Getting Location...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <MapPin size={18} />
+                                                Use Current Location
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Modal Footer */}
+                        <div className="sticky bottom-0 p-6 border-t border-white/5 bg-gradient-to-r from-[#0B0B0B] via-[#111] to-[#0B0B0B] flex gap-4">
+                            <button
+                                onClick={() => setIsEditModalOpen(false)}
+                                className="flex-1 py-3 bg-white/5 border border-white/10 text-white font-bold rounded-lg hover:bg-white/10 transition-all"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => {
+                                    handleSaveProfile();
+                                    handleSaveAddress();
+                                }}
+                                disabled={loading}
+                                className="flex-1 py-3 bg-gradient-to-r from-[#FFC92E] to-[#DE9D0D] text-black font-bold rounded-lg hover:shadow-[0_0_20px_rgba(255,201,46,0.3)] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                            >
+                                {loading ? (
+                                    <>
+                                        <Loader2 size={18} className="animate-spin" />
+                                        Saving...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Sparkles size={18} />
+                                        Save Changes
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
