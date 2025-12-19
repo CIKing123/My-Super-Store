@@ -1,74 +1,92 @@
 const GOOGLE_MAPS_API_KEY = 'AIzaSyAVamyyQXuecYqP-WyQsVuNdi5mEwUnSGc';
 
-// Get precise location from IP geolocation (multiple services for redundancy)
-export async function getCurrentLocation(): Promise<{ lat: number; lng: number }> {
-  console.log('\n\n╔════════════════════════════════════════════════════════╗');
-  console.log('║        IP-BASED GEOLOCATION (CLOUDFLARE LEVEL)         ║');
-  console.log('╚════════════════════════════════════════════════════════╝\n');
+// Browser Geolocation with timeout
+function getDeviceLocation(): Promise<{ lat: number; lng: number; accuracy: number }> {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject(new Error('Geolocation not supported'));
+      return;
+    }
 
-  // Try multiple providers for reliability
+    const timeout = setTimeout(() => {
+      reject(new Error('Device location request timed out'));
+    }, 10000);
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        clearTimeout(timeout);
+        resolve({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+          accuracy: position.coords.accuracy,
+        });
+      },
+      (error) => {
+        clearTimeout(timeout);
+        reject(error);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 8000,
+        maximumAge: 0,
+      }
+    );
+  });
+}
+
+// IP-based geolocation fallback
+async function getIPLocation(): Promise<{ lat: number; lng: number }> {
   const providers = [
     {
       name: 'ipapi.co',
       url: 'https://ipapi.co/json/',
-      parse: (data: any) => ({ lat: data.latitude, lng: data.longitude, city: data.city, region: data.region, country: data.country_name })
+      parse: (data: any) => ({ lat: data.latitude, lng: data.longitude })
     },
     {
       name: 'geolocation-db',
       url: 'https://geolocation-db.com/json/',
-      parse: (data: any) => ({ lat: parseFloat(data.latitude), lng: parseFloat(data.longitude), city: data.city, region: data.state, country: data.country_name })
+      parse: (data: any) => ({ lat: parseFloat(data.latitude), lng: parseFloat(data.longitude) })
     },
-    {
-      name: 'ipwho.is',
-      url: 'https://ipwho.is/',
-      parse: (data: any) => ({ lat: data.latitude, lng: data.longitude, city: data.city, region: data.region, country: data.country_name })
-    }
   ];
 
   for (const provider of providers) {
     try {
-      console.log(`[IPGeo] Trying ${provider.name}...`);
-      
-      const res = await fetch(provider.url, {
-        headers: {
-          'Accept': 'application/json'
-        }
-      });
-      
-      if (!res.ok) {
-        console.warn(`[IPGeo] ${provider.name} returned ${res.status}`);
-        continue;
-      }
-
+      const res = await fetch(provider.url, { headers: { 'Accept': 'application/json' } });
+      if (!res.ok) continue;
       const data = await res.json();
-      
-      if (!data.latitude || !data.longitude) {
-        console.warn(`[IPGeo] ${provider.name} missing coordinates`);
-        continue;
+      if (data.latitude && data.longitude) {
+        return provider.parse(data);
       }
-
-      const location = provider.parse(data);
-
-      console.log('╔════════════════════════════════════════════════════════╗');
-      console.log('║              ✓ LOCATION FOUND                         ║');
-      console.log('╚════════════════════════════════════════════════════════╝');
-      console.log(`[IPGeo] Provider:   ${provider.name}`);
-      console.log(`[IPGeo] Latitude:   ${location.lat}`);
-      console.log(`[IPGeo] Longitude:  ${location.lng}`);
-      console.log(`[IPGeo] City:       ${location.city}`);
-      console.log(`[IPGeo] Region:     ${location.region}`);
-      console.log(`[IPGeo] Country:    ${location.country}\n`);
-
-      return { lat: location.lat, lng: location.lng };
     } catch (error) {
-      console.warn(`[IPGeo] ${provider.name} failed:`, error);
       continue;
     }
   }
 
-  // If all providers fail, throw error
-  console.error('[IPGeo] ✗ All geolocation providers failed');
-  throw new Error('Unable to get location from all providers. Check internet connection.');
+  throw new Error('IP geolocation failed');
+}
+
+// Get precise location - tries device first, then IP as fallback
+export async function getCurrentLocation(): Promise<{ lat: number; lng: number; accuracy?: number }> {
+  console.log('[Geolocation] Starting location acquisition...');
+
+  try {
+    console.log('[Geolocation] Attempting device geolocation...');
+    const deviceLocation = await getDeviceLocation();
+    console.log(`[Geolocation] Device location: ${deviceLocation.lat}, ${deviceLocation.lng} (accuracy: ${deviceLocation.accuracy.toFixed(0)}m)`);
+    return deviceLocation;
+  } catch (deviceError) {
+    console.warn('[Geolocation] Device location unavailable:', (deviceError as Error).message);
+    console.log('[Geolocation] Falling back to IP geolocation...');
+
+    try {
+      const ipLocation = await getIPLocation();
+      console.log(`[Geolocation] IP location: ${ipLocation.lat}, ${ipLocation.lng}`);
+      return ipLocation;
+    } catch (ipError) {
+      console.error('[Geolocation] All methods failed');
+      throw new Error('Unable to determine location. Please enable device location or check internet connection.');
+    }
+  }
 }
 
 export async function reverseGeocode(lat: number, lng: number): Promise<{
@@ -79,10 +97,7 @@ export async function reverseGeocode(lat: number, lng: number): Promise<{
   postal_code: string;
 }> {
   try {
-    console.log('\n╔════════════════════════════════════════════════════════╗');
-    console.log('║          REVERSE GEOCODING COORDINATES                ║');
-    console.log('╚════════════════════════════════════════════════════════╝');
-    console.log(`[GeoAPI] Input: Lat ${lat}, Lng ${lng}\n`);
+    console.log('[ReverseGeocode] Converting coordinates to address...');
 
     const res = await fetch(
       `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&result_type=street_address|route|locality&language=en&key=${GOOGLE_MAPS_API_KEY}`
@@ -94,16 +109,13 @@ export async function reverseGeocode(lat: number, lng: number): Promise<{
 
     const data = await res.json();
 
-    console.log(`[GeoAPI] API Status: ${data.status}`);
-    console.log(`[GeoAPI] Results found: ${data.results.length}`);
-
     if (data.status === 'ZERO_RESULTS') {
-      console.warn('[GeoAPI] No results for these coordinates - using fallback parsing');
+      console.warn('[ReverseGeocode] No address found for coordinates');
       return {
         line1: `${lat.toFixed(5)}, ${lng.toFixed(5)}`,
         city: 'Unknown',
         state: 'Unknown',
-        country: 'Nigeria',
+        country: 'Unknown',
         postal_code: '',
       };
     }
@@ -111,12 +123,6 @@ export async function reverseGeocode(lat: number, lng: number): Promise<{
     if (data.results.length === 0) {
       throw new Error('No geocoding results');
     }
-
-    // Log top results
-    console.log('\n[GeoAPI] Top results:');
-    data.results.slice(0, 3).forEach((result: any, idx: number) => {
-      console.log(`  ${idx + 1}. ${result.formatted_address}`);
-    });
 
     const result = data.results[0];
 
@@ -135,16 +141,10 @@ export async function reverseGeocode(lat: number, lng: number): Promise<{
       postal_code: getPart(['postal_code']),
     };
 
-    console.log('\n[GeoAPI] Extracted Address:');
-    console.log(`  Street:  ${address.line1}`);
-    console.log(`  City:    ${address.city}`);
-    console.log(`  State:   ${address.state}`);
-    console.log(`  Country: ${address.country}`);
-    console.log(`  Postal:  ${address.postal_code}\n`);
-
+    console.log('[ReverseGeocode] Address extracted:', address);
     return address;
   } catch (error) {
-    console.error('[GeoAPI] Reverse geocoding error:', error);
+    console.error('[ReverseGeocode] Error:', error);
     throw error;
   }
 }
@@ -159,51 +159,24 @@ export async function getAddressFromLocation(): Promise<{
   postal_code: string;
 }> {
   try {
-    console.log('\n\n');
-    console.log('╔════════════════════════════════════════════════════════╗');
-    console.log('║         DELIVERY ADDRESS TRACKING - FULL PROCESS       ║');
-    console.log('║      Using Cloudflare-Level IP Geolocation Accuracy    ║');
-    console.log('╚════════════════════════════════════════════════════════╝\n');
+    console.log('[AddressTracking] Getting delivery address...');
 
-    // Step 1: Get IP-based geolocation
-    console.log('STEP 1: Getting precise IP geolocation...');
+    // Get location (device or IP fallback)
     const location = await getCurrentLocation();
 
-    // Step 2: Reverse geocode to street address
-    console.log('\nSTEP 2: Converting coordinates to street address...');
+    // Reverse geocode coordinates to street address
     const address = await reverseGeocode(location.lat, location.lng);
 
     const fullAddress = {
-      ...location,
+      lat: location.lat,
+      lng: location.lng,
       ...address,
     };
 
-    console.log('\n╔════════════════════════════════════════════════════════╗');
-    console.log('║         ✓ COMPLETE DELIVERY ADDRESS OBTAINED           ║');
-    console.log('╚════════════════════════════════════════════════════════╝');
-    console.log('\n📍 PRECISE COORDINATES:');
-    console.log(`   Latitude:  ${location.lat}`);
-    console.log(`   Longitude: ${location.lng}`);
-    console.log('\n📮 FULL ADDRESS:');
-    console.log(`   ${fullAddress.line1}`);
-    console.log(`   ${fullAddress.city}, ${fullAddress.state}`);
-    console.log(`   ${fullAddress.country} ${fullAddress.postal_code}`);
-    console.log('\n📦 COMPLETE OBJECT:');
-    console.log(fullAddress);
-    console.log('\n╚════════════════════════════════════════════════════════╝\n');
-
+    console.log('[AddressTracking] Delivery address obtained successfully');
     return fullAddress;
   } catch (error) {
-    console.error('\n╔════════════════════════════════════════════════════════╗');
-    console.error('║         ✗ DELIVERY ADDRESS TRACKING FAILED            ║');
-    console.error('╚════════════════════════════════════════════════════════╝');
-    console.error('\n❌ ERROR:', error);
-    console.error('\n🔧 TROUBLESHOOTING:');
-    console.error('   1. Check internet connection');
-    console.error('   2. Refresh the page');
-    console.error('   3. Try using a different browser');
-    console.error('   4. Check if geolocation services are accessible\n');
-    console.error('╚════════════════════════════════════════════════════════╝\n');
+    console.error('[AddressTracking] Failed:', error);
     throw error;
   }
 }

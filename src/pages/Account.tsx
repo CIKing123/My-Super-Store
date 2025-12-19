@@ -139,12 +139,9 @@ export function Account() {
     const handleGetLocation = async () => {
         try {
             setIsLoadingLocation(true);
-            console.log('[Delivery Tracking] Starting location acquisition...');
-            
+
             const addressData = await getAddressFromLocation();
-            
-            console.log('[Delivery Tracking] Address data received:', addressData);
-            
+
             setEditAddressData({
                 line1: addressData.line1,
                 city: addressData.city,
@@ -154,8 +151,21 @@ export function Account() {
                 label: 'Current Location',
             });
         } catch (error) {
-            console.error('[Delivery Tracking] Failed to get location:', error);
-            alert('Failed to get location. Please enable geolocation and try again.');
+            const errorMessage = (error as Error).message;
+            let userMessage = 'Failed to get location.';
+
+            if (errorMessage.includes('not supported')) {
+                userMessage = 'Geolocation is not supported in your browser.';
+            } else if (errorMessage.includes('permission denied')) {
+                userMessage = 'Please enable location access in your browser settings and try again.';
+            } else if (errorMessage.includes('timed out')) {
+                userMessage = 'Location request timed out. Please ensure location services are enabled.';
+            } else if (errorMessage.includes('internet')) {
+                userMessage = 'Please check your internet connection and try again.';
+            }
+
+            alert(userMessage);
+            console.error('[AddressTracking] Location error:', error);
         } finally {
             setIsLoadingLocation(false);
         }
@@ -691,6 +701,7 @@ export function Account() {
                                         onClick={handleGetLocation}
                                         disabled={isLoadingLocation}
                                         className="w-full py-3 bg-white/5 border border-white/10 hover:border-[#FFC92E]/50 text-white font-bold rounded-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                                        title="Uses device GPS for accuracy, falls back to IP geolocation"
                                     >
                                         {isLoadingLocation ? (
                                             <>
