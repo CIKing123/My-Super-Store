@@ -24,6 +24,7 @@ export function Account() {
     const [editAddressData, setEditAddressData] = useState<any>({
         line1: '',
         line2: '',
+        neighborhood: '',
         city: '',
         state: '',
         country: '',
@@ -144,6 +145,7 @@ export function Account() {
 
             setEditAddressData({
                 line1: addressData.line1,
+                neighborhood: addressData.neighborhood,
                 city: addressData.city,
                 state: addressData.state,
                 country: addressData.country,
@@ -183,6 +185,7 @@ export function Account() {
                     label: editAddressData.label,
                     line1: editAddressData.line1,
                     line2: editAddressData.line2,
+                    neighborhood: editAddressData.neighborhood,
                     city: editAddressData.city,
                     state: editAddressData.state,
                     country: editAddressData.country,
@@ -619,6 +622,7 @@ export function Account() {
                                             <div key={addr.id} className="p-3 rounded-lg bg-white/5 border border-white/10">
                                                 <p className="font-semibold text-white text-sm mb-1">{addr.label}</p>
                                                 <p className="text-xs text-gray-400">{addr.line1}</p>
+                                                {addr.neighborhood && <p className="text-xs text-gray-400">{addr.neighborhood}</p>}
                                                 {addr.line2 && <p className="text-xs text-gray-400">{addr.line2}</p>}
                                                 <p className="text-xs text-gray-400">{addr.city}, {addr.state} {addr.postal_code}</p>
                                             </div>
@@ -645,6 +649,16 @@ export function Account() {
                                             type="text"
                                             value={editAddressData.line1}
                                             onChange={(e) => setEditAddressData({ ...editAddressData, line1: e.target.value })}
+                                            className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-[#FFC92E]/50 transition-colors"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-gray-500 mb-2 text-[10px] uppercase tracking-widest font-bold">Neighborhood/Region</label>
+                                        <input
+                                            type="text"
+                                            value={editAddressData.neighborhood}
+                                            onChange={(e) => setEditAddressData({ ...editAddressData, neighborhood: e.target.value })}
+                                            placeholder="e.g., Shonibare Estate, Maryland"
                                             className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-[#FFC92E]/50 transition-colors"
                                         />
                                     </div>
