@@ -1451,3 +1451,59 @@ select:focus-visible {
         transform: none;
     }
 }
+.flexbb {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+.metallic-scroll-border {
+  position: relative;
+  --shine-pos: 50%;
+}
+
+.metallic-scroll-border::before,
+.metallic-scroll-border::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  pointer-events: none;
+  z-index: 20;
+
+  background: linear-gradient(
+    90deg,
+    #3b2a00 0%,
+    #7a5200 18%,
+    #b67f00 35%,
+    #f6dd6a 45%,
+    #ffffff 50%,
+    #f6dd6a 55%,
+    #b67f00 65%,
+    #7a5200 82%,
+    #3b2a00 100%
+  );
+
+  background-size: 200% 100%;
+  background-position: var(--shine-pos) 50%;
+  box-shadow: 0 0 18px rgba(212, 175, 55, 0.35);
+}
+
+/* Top */
+.metallic-scroll-border::before {
+  top: 0;
+}
+
+/* Bottom */
+.metallic-scroll-border::after {
+  bottom: 0;
+}
+
+/* Thicker borders on desktop */
+@media (min-width: 1024px) {
+  .metallic-scroll-border::before,
+  .metallic-scroll-border::after {
+    height: 8px;
+  }
+}
