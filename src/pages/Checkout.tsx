@@ -22,27 +22,38 @@ export function Checkout() {
                     <div className="lg:col-span-2 space-y-8">
 
                         {/* Steps Indicator */}
-                        <div className="flex justify-between mb-8">
-                            {steps.map((s) => (
-                                <div key={s.id} className={`flex items-center gap-3 ${step >= s.id ? 'opacity-100' : 'opacity-40'}`}>
-                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${step >= s.id ? 'border-[var(--gold-primary)] text-[var(--gold-primary)]' : 'border-gray-400 text-gray-400'}`}>
-                                        <s.icon size={20} />
+                        <div className="mb-12">
+                            <div className="flex justify-between items-center relative">
+                                {/* Progress Bar Background */}
+                                <div className="absolute top-5 left-0 right-0 h-1 bg-gray-600 pointer-events-none"></div>
+                                
+                                {/* Progress Bar Fill */}
+                                <div 
+                                    className="absolute top-5 left-0 h-1 bg-[var(--gold-primary)] pointer-events-none transition-all duration-500"
+                                    style={{ width: `${((step - 1) / (steps.length - 1)) * 100}%` }}
+                                ></div>
+
+                                {steps.map((s) => (
+                                    <div key={s.id} className={`flex flex-col items-center gap-2 relative z-20 ${step >= s.id ? 'opacity-100' : 'opacity-40'}`}>
+                                        <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 bg-black ${step >= s.id ? 'border-[var(--gold-primary)] text-[var(--gold-primary)]' : 'border-gray-400 text-gray-400'}`}>
+                                            <s.icon size={20} />
+                                        </div>
+                                        <span className="font-semibold text-sm whitespace-nowrap">{s.title}</span>
                                     </div>
-                                    <span className="font-semibold">{s.title}</span>
-                                </div>
-                            ))}
+                                ))}
+                            </div>
                         </div>
 
                         {/* Shipping Form */}
                         <div className={`card-black ${step !== 1 ? 'opacity-50 pointer-events-none' : ''}`}>
                             <h3 className="text-2xl font-serif mb-6 text-[var(--gold-primary)]">Shipping Address</h3>
                             <div className="grid grid-cols-2 gap-6">
-                                <input type="text" placeholder="First Name" className="bg-white/10 border border-white/20 p-3 rounded text-white placeholder:text-gray-500" />
-                                <input type="text" placeholder="Last Name" className="bg-white/10 border border-white/20 p-3 rounded text-white placeholder:text-gray-500" />
-                                <input type="email" placeholder="Email" className="col-span-2 bg-white/10 border border-white/20 p-3 rounded text-white placeholder:text-gray-500" />
-                                <input type="text" placeholder="Address" className="col-span-2 bg-white/10 border border-white/20 p-3 rounded text-white placeholder:text-gray-500" />
-                                <input type="text" placeholder="City" className="bg-white/10 border border-white/20 p-3 rounded text-white placeholder:text-gray-500" />
-                                <input type="text" placeholder="Postal Code" className="bg-white/10 border border-white/20 p-3 rounded text-white placeholder:text-gray-500" />
+                                <input type="text" placeholder="First Name" className="bg-white/10 border border-white/20 p-3 rounded text-white placeholder:text-gray-200" />
+                                <input type="text" placeholder="Last Name" className="bg-white/10 border border-white/20 p-3 rounded text-white placeholder:text-gray-200" />
+                                <input type="email" placeholder="Email" className="col-span-2 bg-white/10 border border-white/20 p-3 rounded text-white placeholder:text-gray-200" />
+                                <input type="text" placeholder="Address" className="col-span-2 bg-white/10 border border-white/20 p-3 rounded text-white placeholder:text-gray-200" />
+                                <input type="text" placeholder="City" className="bg-white/10 border border-white/20 p-3 rounded text-white placeholder:text-gray-200" />
+                                <input type="text" placeholder="Postal Code" className="bg-white/10 border border-white/20 p-3 rounded text-white placeholder:text-gray-200" />
                             </div>
                             {step === 1 && (
                                 <button
@@ -63,9 +74,9 @@ export function Checkout() {
                                     <span>Credit Card</span>
                                 </div>
                                 <div className="grid grid-cols-2 gap-6 mt-4">
-                                    <input type="text" placeholder="Card Number" className="col-span-2 bg-white/10 border border-white/20 p-3 rounded text-white placeholder:text-gray-500" />
-                                    <input type="text" placeholder="MM/YY" className="bg-white/10 border border-white/20 p-3 rounded text-white placeholder:text-gray-500" />
-                                    <input type="text" placeholder="CVC" className="bg-white/10 border border-white/20 p-3 rounded text-white placeholder:text-gray-500" />
+                                    <input type="text" placeholder="Card Number" className="col-span-2 bg-white/10 border border-white/20 p-3 rounded text-white placeholder:text-gray-300" />
+                                    <input type="text" placeholder="MM/YY" className="bg-white/10 border border-white/20 p-3 rounded text-white placeholder:text-gray-300" />
+                                    <input type="text" placeholder="CVC" className="bg-white/10 border border-white/20 p-3 rounded text-white placeholder:text-gray-3s00" />
                                 </div>
                             </div>
                             {step === 2 && (

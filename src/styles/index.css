@@ -1451,3 +1451,9 @@ select:focus-visible {
         transform: none;
     }
 }
+.flexbb {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
