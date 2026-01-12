@@ -57,12 +57,12 @@ export function Home({ onNavigate }: HomeProps) {
                   <span className="h-[1px] w-8 bg-[#d4af37]"></span>
                   <span className="text-[#d4af37] text-xs font-bold uppercase tracking-widest">Est. 2024</span>
                 </div>
-                
+
                 {/* Main Title with Typing Animation */}
                 <h1 className="text-slate-900 text-5xl sm:text-6xl lg:text-7xl font-extrabold leading-[1.1] tracking-[-0.02em]">
                   <TypingText texts={["Collect the Exceptional.", "Embrace Luxury.", "Redefine Excellence."]} />
                 </h1>
-                
+
                 {/* Description */}
                 <p className="text-slate-1500 text-lg sm:text-xl font-medium leading-relaxed max-w-[540px]">
                   Discover a curated selection of artifacts designed for the few, not the many. Elevate your everyday with unparalleled craftsmanship.
@@ -80,7 +80,7 @@ export function Home({ onNavigate }: HomeProps) {
                   {/* Shine effect overlay */}
                   <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500 ease-in-out"></div>
                 </button>
-                
+
                 {/* Secondary CTA */}
                 <button
                   onClick={() => onNavigate('shop')}
@@ -110,9 +110,9 @@ export function Home({ onNavigate }: HomeProps) {
               <div className="absolute inset-0 rounded-2xl overflow-hidden bg-slate-100 shadow-2xl">
                 {/* Animated Particles Behind */}
                 <div className="absolute inset-0 z-0">
-                 
+
                 </div>
-                
+
                 {/* Image or Placeholder */}
                 <div className="relative z-10 w-full h-full bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
                   {featuredProducts.length > 0 && featuredProducts[0].product_images?.length > 0 ? (
@@ -150,13 +150,13 @@ export function Home({ onNavigate }: HomeProps) {
           </div>
         </div>
       </main>
-      
+
       {/*What we deliver*/}
 
-   {/* We Deliver – Industry Partnerships */}
-<section className="relative py-20 px-6 lg:px-10 bg-black overflow-hidden">
-  {/* Top metallic border */}
-  <div className="absolute top-0 left-0 right-0 h-2
+      {/* We Deliver – Industry Partnerships */}
+      <section className="relative py-20 px-6 lg:px-10 bg-black overflow-hidden">
+        {/* Top metallic border */}
+        <div className="absolute top-0 left-0 right-0 h-2
     bg-gradient-to-r
     from-[#5d4300]
     via-[#8b5e00]
@@ -165,10 +165,10 @@ export function Home({ onNavigate }: HomeProps) {
     via-[#b67f00]
     via-[#8b5e00]
     to-[#5d4300]"
-  />
+        />
 
-  {/* Bottom metallic border */}
-  <div className="absolute bottom-0 left-0 right-0 h-2
+        {/* Bottom metallic border */}
+        <div className="absolute bottom-0 left-0 right-0 h-2
     bg-gradient-to-r
     from-[#5d4300]
     via-[#8b5e00]
@@ -177,81 +177,81 @@ export function Home({ onNavigate }: HomeProps) {
     via-[#b67f00]
     via-[#8b5e00]
     to-[#5d4300]"
-  />
+        />
 
-  <div className="max-w-[1280px] mx-auto">
+        <div className="max-w-[1280px] mx-auto">
 
-    {/* Header */}
-    <div className='flexbb'>
-    <div className="p-7 mb-16 max-w-2xl text-center mx-auto">
-      <h2 className="text-3xl text-center font-serif text-[#f3f3f3] mb-4">
-        We Deliver
-      </h2>
-      <p className="text-slate-100 leading-relaxed">
-        We have partnered with multiple industries to deliver all these fine products
-        to our customers, providing a seamless sourcing and delivery experience across
-        diverse categories.
-      </p>
-    </div>
-    </div>
+          {/* Header */}
+          <div className='flexbb'>
+            <div className="p-7 mb-16 max-w-2xl text-center mx-auto">
+              <h2 className="text-3xl text-center font-serif text-[#f3f3f3] mb-4">
+                We Deliver
+              </h2>
+              <p className="text-slate-100 leading-relaxed">
+                We have partnered with multiple industries to deliver all these fine products
+                to our customers, providing a seamless sourcing and delivery experience across
+                diverse categories.
+              </p>
+            </div>
+          </div>
 
-    {/* Horizontal Flex Grid */}
-    <div className='flex flex-wrap md:flex-nowrap gap-8'>
+          {/* Horizontal Flex Grid - Centered on Desktop */}
+          <div className='flex flex-wrap md:flex-nowrap justify-center gap-8'>
 
-      {/* Card 1 */}
-      <div className="w-full md:w-[32%] flex flex-col gap-4 p-8 rounded-xl border border-[#D4AF37]
+            {/* Card 1 */}
+            <div className="w-full md:flex-1 max-w-[400px] flex flex-col gap-4 p-8 rounded-xl border border-[#D4AF37]
+              transition-all duration-300
+              hover:shadow-[0_0_30px_rgba(212,175,55,0.45)]
+              hover:-translate-y-1">
+              <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-[#D4AF37]/15 text-[#D4AF37]">
+                <Glasses size={26} />
+              </div>
+              <h4 className="text-lg font-semibold text-slate-200">Cosmetics & Beauty Products</h4>
+              <p className="text-sm text-slate-100 leading-relaxed">
+                Explore premium cosmetics, skincare, fragrances, and personal care products
+                sourced from trusted manufacturers and suppliers.
+              </p>
+            </div>
+
+            {/* Card 2 */}
+            <div className="w-full md:flex-1 max-w-[400px] flex flex-col gap-4 p-8 rounded-xl border border-[#D4AF37]
         transition-all duration-300
         hover:shadow-[0_0_30px_rgba(212,175,55,0.45)]
         hover:-translate-y-1">
-        <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-[#D4AF37]/15 text-[#D4AF37]">
-          <Glasses size={26} />
-        </div>
-        <h4 className="text-lg font-semibold text-slate-200">Cosmetics & Beauty Products</h4>
-        <p className="text-sm text-slate-100 leading-relaxed">
-          Explore premium cosmetics, skincare, fragrances, and personal care products
-          sourced from trusted manufacturers and suppliers.
-        </p>
-      </div>
+              <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-[#D4AF37]/15 text-[#D4AF37]">
+                <Construction size={26} />
+              </div>
+              <h4 className="text-lg font-semibold text-slate-200">Building Materials</h4>
+              <p className="text-sm text-slate-100 leading-relaxed">
+                Source durable construction materials including structural, finishing, and
+                industrial-grade supplies for residential and commercial projects.
+              </p>
+            </div>
 
-      {/* Card 2 */}
-      <div className="w-full md:w-[32%] flex flex-col gap-4 p-8 rounded-xl border border-[#D4AF37]
+            {/* Card 3 */}
+            <div className="w-full md:flex-1 max-w-[400px] flex flex-col gap-4 p-8 rounded-xl border border-[#D4AF37]
         transition-all duration-300
         hover:shadow-[0_0_30px_rgba(212,175,55,0.45)]
         hover:-translate-y-1">
-        <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-[#D4AF37]/15 text-[#D4AF37]">
-          <Construction size={26} />
+              <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-[#D4AF37]/15 text-[#D4AF37]">
+                <Tv2 size={26} />
+              </div>
+              <h4 className="text-lg font-semibold text-slate-200">Electrical Appliances</h4>
+              <p className="text-sm text-slate-100 leading-relaxed">
+                Discover reliable electrical and electronic appliances designed for homes,
+                offices, and industrial applications.
+              </p>
+            </div>
+
+          </div>
         </div>
-        <h4 className="text-lg font-semibold text-slate-200">Building Materials</h4>
-        <p className="text-sm text-slate-100 leading-relaxed">
-          Source durable construction materials including structural, finishing, and
-          industrial-grade supplies for residential and commercial projects.
-        </p>
-      </div>
-
-      {/* Card 3 */}
-      <div className="w-full md:w-[32%] flex flex-col gap-4 p-8 rounded-xl border border-[#D4AF37]
-        transition-all duration-300
-        hover:shadow-[0_0_30px_rgba(212,175,55,0.45)]
-        hover:-translate-y-1">
-        <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-[#D4AF37]/15 text-[#D4AF37]">
-          <Tv2 size={26} />
-        </div>
-        <h4 className="text-lg font-semibold text-slate-200">Electrical Appliances</h4>
-        <p className="text-sm text-slate-100 leading-relaxed">
-          Discover reliable electrical and electronic appliances designed for homes,
-          offices, and industrial applications.
-        </p>
-      </div>
-
-    </div>
-  </div>
-</section>
+      </section>
 
 
 
 
 
-  
+
 
       {/* Featured Section */}
       <div className="section">
