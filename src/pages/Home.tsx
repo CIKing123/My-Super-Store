@@ -179,7 +179,7 @@ export function Home({ onNavigate }: HomeProps) {
     to-[#5d4300]"
   />
 
-  <div className="max-w-[1280px] mx-auto">
+  <div className="flex flex-wrap justify-center gap-8">
 
     {/* Header */}
     <div className='flexbb'>
