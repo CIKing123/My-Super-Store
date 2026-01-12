@@ -37,6 +37,11 @@
 
 }
 
+html {
+    overflow-x: hidden;
+    /* Prevent horizontal scroll at root */
+}
+
 body {
     margin: 0;
     background-color: var(--bg-page);
@@ -44,6 +49,16 @@ body {
     font-family: var(--font-primary);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+    /* Prevent horizontal scroll */
+}
+
+/* Prevent media overflow */
+img,
+video,
+iframe {
+    max-width: 100%;
+    height: auto;
 }
 
 /* Global Link Styles */

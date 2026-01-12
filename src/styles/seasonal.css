@@ -21,8 +21,8 @@
 .snowflake {
     position: absolute;
     top: -10px;
-    color: #a8d8ea;
-    font-size: 1em;
+    color: #16b3ec;
+    font-size: 2rem;
     opacity: 0.9;
     text-shadow: 0 0 8px rgba(135, 206, 235, 0.8),
         0 0 12px rgba(176, 224, 230, 0.6);
@@ -142,6 +142,12 @@
     left: 0;
     z-index: 9999;
     pointer-events: none;
+    overflow: hidden;
+    /* Contain ribbon within banner */
+    width: 150px;
+    /* Limit banner width */
+    height: 150px;
+    /* Limit banner height */
 }
 
 .corner-ribbon {
@@ -149,6 +155,7 @@
     top: 25px;
     left: -50px;
     width: 200px;
+    opacity: 0.8;
     padding: 8px 0;
     background: linear-gradient(135deg, #8b0000 0%, #c41e3a 25%, #8b0000 50%, #6b0000 100%);
     color: #fff;

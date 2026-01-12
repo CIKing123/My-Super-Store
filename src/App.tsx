@@ -45,7 +45,7 @@ export default function App() {
           <div className="min-h-screen flex flex-col">
             <HeaderWrapper />
 
-            <main className="grow">
+            <main className="grow px-4 sm:px-6 lg:px-8">
               <Routes>
                 <Route path="/" element={<Home onNavigate={handleNavigate} />} />
                 <Route path="/shop" element={<Shop onNavigate={handleNavigate} />} />
