@@ -12,8 +12,11 @@ import { Account } from './pages/Account';
 import { About } from './pages/About';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider, useCart } from './context/CartContext';
+import { SeasonProvider } from './context/SeasonContext';
 
 import { GlobalNotifications } from './components/GlobalNotifications';
+import { SeasonalOverlay } from './components/SeasonalOverlay';
+import { GreetingModal } from './components/GreetingModal';
 
 // Header Wrapper to use Cart Context
 const HeaderWrapper = () => {
@@ -35,27 +38,31 @@ export default function App() {
   return (
     <AuthProvider>
       <CartProvider>
-        <GlobalNotifications />
-        <div className="min-h-screen flex flex-col">
-          <HeaderWrapper />
+        <SeasonProvider>
+          <SeasonalOverlay />
+          <GreetingModal />
+          <GlobalNotifications />
+          <div className="min-h-screen flex flex-col">
+            <HeaderWrapper />
 
-          <main className="grow">
-            <Routes>
-              <Route path="/" element={<Home onNavigate={handleNavigate} />} />
-              <Route path="/shop" element={<Shop onNavigate={handleNavigate} />} />
-              <Route path="/product/:id" element={<ProductDetail />} />
-              <Route path="/cart" element={<Cart onNavigate={handleNavigate} />} />
-              <Route path="/checkout" element={<Checkout />} />
-              <Route path="/order-confirmation" element={<OrderConfirmation />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/account" element={<Account />} />
-              <Route path="/about" element={<About />} />
-              <Route path="*" element={<Home onNavigate={handleNavigate} />} />
-            </Routes>
-          </main>
+            <main className="grow">
+              <Routes>
+                <Route path="/" element={<Home onNavigate={handleNavigate} />} />
+                <Route path="/shop" element={<Shop onNavigate={handleNavigate} />} />
+                <Route path="/product/:id" element={<ProductDetail />} />
+                <Route path="/cart" element={<Cart onNavigate={handleNavigate} />} />
+                <Route path="/checkout" element={<Checkout />} />
+                <Route path="/order-confirmation" element={<OrderConfirmation />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/account" element={<Account />} />
+                <Route path="/about" element={<About />} />
+                <Route path="*" element={<Home onNavigate={handleNavigate} />} />
+              </Routes>
+            </main>
 
-          <Footer />
-        </div>
+            <Footer />
+          </div>
+        </SeasonProvider>
       </CartProvider>
     </AuthProvider>
   );
