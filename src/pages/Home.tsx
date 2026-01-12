@@ -4,7 +4,7 @@ import { ProductCarousel } from '../components/ProductCarousel';
 import TypingText from '../components/TypingText';
 import Reveal from '../components/Reveal';
 import { supabase } from '../lib/supabase';
-import { Star, Shield, Truck, Tv2, Search, User, ShoppingBag,Glasses, ChevronRight, Gem, Construction } from 'lucide-react';
+import { Star, Shield, Truck, Tv2, Glasses, ChevronRight, Construction } from 'lucide-react';
 
 interface HomeProps {
   onNavigate: (page: string, productId?: any) => void;
