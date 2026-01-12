@@ -17,19 +17,38 @@ export function Home({ onNavigate }: HomeProps) {
   useEffect(() => {
     const fetchFeatured = async () => {
       try {
-        const { data } = await supabase
+        // Fetch ALL published products for general users (not filtered by vendor)
+        const { data, error } = await supabase
           .from('products')
-          .select('*, product_images(url), product_categories(categories(name))')
+          .select(`
+            *,
+            product_images (url, alt_text, position),
+            product_categories (
+              categories (name)
+            )
+          `)
+          .eq('published', true)
+          .order('created_at', { ascending: false })
           .limit(8);
 
+        if (error) {
+          console.error('Supabase error:', error);
+          throw error;
+        }
+
+        console.log('Home - Fetched products:', data?.length); // Debug log
+
         if (data) {
-          setFeaturedProducts(data.map(p => ({
+          setFeaturedProducts(data.map((p: any) => ({
             id: p.id,
             name: p.name,
             price: p.price,
-            image: undefined,
-            product_images: p.product_images,
-            category: p.product_categories?.[0]?.categories?.name
+            stock: p.stock || 0,
+            brand: p.brand,
+            short_description: p.short_description,
+            image: p.product_images?.sort((a: any, b: any) => (a.position || 0) - (b.position || 0))[0]?.url,
+            product_images: p.product_images?.sort((a: any, b: any) => (a.position || 0) - (b.position || 0)) || [],
+            category: p.product_categories?.[0]?.categories?.name || 'Uncategorized'
           })));
         }
       } catch (error) {
@@ -87,6 +106,20 @@ export function Home({ onNavigate }: HomeProps) {
                   className="flex items-center justify-center rounded-lg h-14 px-8 min-w-[180px] bg-white border border-slate-200 text-slate-900 text-base font-bold tracking-wide uppercase hover:bg-slate-50 hover:border-slate-300 transition-all"
                 >
                   <span>Explore More</span>
+                </button>
+
+                {/* Vendor Dashboard CTA */}
+                <button
+                  onClick={() => onNavigate('vendor/dashboard')}
+                  className="flex items-center gap-2 justify-center rounded-lg h-14 px-8 min-w-[180px] bg-slate-900 text-white text-base font-bold tracking-wide uppercase hover:bg-slate-800 transition-all border border-slate-700"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                  </svg>
+                  <span>Vendor Portal</span>
                 </button>
               </div>
 
@@ -179,7 +212,7 @@ export function Home({ onNavigate }: HomeProps) {
     to-[#5d4300]"
         />
 
-  <div className="flex flex-wrap justify-center gap-8">
+        <div className="flex flex-wrap justify-center gap-8">
 
           {/* Header */}
           <div className='flexbb'>

@@ -1,13 +1,17 @@
 import { useEffect, useState } from 'react';
-import { Heart, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Heart, ChevronLeft, ChevronRight, Package } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 
 interface Product {
   id: number;
   name: string;
   price: number;
+  stock?: number;
+  brand?: string;
+  sku?: string;
+  short_description?: string;
   image?: string;
-  product_images?: { url: string }[];
+  product_images?: { url: string; alt_text?: string; position?: number }[];
   category: string;
 }
 
@@ -49,13 +53,15 @@ export function ProductCard({ product, onProductClick, variant = 'default' }: Pr
   const handleMouseEnter = () => setIsAutoRotating(false);
   const handleMouseLeave = () => setIsAutoRotating(true);
 
+  const inStock = (product.stock ?? 0) > 0;
+
   return (
     <div
       onClick={() => onProductClick(product.id)}
       className={`product-card ${variant === 'black' ? 'card-black p-4' : ''}`}
     >
       {/* Image Container with Carousel */}
-      <div 
+      <div
         className="product-image-container group relative"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
@@ -67,6 +73,20 @@ export function ProductCard({ product, onProductClick, variant = 'default' }: Pr
             alt={product.name}
             className="product-image transition-opacity duration-500"
           />
+
+          {/* Stock Badge */}
+          {!inStock && (
+            <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-semibold">
+              Out of Stock
+            </div>
+          )}
+
+          {/* Brand Badge */}
+          {product.brand && (
+            <div className="absolute top-2 right-2 bg-black/60 text-[#D4AF37] px-2 py-1 rounded text-xs font-medium backdrop-blur-sm">
+              {product.brand}
+            </div>
+          )}
 
           {/* Image Counter */}
           {images.length > 1 && (
@@ -105,11 +125,10 @@ export function ProductCard({ product, onProductClick, variant = 'default' }: Pr
                     setIsAutoRotating(false);
                     setImageIndex(index);
                   }}
-                  className={`w-1 h-1 rounded-full transition-all ${
-                    index === imageIndex
+                  className={`w-1 h-1 rounded-full transition-all ${index === imageIndex
                       ? 'bg-[#D4AF37] w-2'
                       : 'bg-white/40 hover:bg-white/60'
-                  }`}
+                    }`}
                 />
               ))}
             </div>
@@ -117,7 +136,7 @@ export function ProductCard({ product, onProductClick, variant = 'default' }: Pr
         </div>
 
         {/* Wishlist Button */}
-        <button 
+        <button
           className="wishlist-btn"
           onClick={(e) => e.stopPropagation()}
         >
@@ -129,6 +148,25 @@ export function ProductCard({ product, onProductClick, variant = 'default' }: Pr
       <div className="product-info">
         <p className="product-category">{product.category}</p>
         <h3 className="product-name">{product.name}</h3>
+
+        {/* Short Description */}
+        {product.short_description && (
+          <p className="text-xs text-gray-600 mb-2 line-clamp-2">
+            {product.short_description}
+          </p>
+        )}
+
+        {/* SKU and Stock Info */}
+        <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
+          {product.sku && <span>SKU: {product.sku}</span>}
+          {inStock && (
+            <span className="flex items-center gap-1 text-green-600">
+              <Package size={12} />
+              {product.stock} in stock
+            </span>
+          )}
+        </div>
+
         <div className="product-price">
           ${product.price.toLocaleString()}
         </div>
