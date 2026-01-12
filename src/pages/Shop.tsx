@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ChevronDown, SlidersHorizontal, Loader2 } from 'lucide-react';
 import { ProductCard } from '../components/ProductCard';
+import { useSearchParams } from 'react-router-dom';
 
 import { supabase } from '../lib/supabase';
 
@@ -23,12 +24,24 @@ export function Shop({ onNavigate }: ShopProps) {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [sortBy, setSortBy] = useState<string>('featured');
+  const [searchParams] = useSearchParams();
 
   const categories = ['All', 'Cosmetics', 'Construction', 'Furniture', 'Clothing and Fashion', 'Events Tools', 'Electrical Appliances'];
 
   useEffect(() => {
     fetchProducts();
   }, []);
+
+  useEffect(() => {
+  const categoryFromUrl = searchParams.get('category');
+
+  if (categoryFromUrl) {
+    setSelectedCategory(categoryFromUrl);
+  } else {
+    setSelectedCategory('All');
+  }
+}, [searchParams]);
+
 
   const fetchProducts = async () => {
     try {
@@ -101,13 +114,22 @@ export function Shop({ onNavigate }: ShopProps) {
         {/* Category Filters */}
         <div className="filter-group">
           {categories.map((category) => (
-            <button
-              key={category}
-              onClick={() => setSelectedCategory(category)}
-              className={`filter-chip ${selectedCategory === category ? 'active' : ''}`}
-            >
-              {category}
-            </button>
+          <button
+            key={category}
+            onClick={() => {
+              setSelectedCategory(category);
+
+              if (category === 'All') {
+                searchParams.delete('category');
+                setSearchParams(searchParams);
+              } else {
+                setSearchParams({ category });
+              }
+            }}
+            className={`filter-chip ${selectedCategory === category ? 'active' : ''}`}
+          >
+            {category}
+          </button>
           ))}
         </div>
 

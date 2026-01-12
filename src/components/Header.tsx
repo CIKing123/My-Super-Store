@@ -1,4 +1,4 @@
-import { Search, ShoppingCart, User, Menu, X, Gem } from 'lucide-react';
+import { Search, ShoppingCart, User, Menu, X, Gem, ChevronDown } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
@@ -9,6 +9,7 @@ interface HeaderProps {
 
 export function Header({ cartItemCount }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isShopDropdownOpen, setIsShopDropdownOpen] = useState(false);
   const [user, setUser] = useState<any>(null); // eslint-disable-line @typescript-eslint/no-explicit-any
   const location = useLocation();
   const navigate = useNavigate();
@@ -25,12 +26,22 @@ export function Header({ cartItemCount }: HeaderProps) {
     return () => subscription.unsubscribe();
   }, []);
 
+  const shopCategories = [
+    { label: 'All Products', value: 'All' },
+    { label: 'Cosmetics', value: 'Cosmetics' },
+    { label: 'Construction', value: 'Construction' },
+    { label: 'Furniture', value: 'Furniture' },
+    { label: 'Clothing and Fashion', value: 'Clothing and Fashion' },
+    { label: 'Events Tools', value: 'Events Tools' },
+    { label: 'Electrical Appliances', value: 'Electrical Appliances' }
+  ];
+
   const navItems = [
     { name: 'Home', path: '/' },
-    { name: 'Shop', path: '/shop' },
     { name: 'About', path: '/about' },
     { name: 'Login', path: '/login' }
   ];
+
 
   const isAccountPage = location.pathname.startsWith('/account');
 
@@ -60,7 +71,7 @@ export function Header({ cartItemCount }: HeaderProps) {
           </Link>
 
           {/* Desktop Nav Links - Between Logo and Icons */}
-          <nav style={{ display: window.innerWidth >= 768 ? 'flex' : 'none', gap: '24px', marginLeft: '48px' }} className="items-center">
+          <nav style={{ display: window.innerWidth >= 768 ? 'flex' : 'none', gap: '24px', marginLeft: '48px' }} className="items-center relative">
             {navItems.map((item) => (
               <Link
                 key={item.name}
@@ -70,16 +81,47 @@ export function Header({ cartItemCount }: HeaderProps) {
                 {item.name}
               </Link>
             ))}
+            
+            {/* Shop Dropdown */}
+            <div 
+              className="relative group"
+              onMouseEnter={() => setIsShopDropdownOpen(true)}
+              onMouseLeave={() => setIsShopDropdownOpen(false)}
+            >
+              <button className={`flex items-center gap-1 ${textMutedClass} ${linkHoverClass} transition-colors text-sm font-semibold tracking-wide`}>
+                Shop
+                <ChevronDown size={16} className={`transition-transform duration-300 ${isShopDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+              
+              {/* Dropdown Menu */}
+              {isShopDropdownOpen && (
+                <div className={`absolute top-full left-0 mt-2 w-48 rounded-lg shadow-lg z-50 ${
+                  isAccountPage ? 'bg-[#1a1a1a] border border-white/10' : 'bg-white border border-slate-200'
+                }`}>
+                  {shopCategories.map((category) => (
+                    <button
+                      key={category.value}
+                      onClick={() => {
+                        navigate(`/shop?category=${category.value}`);
+                        setIsShopDropdownOpen(false);
+                      }}
+                      className={`w-full text-left px-4 py-3 transition-colors ${
+                        isAccountPage 
+                          ? 'text-white hover:bg-white/10 first:rounded-t-lg last:rounded-b-lg border-b border-white/5 last:border-b-0' 
+                          : 'text-slate-900 hover:bg-slate-100 first:rounded-t-lg last:rounded-b-lg border-b border-slate-200 last:border-b-0'
+                      } text-sm font-medium`}
+                    >
+                      {category.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </nav>
 
           {/* Icons / Actions - Right */}
           <div className="flex items-center gap-3 sm:gap-4 md:gap-5 ml-auto">
-            <button 
-              onClick={() => navigate('/shop')}
-              className={` sm:flex items-center justify-center size-10 rounded-full ${hoverBgClass} transition-colors ${textColorClass}`}
-            >
-              <Search size={20} strokeWidth={2} />
-            </button>
+ 
             <button 
               onClick={() => navigate(user ? '/account' : '/login')}
               className={`flex items-center justify-center size-10 rounded-full ${hoverBgClass} transition-colors ${textColorClass}`}
@@ -125,6 +167,23 @@ export function Header({ cartItemCount }: HeaderProps) {
                   {item.name}
                 </Link>
               ))}
+              
+              {/* Mobile Shop Categories */}
+              <div className="border-t border-white/10 pt-4 mt-4">
+                <p className={`${textColorClass} text-sm font-semibold mb-3`}>Shop by Category</p>
+                {shopCategories.map((category) => (
+                  <button
+                    key={category.value}
+                    onClick={() => {
+                      navigate(`/shop?category=${category.value}`);
+                      setIsMenuOpen(false);
+                    }}
+                    className={`w-full text-left px-3 py-2 ${textMutedClass} ${linkHoverClass} transition-colors text-sm font-medium no-underline`}
+                  >
+                    {category.label}
+                  </button>
+                ))}
+              </div>
             </div>
           </nav>
         </div>
