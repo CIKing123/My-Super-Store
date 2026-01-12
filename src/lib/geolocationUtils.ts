@@ -91,6 +91,7 @@ export async function getCurrentLocation(): Promise<{ lat: number; lng: number; 
 
 export async function reverseGeocode(lat: number, lng: number): Promise<{
   line1: string;
+  neighborhood: string;
   city: string;
   state: string;
   country: string;
@@ -113,6 +114,7 @@ export async function reverseGeocode(lat: number, lng: number): Promise<{
       console.warn('[ReverseGeocode] No address found for coordinates');
       return {
         line1: `${lat.toFixed(5)}, ${lng.toFixed(5)}`,
+        neighborhood: '',
         city: 'Unknown',
         state: 'Unknown',
         country: 'Unknown',
@@ -135,6 +137,7 @@ export async function reverseGeocode(lat: number, lng: number): Promise<{
 
     const address = {
       line1: result.formatted_address.split(',')[0].trim(),
+      neighborhood: getPart(['neighborhood', 'sublocality_level_1', 'sublocality']),
       city: getPart(['locality', 'administrative_area_level_2', 'administrative_area_level_3']),
       state: getPart(['administrative_area_level_1']),
       country: getPart(['country']),
@@ -153,6 +156,7 @@ export async function getAddressFromLocation(): Promise<{
   lat: number;
   lng: number;
   line1: string;
+  neighborhood: string;
   city: string;
   state: string;
   country: string;
