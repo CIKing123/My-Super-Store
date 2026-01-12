@@ -95,8 +95,10 @@ export function Header({ cartItemCount }: HeaderProps) {
               
               {/* Dropdown Menu */}
               {isShopDropdownOpen && (
-                <div className={`absolute top-full left-0 mt-2 w-48 rounded-lg shadow-lg z-50 ${
-                  isAccountPage ? 'bg-[#1a1a1a] border border-white/10' : 'bg-white border border-slate-200'
+                <div className={`absolute top-full left-0 mt-2 w-56 rounded-lg shadow-lg z-50 backdrop-blur-md ${
+                  isAccountPage 
+                    ? 'bg-[#0A0A0A]/80 border border-white/10' 
+                    : 'bg-white/30 border border-white/20'
                 }`}>
                   {shopCategories.map((category) => (
                     <button
@@ -105,10 +107,10 @@ export function Header({ cartItemCount }: HeaderProps) {
                         navigate(`/shop?category=${category.value}`);
                         setIsShopDropdownOpen(false);
                       }}
-                      className={`w-full text-left px-4 py-3 transition-colors ${
+                      className={`w-full text-left px-4 py-3 transition-all ${
                         isAccountPage 
-                          ? 'text-white hover:bg-white/10 first:rounded-t-lg last:rounded-b-lg border-b border-white/5 last:border-b-0' 
-                          : 'text-slate-900 hover:bg-slate-100 first:rounded-t-lg last:rounded-b-lg border-b border-slate-200 last:border-b-0'
+                          ? 'text-white/70 hover:text-white hover:bg-white/10 first:rounded-t-lg last:rounded-b-lg' 
+                          : 'text-slate-900/70 hover:text-slate-900 hover:bg-slate-100/20 first:rounded-t-lg last:rounded-b-lg'
                       } text-sm font-medium`}
                     >
                       {category.label}

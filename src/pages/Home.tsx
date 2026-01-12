@@ -59,7 +59,13 @@ export function Home({ onNavigate }: HomeProps) {
                 </div>
 
                 {/* Main Title with Typing Animation */}
-                <h1 className="text-slate-900 text-5xl sm:text-6xl lg:text-7xl font-extrabold leading-[1.1] tracking-[-0.02em]">
+                <h1 className="text-slate-900 text-5xl sm:text-6xl lg:text-7xl font-extrabold leading-[1.1] tracking-[-0.02em]"
+                style={{
+    textShadow: `
+      0 0 6px rgba(236, 211, 141, 0.03),
+      0 0 14px rgba(231, 227, 214, 0.36)
+    `
+  }}>
                   <TypingText texts={["Collect the Exceptional.", "Embrace Luxury.", "Redefine Excellence."]} />
                 </h1>
 
@@ -182,7 +188,7 @@ export function Home({ onNavigate }: HomeProps) {
   <div className="flex flex-wrap justify-center gap-8">
 
           {/* Header */}
-          <div className='flexbb'>
+          <div className='flex'>
             <div className="p-7 mb-16 max-w-2xl text-center mx-auto">
               <h2 className="text-3xl text-center font-serif text-[#f3f3f3] mb-4">
                 We Deliver
