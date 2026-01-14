@@ -24,7 +24,7 @@ export function Shop({ onNavigate }: ShopProps) {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [sortBy, setSortBy] = useState<string>('featured');
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const categories = ['All', 'Cosmetics', 'Construction', 'Furniture', 'Clothing and Fashion', 'Events Tools', 'Electrical Appliances'];
 
@@ -102,7 +102,7 @@ export function Shop({ onNavigate }: ShopProps) {
           
         </div>
         <div className="relative z-10 text-center">
-          <h1 className="page-title">Luxury Collection</h1>
+          <h1 className="page-title" style={{fontFamily: "'Oswald', sans-serif"}}>Luxury Collection</h1>
           <p className="page-desc">
             {filteredProducts.length} exceptional pieces representing the pinnacle of craftsmanship.
           </p>

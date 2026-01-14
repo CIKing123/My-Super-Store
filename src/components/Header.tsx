@@ -76,7 +76,11 @@ export function Header({ cartItemCount }: HeaderProps) {
               <Link
                 key={item.name}
                 to={item.path}
-                className={`${textMutedClass} ${linkHoverClass} transition-colors text-sm font-semibold tracking-wide no-underline`}
+                className={`transition-all text-sm font-semibold tracking-wide no-underline ${
+                  isAccountPage 
+                    ? 'text-white 70 drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] hover:text-white hover:drop-shadow-[0_0_16px_rgba(255,255,255,0.8)]' 
+                    : `${textMutedClass} ${linkHoverClass} text-slate-900 drop-shadow-[0_0_8px_rgba(15,23,42,0.3)] hover:drop-shadow-[0_0_16px_rgba(15,23,42,0.6)]`
+                }`}
               >
                 {item.name}
               </Link>
@@ -110,7 +114,7 @@ export function Header({ cartItemCount }: HeaderProps) {
                       className={`w-full text-left px-4 py-3 transition-all ${
                         isAccountPage 
                           ? 'text-white/70 hover:text-white hover:bg-white/10 first:rounded-t-lg last:rounded-b-lg' 
-                          : 'text-slate-900/70 hover:text-slate-900 hover:bg-slate-100/20 first:rounded-t-lg last:rounded-b-lg'
+                          : 'text-slate-900/20 hover:text-slate-900 hover:bg-slate-100/20 first:rounded-t-lg last:rounded-b-lg'
                       } text-sm font-medium`}
                     >
                       {category.label}

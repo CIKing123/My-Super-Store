@@ -61,7 +61,7 @@ export function ProductCarousel({
 
   return (
     <div
-      className="relative w-full py-12 overflow-visible"
+      className="relative w-full py-12 overflow-hidden"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
@@ -70,14 +70,16 @@ export function ProductCarousel({
         ref={scrollRef}
         onScroll={handleScroll}
         className="
-          flex gap-6 px-12 overflow-x-auto scrollbar-hide
+          flex gap-6 px-12 overflow-x-auto
           scroll-smooth
           snap-x snap-mandatory
-          overflow-y-visible
+          overflow-y-hidden
         "
         style={{
-          WebkitOverflowScrolling: "touch",
+         
           minHeight: "500px",
+          msOverflowStyle: "none",
+          scrollbarWidth: "none",
         }}
       >
         {products.map((product, index) => {
@@ -97,7 +99,7 @@ export function ProductCarousel({
                 alignItems: "center",
               }}
             >
-              <div className="glass-border shadow-2xl w-full" style={{ height: "420px" }}>
+              <div className="glass-border shadow-2xl w-full" style={{ height: "450px" }}>
                 <ProductCard
                   product={product}
                   onProductClick={onProductClick}

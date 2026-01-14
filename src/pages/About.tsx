@@ -46,7 +46,7 @@ export function About() {
       <div className="relative z-10">
         {/* Hero Section */}
         <section className="hero-section">
-          <h1 className="hero-title">
+          <h1 className="hero-title" style={{fontFamily: "'Oswald', sans-serif"}}>
             Connecting Worlds.<br />
             Delivering Excellence.
           </h1>
@@ -60,7 +60,7 @@ export function About() {
           <div className="container">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
               <div>
-                <h2 className="text-3xl font-serif text-[#D4AF37] mb-6">
+                <h2 className="text-3xl font-serif text-[#D4AF37] mb-6" style={{fontFamily: "'Oswald', sans-serif"}}>
                   What We Do
                 </h2>
                 <div className="space-y-6 text-black ml-20">
@@ -109,7 +109,7 @@ export function About() {
           className="features-section metallic-scroll-border bg-black py-20"
         >
           <div className="container">
-            <h2 className="text-3xl font-serif text-center text-[#D4AF37] mb-4">
+            <h2 className="text-3xl font-serif text-center text-[#D4AF37] mb-4" style={{fontFamily: "'Oswald', sans-serif"}}>
               Contact & Support
             </h2>
 
@@ -160,7 +160,7 @@ export function About() {
         {/* Shipping Info Section */}
         <section className="section bg-[#0F0F0F]">
           <div className="container">
-            <h2 className="text-3xl font-serif text-center text-[#D4AF37] mb-8">
+            <h2 className="text-3xl font-serif text-center text-[#D4AF37] mb-8" style={{fontFamily: "'Oswald', sans-serif"}}>
               Shipping Information
             </h2>
 

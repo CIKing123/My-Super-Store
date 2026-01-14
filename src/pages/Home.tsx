@@ -59,8 +59,7 @@ export function Home({ onNavigate }: HomeProps) {
                 </div>
 
                 {/* Main Title with Typing Animation */}
-                <h1 className="text-slate-900 text-5xl sm:text-6xl lg:text-7xl font-extrabold leading-[1.1] tracking-[-0.02em]"
-                style={{
+                <h1 className="text-slate-900 text-5xl sm:text-6xl lg:text-7xl font-extrabold leading-[1.1] tracking-[-0.02em]" style={{fontFamily: "'Oswald', sans-serif",
     textShadow: `
       0 0 6px rgba(236, 211, 141, 0.03),
       0 0 14px rgba(231, 227, 214, 0.36)
@@ -160,7 +159,7 @@ export function Home({ onNavigate }: HomeProps) {
       {/*What we deliver*/}
 
       {/* We Deliver – Industry Partnerships */}
-      <section className="relative py-20 px-6 lg:px-10 bg-black overflow-hidden">
+      <section className="relative py-20 px-2 lg:px-10 bg-black overflow-hidden">
         {/* Top metallic border */}
         <div className="absolute top-0 left-0 right-0 h-2
     bg-gradient-to-r
@@ -190,7 +189,7 @@ export function Home({ onNavigate }: HomeProps) {
           {/* Header */}
           <div className='flex'>
             <div className="p-7 mb-16 max-w-2xl text-center mx-auto">
-              <h2 className="text-3xl text-center font-serif text-[#f3f3f3] mb-4">
+              <h2 className="text-3xl text-center font-serif text-[#f3f3f3] mb-4" style={{fontFamily: "'Oswald', sans-serif"}}>
                 We Deliver
               </h2>
               <p className="text-slate-100 leading-relaxed">
@@ -263,7 +262,7 @@ export function Home({ onNavigate }: HomeProps) {
       <div className="section">
         <div className="flex justify-between items-end mb-12">
           <div>
-            <h2 className="text-3xl font-serif text-[#D4AF37] mb-4">Featured Collection</h2>
+            <h2 className="text-3xl font-serif text-[#D4AF37] mb-4" style={{fontFamily: "'Oswald', sans-serif"}}>Featured Collection</h2>
             <p className="text-muted max-w-xl">
               Curated selection of our most exclusive pieces, designed for the discerning few.
             </p>

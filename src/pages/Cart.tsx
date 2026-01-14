@@ -26,7 +26,7 @@ export function Cart({ onNavigate }: CartProps) {
 
   return (
     <div className="page-fade section relative">
-      <h1 className="page-title mb-12">Shopping Cart</h1>
+      <h1 className="page-title mb-12" >Shopping Cart</h1>
 
       {items.length === 0 ? (
         <div className="card-black p-24 text-center">
@@ -103,7 +103,7 @@ export function Cart({ onNavigate }: CartProps) {
           {/* Order Summary */}
           <div>
             <div className="card-black p-8 sticky top-24">
-              <h3 className="text-white mb-8 font-serif">Order Summary</h3>
+              <h3 className="text-white mb-8 font-serif" style={{fontFamily: "'Oswald', sans-serif"}}>Order Summary</h3>
 
               <div className="space-y-4 mb-8">
                 <div className="summary-row">
