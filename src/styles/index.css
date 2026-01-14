@@ -1093,13 +1093,33 @@ h6 {
 }
 
 .glass-border {
-    border: 0.05px solid #B8941F;
-    padding: 12px;
+    border: 2px solid rgba(212, 175, 55, 0.6);
+    padding: 3px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 1.2rem;
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(184, 148, 31, 0.1) 50%, rgba(212, 175, 55, 0.15) 100%);
+    box-shadow:
+        0 0 15px rgba(212, 175, 55, 0.3),
+        0 0 30px rgba(212, 175, 55, 0.15),
+        inset 0 0 20px rgba(212, 175, 55, 0.05);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
 
-    backdrop-filter: blur(5rem);
-    -webkit-backdrop-filter: blur(5rem);
+.glass-border:hover {
+    border-color: rgba(212, 175, 55, 0.9);
+    box-shadow:
+        0 0 20px rgba(212, 175, 55, 0.5),
+        0 0 40px rgba(212, 175, 55, 0.25),
+        0 0 60px rgba(212, 175, 55, 0.1),
+        inset 0 0 25px rgba(212, 175, 55, 0.1);
+}
+
+/* Ensure product card fits inside glass border */
+.glass-border .product-card {
     border-radius: 1rem;
-    background: rgba(245, 232, 163, 0.2);
+    margin: 0;
 }
 
 .sort-container {

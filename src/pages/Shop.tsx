@@ -9,10 +9,16 @@ interface Product {
   id: any;
   name: string;
   price: number;
-  image?: string;
-  product_images?: { url: string }[];
-  category: string; // Mapped from category logic or table
+  stock: number;
+  brand?: string;
+  sku?: string;
+  short_description?: string;
   description?: string;
+  image?: string;
+  product_images?: { url: string; alt_text?: string; position?: number }[];
+  category: string;
+  product_specs?: { spec_key: string; spec_value: string }[];
+  view_count?: number;
 }
 
 interface ShopProps {
@@ -33,41 +39,52 @@ export function Shop({ onNavigate }: ShopProps) {
   }, []);
 
   useEffect(() => {
-  const categoryFromUrl = searchParams.get('category');
+    const categoryFromUrl = searchParams.get('category');
 
-  if (categoryFromUrl) {
-    setSelectedCategory(categoryFromUrl);
-  } else {
-    setSelectedCategory('All');
-  }
-}, [searchParams]);
+    if (categoryFromUrl) {
+      setSelectedCategory(categoryFromUrl);
+    } else {
+      setSelectedCategory('All');
+    }
+  }, [searchParams]);
 
 
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      // Fetch products with their images and categories
+      // Fetch ALL published products with complete data including images, categories, and specs
       const { data, error } = await supabase
         .from('products')
         .select(`
           *,
-          product_images ( url ),
+          product_images ( url, alt_text, position ),
           product_categories (
             categories ( name )
-          )
-        `);
+          ),
+          product_specs ( spec_key, spec_value )
+        `)
+        .eq('published', true)
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
+
+      console.log('Fetched products:', data?.length); // Debug log
 
       // Transform data to match component needs
       const transformedProducts = data?.map((p: any) => ({
         id: p.id,
         name: p.name,
         price: p.price,
-        image: undefined,
-        product_images: p.product_images,
+        stock: p.stock || 0,
+        brand: p.brand,
+        sku: p.sku,
+        short_description: p.short_description,
+        description: p.description,
+        image: p.product_images?.sort((a: any, b: any) => a.position - b.position)[0]?.url,
+        product_images: p.product_images?.sort((a: any, b: any) => a.position - b.position) || [],
         category: p.product_categories?.[0]?.categories?.name || 'Uncategorized',
-        description: p.description
+        product_specs: p.product_specs || [],
+        view_count: p.view_count
       })) || [];
 
       setProducts(transformedProducts);
@@ -99,7 +116,7 @@ export function Shop({ onNavigate }: ShopProps) {
       {/* Header with Particles Behind */}
       <div className="relative min-h-[300px] flex items-center justify-center -mx-8 -mt-8 px-8 pt-8 mb-8" style={{ overflow: 'hidden' }}>
         <div className="absolute inset-0 z-0">
-          
+
         </div>
         <div className="relative z-10 text-center">
           <h1 className="page-title" style={{fontFamily: "'Oswald', sans-serif"}}>Luxury Collection</h1>
@@ -114,22 +131,22 @@ export function Shop({ onNavigate }: ShopProps) {
         {/* Category Filters */}
         <div className="filter-group">
           {categories.map((category) => (
-          <button
-            key={category}
-            onClick={() => {
-              setSelectedCategory(category);
+            <button
+              key={category}
+              onClick={() => {
+                setSelectedCategory(category);
 
-              if (category === 'All') {
-                searchParams.delete('category');
-                setSearchParams(searchParams);
-              } else {
-                setSearchParams({ category });
-              }
-            }}
-            className={`filter-chip ${selectedCategory === category ? 'active' : ''}`}
-          >
-            {category}
-          </button>
+                if (category === 'All') {
+                  searchParams.delete('category');
+                  setSearchParams(searchParams);
+                } else {
+                  setSearchParams({ category });
+                }
+              }}
+              className={`filter-chip ${selectedCategory === category ? 'active' : ''}`}
+            >
+              {category}
+            </button>
           ))}
         </div>
 

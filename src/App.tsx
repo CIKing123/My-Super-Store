@@ -18,6 +18,15 @@ import { GlobalNotifications } from './components/GlobalNotifications';
 import { SeasonalOverlay } from './components/SeasonalOverlay';
 import { GreetingModal } from './components/GreetingModal';
 
+// Vendor Dashboard Imports
+import { VendorLayout } from './components/vendor/VendorLayout';
+import { VendorDashboard } from './pages/vendor/VendorDashboard';
+import { ProductList } from './pages/vendor/ProductList';
+import { ProductForm } from './pages/vendor/ProductForm';
+import { ProductDetail as VendorProductDetail } from './pages/vendor/ProductDetail';
+import { OrderList } from './pages/vendor/OrderList';
+import { VendorProfile } from './pages/vendor/VendorProfile';
+
 // Header Wrapper to use Cart Context
 const HeaderWrapper = () => {
   const { itemCount } = useCart();
@@ -47,6 +56,7 @@ export default function App() {
 
             <main className="grow px-0 sm:px-0 lg:px-0">
               <Routes>
+                {/* Customer Routes */}
                 <Route path="/" element={<Home onNavigate={handleNavigate} />} />
                 <Route path="/shop" element={<Shop onNavigate={handleNavigate} />} />
                 <Route path="/product/:id" element={<ProductDetail />} />
@@ -56,6 +66,22 @@ export default function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/account" element={<Account />} />
                 <Route path="/about" element={<About />} />
+
+                {/* Vendor Routes */}
+                <Route path="/vendor/*" element={
+                  <VendorLayout>
+                    <Routes>
+                      <Route path="dashboard" element={<VendorDashboard />} />
+                      <Route path="products" element={<ProductList />} />
+                      <Route path="products/new" element={<ProductForm />} />
+                      <Route path="products/:id" element={<VendorProductDetail />} />
+                      <Route path="products/:id/edit" element={<ProductForm />} />
+                      <Route path="orders" element={<OrderList />} />
+                      <Route path="profile" element={<VendorProfile />} />
+                    </Routes>
+                  </VendorLayout>
+                } />
+
                 <Route path="*" element={<Home onNavigate={handleNavigate} />} />
               </Routes>
             </main>
