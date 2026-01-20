@@ -26,7 +26,7 @@ export function Checkout() {
     return (
         <div className="section relative">
             <div className="max-w-6xl mx-auto">
-                <h1 className="page-title mb-12">Checkout</h1>
+                <h1 className="page-title mb-12" style={{fontFamily: "'Oswald', sans-serif"}}>Checkout</h1>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
                     {/* Main Content */}
@@ -101,7 +101,7 @@ export function Checkout() {
 
                         {/* Shipping Form */}
                         <div className={`card-black ${step !== 1 ? 'opacity-50 pointer-events-none' : ''}`}>
-                            <h3 className="text-2xl font-serif mb-6 text-[var(--gold-primary)]">Shipping Address</h3>
+                            <h3 className="text-2xl font-serif mb-6 text-[var(--gold-primary)]" style={{fontFamily: "'Oswald', sans-serif"}}>Shipping Address</h3>
                             <div className="grid grid-cols-2 gap-6">
                                 <input type="text" placeholder="First Name" className="bg-white/10 border border-white/20 p-3 rounded text-white placeholder:text-gray-200" />
                                 <input type="text" placeholder="Last Name" className="bg-white/10 border border-white/20 p-3 rounded text-white placeholder:text-gray-200" />
@@ -122,7 +122,7 @@ export function Checkout() {
 
                         {/* Payment Form */}
                         <div className={`card-black ${step !== 2 ? 'opacity-50 pointer-events-none' : ''}`}>
-                            <h3 className="text-2xl font-serif mb-6 text-[var(--gold-primary)]">Payment Method</h3>
+                            <h3 className="text-2xl font-serif mb-6 text-[var(--gold-primary)]" style={{fontFamily: "'Oswald', sans-serif"}}>Payment Method</h3>
                             <div className="space-y-4">
                                 <div className="p-4 border border-[var(--gold-primary)] rounded flex items-center gap-4 bg-[var(--gold-glow)]">
                                     <CreditCard className="text-[var(--gold-primary)]" />
@@ -149,7 +149,7 @@ export function Checkout() {
                     {/* Order Summary */}
                     <div>
                         <div className="card-black sticky top-24">
-                            <h3 className="font-serif text-xl mb-6">Order Summary</h3>
+                            <h3 className="font-serif text-xl mb-6" style={{fontFamily: "'Oswald', sans-serif"}}>Order Summary</h3>
                             <div className="space-y-4 text-gray-400">
                                 <div className="flex justify-between"><span>Subtotal</span><span>$12,500</span></div>
                                 <div className="flex justify-between"><span>Shipping</span><span>Free</span></div>

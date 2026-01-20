@@ -119,7 +119,7 @@ export function Shop({ onNavigate }: ShopProps) {
 
         </div>
         <div className="relative z-10 text-center">
-          <h1 className="page-title">Luxury Collection</h1>
+          <h1 className="page-title" style={{fontFamily: "'Oswald', sans-serif"}}>Luxury Collection</h1>
           <p className="page-desc">
             {filteredProducts.length} exceptional pieces representing the pinnacle of craftsmanship.
           </p>

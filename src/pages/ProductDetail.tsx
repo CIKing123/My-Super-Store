@@ -114,23 +114,8 @@ export function ProductDetail() {
 
         {/* Product Info - Right Column Black Card */}
         <div className="card-black">
-          {/* Category & Brand */}
-          <div className="flex items-center gap-2 mb-2">
-            <p className="text-muted">{product.category}</p>
-            {product.brand && (
-              <>
-                <span className="text-muted">•</span>
-                <p className="text-[#D4AF37] font-medium">{product.brand}</p>
-              </>
-            )}
-          </div>
-
-          <h1 className="text-white mb-4" style={{ fontSize: '2.5rem' }}>{product.name}</h1>
-
-          {/* SKU */}
-          {product.sku && (
-            <p className="text-gray-400 text-sm mb-4">SKU: {product.sku}</p>
-          )}
+          <p className="text-muted mb-2">{product.category}</p>
+          <h1 className="text-white mb-6" style={{ fontSize: '2.5rem', fontFamily: "'Oswald', sans-serif" }}>{product.name}</h1>
 
           {/* Rating */}
           <div className="flex items-center gap-2 mb-6">
@@ -211,7 +196,7 @@ export function ProductDetail() {
 
           {/* Size Selection */}
           <div className="mb-6">
-            <h4 className="text-white mb-4">Select Size</h4>
+            <h4 className="text-white mb-4" style={{fontFamily: "'Oswald', sans-serif"}}>Select Size</h4>
             <div className="size-grid">
               {sizes.map((size) => (
                 <button
@@ -226,8 +211,8 @@ export function ProductDetail() {
           </div>
 
           {/* Quantity */}
-          <div className="mb-8">
-            <h4 className="text-white mb-4">Quantity</h4>
+          <div className="mb-12">
+            <h4 className="text-white mb-4" style={{fontFamily: "'Oswald', sans-serif"}}>Quantity</h4>
             <div className="quantity-controls">
               <button
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}

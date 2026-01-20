@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&family=Oswald:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 @import './seasonal.css';
 
@@ -567,7 +567,7 @@ h6 {
     border-radius: var(--radius-lg);
     overflow: hidden;
     cursor: pointer;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 0.1s ease, box-shadow 0.3s ease;
 
 }
 
