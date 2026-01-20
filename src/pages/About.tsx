@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 
 import { ProductCarousel } from '../components/ProductCarousel';
@@ -20,6 +21,7 @@ interface AboutProps {
 }
 
 export function About({ onNavigate }: AboutProps) {
+  const navigate = useNavigate();
   const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -118,21 +120,21 @@ export function About({ onNavigate }: AboutProps) {
               {/* CTA BUTTONS */}
               <div className="flex flex-wrap gap-4 pt-4">
                 <button
-                  onClick={() => onNavigate('shop')}
+                  onClick={() => navigate('/shop')}
                   className="group relative h-14 px-8 min-w-[180px] rounded-lg bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#B38728] text-white font-bold uppercase shadow-lg transition active:scale-95"
                 >
                   Shop Collection
                 </button>
 
                 <button
-                  onClick={() => onNavigate('shop')}
+                  onClick={() => navigate('/shop')}
                   className="h-14 px-8 min-w-[180px] rounded-lg border border-slate-200 font-bold uppercase hover:bg-slate-50"
                 >
                   Explore More
                 </button>
 
                 <button
-                  onClick={() => onNavigate('vendor/dashboard')}
+                  onClick={() => navigate('/vendor/dashboard')}
                   className="h-14 px-8 min-w-[180px] rounded-lg bg-slate-900 text-white font-bold uppercase border border-slate-700 hover:bg-slate-800"
                 >
                   Vendor Portal
