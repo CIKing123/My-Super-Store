@@ -47,7 +47,7 @@ export function Account() {
                 .select('*')
                 .eq('user_id', user!.id)
                 .single();
-            
+
             setProfile(profileData);
             setEditFormData({
                 display_name: profileData?.display_name || '',
@@ -70,13 +70,30 @@ export function Account() {
                 .eq('user_id', user!.id);
             setAddresses(addressesData || []);
 
-            // Fetch orders from orders table with related order_items and products
-            const { data: ordersData } = await supabase
+            // 1️⃣ Fetch orders
+            const { data: orders } = await supabase
                 .from('orders')
-                .select(`*, order_items ( *, products ( name, product_images ( url ) ) )`)
+                .select('*')
                 .eq('user_id', user!.id)
                 .order('placed_at', { ascending: false });
-            setOrders(ordersData || []);
+
+            if (orders && orders.length > 0) {
+                // 2️⃣ Fetch order_items for all orders
+                const orderIds = orders.map(o => o.id);
+                const { data: orderItems } = await supabase
+                    .from('order_items')
+                    .select('*, products(name, product_images(url))')
+                    .in('order_id', orderIds);
+
+                // 3️⃣ Combine in JS
+                const ordersWithItems = orders.map(order => ({
+                    ...order,
+                    order_items: orderItems?.filter(oi => oi.order_id === order.id) || [],
+                }));
+                setOrders(ordersWithItems);
+            } else {
+                setOrders([]);
+            }
 
             // Fetch user's cart from carts table, then get cart_items with products
             const { data: cartData } = await supabase
@@ -84,7 +101,7 @@ export function Account() {
                 .select('id')
                 .eq('user_id', user!.id)
                 .single();
-            
+
             if (cartData?.id) {
                 const { data: cartItemsData } = await supabase
                     .from('cart_items')
@@ -290,7 +307,7 @@ export function Account() {
                                     </h3>
                                     <p className="text-xs text-gray-500 mb-6 font-mono">{user?.email}</p>
 
-                                    <button 
+                                    <button
                                         onClick={handleEditProfileClick}
                                         className="w-full py-2 rounded-lg bg-[#FFC92E]/10 border border-[#FFC92E]/30 text-[#FFC92E] text-xs font-bold uppercase tracking-widest hover:bg-[#FFC92E] hover:text-black transition-all duration-300">
                                         Edit Profile

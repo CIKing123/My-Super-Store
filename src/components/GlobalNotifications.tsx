@@ -111,7 +111,7 @@ export function GlobalNotifications() {
                         <div className="flex-1 min-w-0">
                             <p className="text-white/90 text-sm leading-relaxed font-light">
                                 {/* We render the message as HTML to potentially style parts of it if the DB sends rich text, 
-                    but simpler to just render text. The user's DB function sends plain text with emojis. */}
+                    but simpler to just render text. The user's DB function sends plain text with emojis. */} 
                                 {notif.message}
                             </p>
                             <span className="text-[10px] text-white/40 mt-1 block">
