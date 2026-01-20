@@ -1544,3 +1544,63 @@ select:focus-visible {
         height: 8px;
     }
 }
+
+/* Gold Glow Card - reusable for hero, category, and product cards */
+.gold-glow-card {
+    background-color: var(--white); /* or var(--card-black) for dark card variant */
+    border: 2px solid var(--gold-primary);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    position: relative;
+    transition: all 0.35s ease-in-out;
+    box-shadow: 0 0 8px rgba(212, 175, 55, 0.15); /* subtle default glow */
+    cursor: pointer;
+}
+
+.gold-glow-card:hover {
+    box-shadow:
+        0 0 12px rgba(212, 175, 55, 0.4),
+        0 4px 20px rgba(212, 175, 55, 0.3),
+        0 8px 40px rgba(212, 175, 55, 0.2);
+    transform: translateY(-3px) scale(1.02);
+    border-color: var(--gold-light);
+}
+
+/* Optional inner padding for content */
+.gold-glow-card .card-content {
+    padding: 1rem;
+}
+
+/* Image container inside card */
+.gold-glow-card .card-image {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.gold-glow-card .card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.gold-glow-card:hover .card-image img {
+    transform: scale(1.05);
+}
+
+/* Text inside the card */
+.gold-glow-card .card-title {
+    font-family: var(--font-serif);
+    font-weight: 700;
+    color: var(--black);
+    font-size: 1rem;
+    margin-top: 0.5rem;
+}
+
+.gold-glow-card .card-subtitle {
+    color: #A3A3A3;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}

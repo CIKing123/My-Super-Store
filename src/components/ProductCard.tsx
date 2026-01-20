@@ -167,9 +167,12 @@ export function ProductCard({ product, onProductClick, variant = 'default' }: Pr
           )}
         </div>
 
-        <div className="product-price">
-          ${product.price.toLocaleString()}
-        </div>
+        {typeof product.price === 'number' && (
+  <div className="product-price">
+    ${product.price.toLocaleString()}
+  </div>
+)}
+
       </div>
     </div>
   );

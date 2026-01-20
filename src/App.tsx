@@ -36,13 +36,31 @@ const HeaderWrapper = () => {
 export default function App() {
   const navigate = useNavigate();
 
-  const handleNavigate = (page: string, productId?: number) => {
-    if (page === 'product' && productId) {
-      navigate(`/product/${productId}`);
-    } else {
-      navigate(page === 'home' ? '/' : `/${page}`);
-    }
-  };
+  const handleNavigate = (page: string, payload?: any) => {
+  switch (page) {
+    case 'home':
+      navigate('/');
+      break;
+
+    case 'shop':
+      navigate('/shop', { state: payload });
+      break;
+
+    case 'product':
+      if (payload) {
+        navigate(`/product/${payload}`);
+      }
+      break;
+
+    case 'vendor/dashboard':
+      navigate('/vendor/dashboard');
+      break;
+
+    default:
+      navigate(`/${page}`);
+  }
+};
+
 
   return (
     <AuthProvider>

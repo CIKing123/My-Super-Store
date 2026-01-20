@@ -1,203 +1,248 @@
-import { useEffect, useRef } from "react";
-import { Mail, MessageCircle, Phone } from "lucide-react";
+import { useEffect, useState } from 'react';
+import { supabase } from '../lib/supabase';
 
-export function About() {
-  const contactSectionRef = useRef<HTMLElement | null>(null);
+import { ProductCarousel } from '../components/ProductCarousel';
+import TypingText from '../components/TypingText';
+import Reveal from '../components/Reveal';
+
+import {
+  Star,
+  Shield,
+  Truck,
+  Tv2,
+  Glasses,
+  ChevronRight,
+  Construction,
+} from 'lucide-react';
+
+interface AboutProps {
+  onNavigate: (page: string, productId?: any) => void;
+}
+
+export function About({ onNavigate }: AboutProps) {
+  const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const section = contactSectionRef.current;
-    if (!section) return;
+    const fetchFeatured = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('products')
+          .select(`
+            *,
+            product_images (url, alt_text, position),
+            product_categories (
+              categories (name)
+            )
+          `)
+          .eq('published', true)
+          .order('created_at', { ascending: false })
+          .limit(8);
 
-    const handleScroll = () => {
-      const rect = section.getBoundingClientRect();
-      const viewportHeight = window.innerHeight;
+        if (error) throw error;
 
-      const progress = Math.min(
-        Math.max(1 - rect.top / viewportHeight, 0),
-        1
-      );
-
-      section.style.setProperty("--shine-pos", `${progress * 100}%`);
+        if (data) {
+          setFeaturedProducts(
+            data.map((p: any) => ({
+              id: p.id,
+              name: p.name,
+              brand: p.brand,
+              short_description: p.short_description,
+              image:
+                p.product_images
+                  ?.sort(
+                    (a: any, b: any) =>
+                      (a.position || 0) - (b.position || 0)
+                  )[0]?.url || null,
+              product_images:
+                p.product_images?.sort(
+                  (a: any, b: any) =>
+                    (a.position || 0) - (b.position || 0)
+                ) || [],
+              category:
+                p.product_categories?.[0]?.categories?.name ||
+                'Uncategorized',
+            }))
+          );
+        }
+      } catch (err) {
+        console.error('Error loading featured products:', err);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    handleScroll();
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("resize", handleScroll);
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("resize", handleScroll);
-    };
+    fetchFeatured();
   }, []);
 
   return (
-    <div className="relative min-h-screen">
-      {/* Background Image */}
-      <div
-        className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage: 'url("/images/deliver_man_photo.jpg")',
-          opacity: 0.15,
-          pointerEvents: "none",
-        }}
-      />
+    <div>
+      {/* ================= HERO SECTION ================= */}
+      <main className="flex items-center justify-center w-full py-12 lg:py-20 px-6 lg:px-10">
+        <div className="w-full max-w-[1280px]">
+          <div className="flex flex-col-reverse lg:flex-row items-center gap-16 lg:gap-32">
 
-      {/* Content */}
-      <div className="relative z-10">
-        {/* Hero Section */}
-        <section className="hero-section">
-          <h1 className="hero-title" style={{fontFamily: "'Oswald', sans-serif"}}>
-            Connecting Worlds.<br />
-            Delivering Excellence.
-          </h1>
-          <p className="hero-text">
-            Bridging the gap between global quality and local access.
-          </p>
-        </section>
-
-        {/* What We Do Section */}
-        <section className="section">
-          <div className="container">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-              <div>
-                <h2 className="text-3xl font-serif text-[#D4AF37] mb-6" style={{fontFamily: "'Oswald', sans-serif"}}>
-                  What We Do
-                </h2>
-                <div className="space-y-6 text-black ml-20">
-                  <p>
-                    My Super Store is a premier e-commerce platform dedicated to
-                    bridging the gap between global markets and Nigeria.
-                  </p>
-                  <p>
-                    We specialize in sourcing and distributing a diverse range
-                    of high-quality items from multiple regions worldwide.
-                  </p>
-                  <p>
-                    We handle international procurement and logistics, offering
-                    a premium shopping experience tailored for Nigeria.
-                  </p>
+            {/* LEFT CONTENT */}
+            <div className="flex flex-col gap-8 flex-1 lg:max-w-[50%]">
+              <div className="flex flex-col gap-4">
+                <div className="flex items-center gap-2">
+                  <span className="h-px w-8 bg-[#d4af37]" />
+                  <span className="text-[#d4af37] text-xs font-bold uppercase tracking-widest">
+                    Est. 2024
+                  </span>
                 </div>
-              </div>
 
-              <div className="card-black p-8 glass-border relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-[#FFC92E] rounded-full blur-[80px] opacity-10" />
-                <div className="relative z-10 grid grid-cols-2 gap-6">
-                  {[
-                    ["Global", "Sourcing Network"],
-                    ["NG", "Nationwide Delivery"],
-                    ["100%", "Authentic Items"],
-                    ["24/7", "Customer Support"],
-                  ].map(([title, subtitle]) => (
-                    <div key={title} className="text-center p-4">
-                      <h3 className="text-4xl font-bold text-black mb-2">
-                        {title}
-                      </h3>
-                      <p className="text-xs uppercase tracking-widest text-[#D4AF37]">
-                        {subtitle}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Contact & Support Section */}
-        <section
-          ref={contactSectionRef}
-          className="features-section metallic-scroll-border bg-black py-20"
-        >
-          <div className="container">
-            <h2 className="text-3xl font-serif text-center text-[#D4AF37] mb-4" style={{fontFamily: "'Oswald', sans-serif"}}>
-              Contact & Support
-            </h2>
-
-            <p className="text-center text-white mb-8">
-              Contact any of our team members through the following channels
-            </p>
-
-            <div className="flex flex-col md:flex-row gap-8 justify-center">
-              <div className="feature-item">
-                <div className="feature-icon-box">
-                  <Mail size={32} strokeWidth={2.5} />
-                </div>
-                <h4 className="feature-title">Email Us</h4>
-                <p className="feature-desc mb-4">
-                  For general inquiries and support.
-                </p>
-                <a
-                  href="mailto:monarchgrouptechgroup@gmail.com"
-                  className="text-[#D4AF37] hover:text-white transition-colors font-medium 
-                  text-center break-all sm:break-words max-w-full block"
+                <h1
+                  className="text-slate-900 text-5xl sm:text-6xl lg:text-7xl font-extrabold leading-[1.1]"
+                  style={{
+                    fontFamily: "'Oswald', sans-serif",
+                    textShadow:
+                      '0 0 6px rgba(236,211,141,0.03), 0 0 14px rgba(231,227,214,0.36)',
+                  }}
                 >
-                  monarchgrouptechgroup@gmail.com
-                </a>
-              </div>
+                  <TypingText
+                    texts={[
+                      'Collect the Exceptional.',
+                      'Embrace Luxury.',
+                      'Redefine Excellence.',
+                    ]}
+                  />
+                </h1>
 
-              <div className="feature-item">
-                <div className="feature-icon-box">
-                  <MessageCircle size={32} strokeWidth={2.5} />
-                </div>
-                <h4 className="feature-title">Live Chat</h4>
-                <p className="feature-desc">
-                  Available Mon–Fri, 9am–6pm WAT.
+                <p className="text-lg sm:text-xl text-slate-600 max-w-[540px]">
+                  Discover a curated selection of artifacts designed for the few,
+                  not the many. Elevate your everyday with unparalleled craftsmanship.
                 </p>
-                <span className="text-[#D4AF37]">Coming Soon</span>
               </div>
 
-              <div className="feature-item">
-                <div className="feature-icon-box">
-                  <Phone size={32} strokeWidth={2.5} />
+              {/* CTA BUTTONS */}
+              <div className="flex flex-wrap gap-4 pt-4">
+                <button
+                  onClick={() => onNavigate('shop')}
+                  className="group relative h-14 px-8 min-w-[180px] rounded-lg bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] to-[#B38728] text-white font-bold uppercase shadow-lg transition active:scale-95"
+                >
+                  Shop Collection
+                </button>
+
+                <button
+                  onClick={() => onNavigate('shop')}
+                  className="h-14 px-8 min-w-[180px] rounded-lg border border-slate-200 font-bold uppercase hover:bg-slate-50"
+                >
+                  Explore More
+                </button>
+
+                <button
+                  onClick={() => onNavigate('vendor/dashboard')}
+                  className="h-14 px-8 min-w-[180px] rounded-lg bg-slate-900 text-white font-bold uppercase border border-slate-700 hover:bg-slate-800"
+                >
+                  Vendor Portal
+                </button>
+              </div>
+
+              {/* TRUST */}
+              <div className="flex items-center gap-8 pt-8 border-t border-slate-100">
+                <div>
+                  <p className="text-2xl font-bold">{featuredProducts.length}+</p>
+                  <p className="text-sm text-slate-500">Exclusive Items</p>
                 </div>
-                <h4 className="feature-title">Call Us</h4>
-                <p className="feature-desc">+234 --- --- ----</p>
+                <div className="w-px h-10 bg-slate-200" />
+                <div>
+                  <p className="text-2xl font-bold">Global</p>
+                  <p className="text-sm text-slate-500">Shipping Available</p>
+                </div>
               </div>
             </div>
-          </div>
-        </section>
 
-        {/* Shipping Info Section */}
-        <section className="section bg-[#0F0F0F]">
-          <div className="container">
-            <h2 className="text-3xl font-serif text-center text-[#D4AF37] mb-8" style={{fontFamily: "'Oswald', sans-serif"}}>
-              Shipping Information
+            {/* RIGHT FEATURED IMAGE */}
+            <div className="relative w-full lg:flex-1 aspect-square max-h-[700px]">
+              <div className="absolute inset-0 rounded-2xl overflow-hidden bg-slate-100 shadow-2xl">
+                {featuredProducts[0]?.image ? (
+                  <img
+                    src={featuredProducts[0].image}
+                    alt={featuredProducts[0].name}
+                    className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-slate-400">
+                    Premium Collection
+                  </div>
+                )}
+
+                <div className="absolute bottom-6 left-6 right-6 bg-white/95 backdrop-blur p-5 rounded-xl flex items-center justify-between">
+                  <div>
+                    <p className="text-xs uppercase tracking-wider text-slate-500 font-bold">
+                      Featured Collection
+                    </p>
+                    <p className="font-bold text-lg">
+                      {featuredProducts[0]?.name || 'Luxury Items'}
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={() =>
+                      onNavigate('product', featuredProducts[0]?.id)
+                    }
+                    className="size-10 rounded-full bg-black text-white flex items-center justify-center"
+                  >
+                    <ChevronRight size={20} />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </main>
+
+      {/* ================= FEATURED CAROUSEL ================= */}
+      <section className="section">
+        <div className="flex justify-between items-end mb-12">
+          <div>
+            <h2 className="text-3xl font-serif text-[#D4AF37] mb-4">
+              Featured Collection
             </h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-              <div>
-                <p className="text-gray-300 mb-6 leading-relaxed">
-                  We offer a reliable shipping network spanning multiple regions
-                  worldwide, delivering directly to Nigeria.
-                </p>
-
-                <ul className="space-y-4">
-                  {[
-                    "Standard Delivery: 5–14 Business Days",
-                    "Express Delivery: 3–5 Business Days",
-                    "Nationwide Coverage",
-                  ].map((item) => (
-                    <li key={item} className="flex items-center text-gray-400">
-                      <span className="w-2 h-2 bg-[#D4AF37] rounded-full mr-3" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="w-full h-[400px] rounded-2xl overflow-hidden glass-border shadow-2xl">
-                <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d253682.4593258525!2d3.1191410931584985!3d6.548376811802148!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x103b8b2ae68280c1%3A0xdc9e87a367c3d9cb!2sLagos%2C%20Nigeria!"
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0 }}
-                  loading="lazy"
-                />
-              </div>
-            </div>
+            <p className="text-muted max-w-xl">
+              Curated selection of our most exclusive pieces.
+            </p>
           </div>
-        </section>
-      </div>
+          <button
+            onClick={() => onNavigate('shop')}
+            className="link-gold"
+          >
+            View All →
+          </button>
+        </div>
+
+        {!loading && (
+          <ProductCarousel
+            products={featuredProducts}
+            onProductClick={(id) => onNavigate('product', id)}
+          />
+        )}
+      </section>
+
+      {/* ================= FEATURES ================= */}
+      <section className="features-section">
+        <div className="container grid grid-cols-3 gap-12">
+          <Reveal className="feature-item">
+            <Star size={32} />
+            <h4>Premium Quality</h4>
+            <p>Only the finest materials</p>
+          </Reveal>
+
+          <Reveal className="feature-item">
+            <Shield size={32} />
+            <h4>Authenticity Guaranteed</h4>
+            <p>Verified & certified</p>
+          </Reveal>
+
+          <Reveal className="feature-item">
+            <Truck size={32} />
+            <h4>White Glove Delivery</h4>
+            <p>Luxury shipping worldwide</p>
+          </Reveal>
+        </div>
+      </section>
     </div>
   );
 }

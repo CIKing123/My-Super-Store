@@ -1,18 +1,43 @@
 @import "tailwindcss";
 
+@import "tailwindcss";
+
+/* ===========================
+   Custom Fonts
+=========================== */
+
 @font-face {
   font-family: 'Qubiko';
   src: url('./fonts/qubiko/Qubiko-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
 
+@font-face {
   font-family: 'Transcity';
   src: url('./fonts/transcity/Transcity-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
 
+@font-face {
   font-family: 'Manbow';
   src: url('./fonts/manbow/Manbow Clear.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
 
+@font-face {
   font-family: 'Dosis';
   src: url('./fonts/dosis/Dosis-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
+
 
 
 
