@@ -58,7 +58,7 @@ export function ProductCardCarousel({ product, onProductClick, variant = 'defaul
       className={`product-card ${variant === 'black' ? 'card-black p-4' : ''}`}
     >
       {/* Image Carousel Container */}
-      <div 
+      <div
         className="product-image-container relative group"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
@@ -72,7 +72,7 @@ export function ProductCardCarousel({ product, onProductClick, variant = 'defaul
                 <ImageWithFallback
                   src={images[getPrevIndex()]}
                   alt="Previous"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                 />
               </div>
             </div>
@@ -85,7 +85,7 @@ export function ProductCardCarousel({ product, onProductClick, variant = 'defaul
                 <ImageWithFallback
                   src={images[getNextIndex()]}
                   alt="Next"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                 />
               </div>
             </div>
@@ -127,7 +127,7 @@ export function ProductCardCarousel({ product, onProductClick, variant = 'defaul
           )}
         </div>
 
-      
+
 
         {/* Carousel indicator dots - visible on hover */}
         {images.length > 1 && (
@@ -140,11 +140,10 @@ export function ProductCardCarousel({ product, onProductClick, variant = 'defaul
                   setIsAutoPlaying(false);
                   setCurrentImageIndex(index);
                 }}
-                className={`w-1.5 h-1.5 rounded-full transition-all ${
-                  index === currentImageIndex
+                className={`w-1.5 h-1.5 rounded-full transition-all ${index === currentImageIndex
                     ? 'bg-[#D4AF37] w-3'
                     : 'bg-white/40 hover:bg-white/60'
-                }`}
+                  }`}
               />
             ))}
           </div>

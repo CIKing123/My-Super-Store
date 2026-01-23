@@ -64,13 +64,15 @@ export function LuxuryCategoryCard({ category, products }: LuxuryCategoryCardPro
             <div className="absolute inset-0 bg-gradient-to-br from-[#FFE55C]/20 via-[#D4AF37]/10 to-[#B8941F]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
             {/* Image Carousel */}
-            <div className="relative h-44 bg-gradient-to-br from-[#F5F5F5] to-[#EBEBEB] overflow-hidden flex items-center justify-center border-b-2 border-[rgba(212,175,55,0.2)]">
+            <div className="relative h-44 bg-transparent overflow-hidden flex items-center justify-center border-b-2 border-[rgba(212,175,55,0.2)]">
                 {currentProduct && currentProduct.image ? (
                     <img
                         src={currentProduct.image}
                         alt={currentProduct.name}
                         loading="lazy"
-                        className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-110 p-2"
+                        style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+                        className="w-full h-full transition-opacity duration-700 p-2"
+
                     />
                 ) : (
                     <div className="w-full h-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center">
@@ -105,15 +107,17 @@ export function LuxuryCategoryCard({ category, products }: LuxuryCategoryCardPro
                         </button>
 
                         {/* Carousel Indicators */}
-                        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+                        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-0.5 md:gap-1.5 z-10">
                             {categoryProducts.map((_, idx) => (
-                                <button
+                                <div
                                     key={idx}
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         setCurrentIndex(idx);
                                     }}
-                                    className={`rounded-full transition-all duration-300 ${idx === currentIndex ? 'bg-[#D4AF37] w-7 h-2' : 'bg-white/60 hover:bg-white/80 w-2 h-2'
+                                    className={`rounded-full transition-all duration-300 cursor-pointer ${idx === currentIndex
+                                        ? 'w-[14px] h-[5px] md:w-7 md:h-2 bg-gradient-to-r from-[#FFD700] via-[#FFA500] to-[#FFD700] shadow-[0_0_8px_rgba(255,215,0,0.8),0_0_12px_rgba(255,165,0,0.6)]'
+                                        : 'bg-white/60 hover:bg-white/80 w-[3px] h-[3px] md:w-2 md:h-2'
                                         }`}
                                 />
                             ))}

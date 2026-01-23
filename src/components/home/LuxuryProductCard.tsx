@@ -49,13 +49,14 @@ export function LuxuryProductCard({ product, delay = 0, isTrending = false }: Lu
             )}
 
             {/* Image Container with Premium Zoom & Fixed Aspect Ratio */}
-            <div className="relative w-full h-48 bg-gradient-to-br from-[#F5F5F5] to-[#EBEBEB] overflow-hidden border-b-2 border-[rgba(212,175,55,0.2)]">
+            <div className="relative w-full h-48 bg-transparent overflow-hidden border-b-2 border-[rgba(212,175,55,0.2)]">
                 {product.image ? (
                     <img
                         src={product.image}
                         alt={product.name}
                         loading="lazy"
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+                        className="w-full h-full transition-opacity duration-700"
                     />
                 ) : (
                     <div className="w-full h-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center">

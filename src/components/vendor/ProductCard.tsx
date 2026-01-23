@@ -20,7 +20,7 @@ export function ProductCard({ product, onEdit, onDelete, onView }: ProductCardPr
                     <img
                         src={primaryImage.url}
                         alt={primaryImage.alt_text || product.name}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain"
                     />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center text-gray-400">
