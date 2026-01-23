@@ -67,7 +67,7 @@ export function Header({ cartItemCount }: HeaderProps) {
             }`}>
               <Gem size={20} strokeWidth={2} className={isAccountPage ? 'text-white' : 'text-white'} />
             </div>
-            <h2 className={`${textColorClass} text-lg sm:text-xl font-extrabold tracking-tight transition-colors whitespace-nowrap`}>My Super Store</h2>
+            <h2 className={`${textColorClass} text-lg sm:text-xl font-extrabold tracking-tight transition-colors whitespace-nowrap`} style={{ fontFamily: 'Flowmery' }}>My Super Store</h2>
           </Link>
 
           {/* Desktop Nav Links - Between Logo and Icons */}

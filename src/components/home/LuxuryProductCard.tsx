@@ -49,7 +49,7 @@ export function LuxuryProductCard({ product, delay = 0, isTrending = false }: Lu
             )}
 
             {/* Image Container with Premium Zoom & Fixed Aspect Ratio */}
-            <div className="relative w-full aspect-[4/5] bg-gradient-to-br from-[#F5F5F5] to-[#EBEBEB] overflow-hidden border-b-2 border-[rgba(212,175,55,0.2)]">
+            <div className="relative w-full h-48 bg-gradient-to-br from-[#F5F5F5] to-[#EBEBEB] overflow-hidden border-b-2 border-[rgba(212,175,55,0.2)]">
                 {product.image ? (
                     <img
                         src={product.image}

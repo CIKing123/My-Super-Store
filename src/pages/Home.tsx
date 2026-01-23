@@ -235,7 +235,7 @@ export function Home() {
                 ✨ Premium Collection
               </span>
             </div>
-            <h1 className="text-6xl lg:text-7xl font-extrabold mb-6 leading-tight text-white">
+            <h1 className="text-6xl lg:text-7xl mb-6 leading-tight text-white font-extrabold" style={{fontFamily: 'dosis'}}>
               Discover <span className="bg-gradient-to-r from-[#FFE55C] via-[#D4AF37] to-[#B8941F] bg-clip-text text-transparent">Luxury</span>
             </h1>
             <p className="text-xl text-[#D0D0D0] mb-10 leading-relaxed opacity-90">
@@ -260,7 +260,7 @@ export function Home() {
         <div className="h-[2px] bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent opacity-50 mb-16" />
 
         <div className="mb-12">
-          <h2 className="text-4xl font-extrabold bg-gradient-to-r from-[#FFE55C] via-[#D4AF37] to-[#B8941F] bg-clip-text text-transparent">
+          <h2 className="text-4xl font-extrabold bg-gradient-to-r from-[#FFE55C] via-[#D4AF37] to-[#B8941F] bg-clip-text text-transparent" style={{fontFamily: 'dosis'}}>
             Shop by Category
           </h2>
           <div className="h-[3px] w-24 bg-gradient-to-r from-[#FFE55C] via-[#D4AF37] to-[#B8941F] rounded-full mt-4 shadow-lg shadow-[#D4AF37]/30" />
@@ -316,10 +316,12 @@ export function Home() {
       {recommendedProducts.length > 0 && (
         <ProductSection
           title="💎 Recommended For You"
+          
           products={recommendedProducts}
           index={1}
           loading={loading}
           productsPerSection={PRODUCTS_PER_SECTION}
+          
         />
       )}
 
@@ -332,6 +334,7 @@ export function Home() {
           index={2}
           loading={loading}
           productsPerSection={PRODUCTS_PER_SECTION}
+          
         />
       )}
 
@@ -344,6 +347,7 @@ export function Home() {
           index={3}
           loading={loading}
           productsPerSection={PRODUCTS_PER_SECTION}
+          
         />
       )}
 
