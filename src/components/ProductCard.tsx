@@ -136,12 +136,7 @@ export function ProductCard({ product, onProductClick, variant = 'default' }: Pr
         </div>
 
         {/* Wishlist Button */}
-        <button
-          className="wishlist-btn"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <Heart size={20} strokeWidth={2.5} className="text-[#D4AF37]" style={{ filter: 'drop-shadow(0 0 6px rgba(244, 224, 77, 0.5))' }} />
-        </button>
+       
       </div>
 
       {/* Product Info */}

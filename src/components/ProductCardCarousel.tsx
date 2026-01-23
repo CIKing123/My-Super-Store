@@ -127,13 +127,7 @@ export function ProductCardCarousel({ product, onProductClick, variant = 'defaul
           )}
         </div>
 
-        {/* Wishlist button */}
-        <button 
-          className="wishlist-btn"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <Heart size={20} strokeWidth={2.5} className="text-[#D4AF37]" style={{ filter: 'drop-shadow(0 0 6px rgba(244, 224, 77, 0.5))' }} />
-        </button>
+      
 
         {/* Carousel indicator dots - visible on hover */}
         {images.length > 1 && (

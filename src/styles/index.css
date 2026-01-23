@@ -103,24 +103,31 @@ h6 {
     0% {
         transform: translateX(-100%);
     }
+
     100% {
         transform: translateX(100%);
     }
 }
 
 @keyframes goldenGlow {
-    0%, 100% {
+
+    0%,
+    100% {
         box-shadow: 0 0 20px rgba(212, 175, 55, 0.3), 0 0 40px rgba(212, 175, 55, 0.1);
     }
+
     50% {
         box-shadow: 0 0 30px rgba(212, 175, 55, 0.5), 0 0 60px rgba(212, 175, 55, 0.2);
     }
 }
 
 @keyframes goldBadgeShimmer {
-    0%, 100% {
+
+    0%,
+    100% {
         opacity: 1;
     }
+
     50% {
         opacity: 0.8;
     }
@@ -131,6 +138,7 @@ h6 {
         transform: scale(0);
         opacity: 1;
     }
+
     100% {
         transform: scale(4);
         opacity: 0;
@@ -138,10 +146,13 @@ h6 {
 }
 
 @keyframes pulse-glow {
-    0%, 100% {
+
+    0%,
+    100% {
         opacity: 0.6;
         transform: scale(1);
     }
+
     50% {
         opacity: 1;
         transform: scale(1.05);
@@ -648,6 +659,9 @@ h6 {
     transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     border: 2px solid rgba(212, 175, 55, 0.3);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 .product-card:hover {
@@ -678,6 +692,9 @@ h6 {
 .product-info {
     background-color: #0F0F0F;
     padding: 1.5rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .product-category {
@@ -694,7 +711,7 @@ h6 {
 }
 
 .product-name {
-    color: var( --gold-light);
+    color: var(--gold-light);
     margin-bottom: 1rem;
     font-weight: 700;
     font-size: 1.05rem;
@@ -1531,6 +1548,7 @@ h6 {
 }
 
 @media (max-width: 480px) {
+
     /* Extra small device optimization */
     .hero-title {
         font-size: clamp(1.75rem, 5vw, 2.5rem);
@@ -1562,8 +1580,11 @@ select:focus-visible {
 
 /* Mobile Touch Interactions & Optimization */
 @media (hover: none) and (pointer: coarse) {
+
     /* Touch devices - remove hover effects and optimize for tap */
-    button, a, [role="button"] {
+    button,
+    a,
+    [role="button"] {
         -webkit-tap-highlight-color: transparent;
         -webkit-touch-callout: none;
         user-select: none;
@@ -1597,13 +1618,18 @@ select:focus-visible {
     }
 
     /* Larger touch targets for mobile */
-    button, a, [role="button"] {
+    button,
+    a,
+    [role="button"] {
         min-height: 44px;
         min-width: 44px;
     }
 
     /* Prevent zoom on double-tap */
-    input, button, a, [role="button"] {
+    input,
+    button,
+    a,
+    [role="button"] {
         touch-action: manipulation;
     }
 
@@ -1629,7 +1655,8 @@ select:focus-visible {
 }
 
 /* Premium luxury micro-interactions */
-a, button {
+a,
+button {
     position: relative;
 }
 
@@ -1778,13 +1805,15 @@ button:hover svg {
 
 /* Gold Glow Card - reusable for hero, category, and product cards */
 .gold-glow-card {
-    background-color: var(--white); /* or var(--card-black) for dark card variant */
+    background-color: var(--white);
+    /* or var(--card-black) for dark card variant */
     border: 2px solid var(--gold-primary);
     border-radius: var(--radius-lg);
     overflow: hidden;
     position: relative;
     transition: all 0.35s ease-in-out;
-    box-shadow: 0 0 8px rgba(212, 175, 55, 0.15); /* subtle default glow */
+    box-shadow: 0 0 8px rgba(212, 175, 55, 0.15);
+    /* subtle default glow */
     cursor: pointer;
 }
 
