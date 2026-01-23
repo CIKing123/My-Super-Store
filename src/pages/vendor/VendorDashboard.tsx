@@ -41,22 +41,31 @@ export function VendorDashboard() {
             const publishedProducts = products?.filter((p) => p.published).length || 0;
             const totalViews = products?.reduce((sum, p) => sum + (p.view_count || 0), 0) || 0;
 
-            // Fetch order count (orders containing vendor's products)
-            const { count: pendingOrdersCount, error: ordersError } = await supabase
-                .from('order_items')
-                .select('order_id', { count: 'exact', head: true })
-                .in('product_id', products?.map((p) => p.id) || [])
-                .eq('orders.status', 'pending');
+            const productIds = products?.map((p) => p.id) || [];
+            let pendingOrdersCount = 0;
+            let orderItems: any[] = [];
 
-            if (ordersError) console.error('Error fetching orders:', ordersError);
+            // Only fetch orders and revenue if vendor has products
+            if (productIds.length > 0) {
+                // Fetch order count (orders containing vendor's products)
+                const { count: count, error: ordersError } = await supabase
+                    .from('order_items')
+                    .select('order_id', { count: 'exact', head: true })
+                    .in('product_id', productIds)
+                    .eq('orders.status', 'pending');
 
-            // Calculate revenue (sum of order_items where product is vendor's)
-            const { data: orderItems, error: revenueError } = await supabase
-                .from('order_items')
-                .select('quantity, unit_price')
-                .in('product_id', products?.map((p) => p.id) || []);
+                if (ordersError) console.error('Error fetching orders:', ordersError);
+                pendingOrdersCount = count || 0;
 
-            if (revenueError) console.error('Error fetching revenue:', revenueError);
+                // Calculate revenue (sum of order_items where product is vendor's)
+                const { data: items, error: revenueError } = await supabase
+                    .from('order_items')
+                    .select('quantity, unit_price')
+                    .in('product_id', productIds);
+
+                if (revenueError) console.error('Error fetching revenue:', revenueError);
+                orderItems = items || [];
+            }
 
             const totalRevenue =
                 orderItems?.reduce((sum, item) => sum + item.quantity * item.unit_price, 0) || 0;
@@ -64,7 +73,7 @@ export function VendorDashboard() {
             setStats({
                 totalProducts,
                 publishedProducts,
-                pendingOrders: pendingOrdersCount || 0,
+                pendingOrders: pendingOrdersCount,
                 totalRevenue,
                 totalViews,
             });
