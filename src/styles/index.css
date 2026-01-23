@@ -28,8 +28,8 @@
     --gold-glow: rgba(222, 157, 13, 0.3);
 
     /* Typography */
-    --font-primary: 'Inter', system-ui, sans-serif;
-    --font-serif: 'Playfair Display', serif;
+    --font-primary: 'Inter', sans-serif;
+    --font-serif: 'Flowmery', serif;
 
     /* Spacing */
     --radius-sm: 4px;

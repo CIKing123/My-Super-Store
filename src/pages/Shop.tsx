@@ -30,6 +30,8 @@ export function Shop({ onNavigate }: ShopProps) {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [sortBy, setSortBy] = useState<string>('featured');
+  const [priceRange, setPriceRange] = useState<{ min: number; max: number }>({ min: 0, max: 1000000 });
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
 
   const categories = ['All', 'Cosmetics', 'Construction', 'Furniture', 'Clothing and Fashion', 'Events Tools', 'Electrical Appliances'];
@@ -97,6 +99,7 @@ export function Shop({ onNavigate }: ShopProps) {
 
   const filteredProducts = products
     .filter(p => selectedCategory === 'All' || p.category === selectedCategory)
+    .filter(p => p.price >= priceRange.min && p.price <= priceRange.max)
     .sort((a, b) => {
       if (sortBy === 'price-low') return a.price - b.price;
       if (sortBy === 'price-high') return b.price - a.price;
@@ -150,9 +153,13 @@ export function Shop({ onNavigate }: ShopProps) {
           ))}
         </div>
 
-        {/* Sort */}
-        <div className="sort-container">
-          <button className="link-gold" style={{ background: 'none', WebkitBackgroundClip: 'unset', color: 'var(--black)' }}>
+        {/* Sort and Filter Toggle */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+          <button
+            onClick={() => setIsFilterOpen(!isFilterOpen)}
+            className="link-gold"
+            style={{ background: 'none', WebkitBackgroundClip: 'unset', color: 'var(--black)', display: 'flex', alignItems: 'center' }}
+          >
             <SlidersHorizontal size={20} strokeWidth={2.5} style={{ marginRight: '0.5rem' }} />
             Filters
           </button>
@@ -175,6 +182,64 @@ export function Shop({ onNavigate }: ShopProps) {
           </div>
         </div>
       </div>
+
+      {/* Price Filter - Shows when Filters button is clicked */}
+      {isFilterOpen && (
+        <div style={{ padding: '1.5rem', backgroundColor: '#f9f9f9', borderRadius: '0.5rem', marginBottom: '2rem', border: '1px solid #e5e7eb' }}>
+          <h3 style={{ marginBottom: '1rem', fontWeight: '600', fontSize: '0.95rem' }}>Price Range</h3>
+          <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '0.5rem', color: '#666' }}>Min</label>
+              <input
+                type="number"
+                value={priceRange.min}
+                onChange={(e) => setPriceRange({ ...priceRange, min: Math.max(0, parseInt(e.target.value) || 0) })}
+                min="0"
+                className="w-full px-2 py-2 border border-gray-300 rounded text-sm"
+                placeholder="$0"
+              />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '0.5rem', color: '#666' }}>Max</label>
+              <input
+                type="number"
+                value={priceRange.max}
+                onChange={(e) => setPriceRange({ ...priceRange, max: Math.max(priceRange.min, parseInt(e.target.value) || 1000000) })}
+                min="0"
+                className="w-full px-2 py-2 border border-gray-300 rounded text-sm"
+                placeholder="$10,000"
+              />
+            </div>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <div>
+              <label style={{ fontSize: '0.85rem', color: '#666', display: 'block', marginBottom: '0.5rem' }}>Min Price Slider</label>
+              <input
+                type="range"
+                min="0"
+                max={priceRange.max}
+                value={priceRange.min}
+                onChange={(e) => setPriceRange({ ...priceRange, min: Math.min(parseInt(e.target.value), priceRange.max) })}
+                style={{ width: '100%' }}
+              />
+            </div>
+            <div>
+              <label style={{ fontSize: '0.85rem', color: '#666', display: 'block', marginBottom: '0.5rem' }}>Max Price Slider</label>
+              <input
+                type="range"
+                min={priceRange.min}
+                max="10000"
+                value={priceRange.max}
+                onChange={(e) => setPriceRange({ ...priceRange, max: Math.max(priceRange.min, parseInt(e.target.value)) })}
+                style={{ width: '100%' }}
+              />
+            </div>
+          </div>
+          <p style={{ marginTop: '1rem', fontSize: '0.9rem', fontWeight: '500' }}>
+            ${priceRange.min.toLocaleString()} - ${priceRange.max.toLocaleString()}
+          </p>
+        </div>
+      )}
 
       {/* Products Grid */}
       <div className="grid grid-cols-4 gap-6">
