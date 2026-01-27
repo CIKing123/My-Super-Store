@@ -56,35 +56,59 @@ export function ProductSection({
     ];
     const bgGradient = bgGradients[index % bgGradients.length];
 
+    // Extract icon (first part before space) from title
+    const titleParts = title.split(' ');
+    const icon = titleParts[0];
+    const titleText = titleParts.slice(1).join(' ');
+
     return (
         <section
-            className={`bg-gradient-to-b ${bgGradient} relative overflow-hidden py-16`}
+            className={`bg-gradient-to-b ${bgGradient} relative overflow-hidden`}
         >
             {/* Decorative gold accent elements */}
             <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-gradient-to-br from-[#FFE55C]/10 to-[#D4AF37]/5 rounded-full filter blur-3xl -z-10" />
             <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-gradient-to-tl from-[#D4AF37]/5 to-[#FFE55C]/10 rounded-full filter blur-3xl -z-10" />
 
             {/* Top gold divider line */}
-            <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent opacity-50" />
+            <div className="h-[2px] bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent opacity-50" />
 
-            <div className="max-w-[1280px] mx-auto px-6 lg:px-10 relative z-10">
-                <div className="flex justify-between items-center mb-10">
-                    <div>
-                        <h2 className="text-4xl font-extrabold bg-gradient-to-r from-[#FFE55C] via-[#D4AF37] to-[#B8941F] bg-clip-text text-transparent">
-                            {title}
-                        </h2>
-                        <div className="h-[3px] w-24 bg-gradient-to-r from-[#FFE55C] via-[#D4AF37] to-[#B8941F] rounded-full mt-3 shadow-lg shadow-[#D4AF37]/30" />
+            {/* Title Header with Black Background - Full Width */}
+            <div className="bg-black px-6 lg:px-10 py-6 border-t-2 border-[#D4AF37] relative">
+                <div className="max-w-[1280px] mx-auto">
+                    <div className="flex justify-between items-start gap-4">
+                        <div className="flex items-center gap-4">
+                            {/* Icon with gold glow effect */}
+                            <span className="text-5xl text-white drop-shadow-lg" style={{
+                                filter: 'drop-shadow(0 0 12px rgba(212, 175, 55, 0.8)) drop-shadow(0 0 20px rgba(212, 175, 55, 0.5))'
+                            }}>
+                                {icon}
+                            </span>
+                            {/* Title text */}
+                            <h2 className="text-4xl font-extrabold bg-gradient-to-r from-[#FFE55C] via-[#D4AF37] to-[#B8941F] bg-clip-text text-transparent">
+                                {titleText}
+                            </h2>
+                        </div>
+                        <button
+                            onClick={() =>
+                                navigate(`/shop${categoryName ? `?category=${categoryName}` : ''}`)
+                            }
+                            className="text-base font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#FFE55C] via-[#D4AF37] to-[#B8941F] hover:opacity-80 transition-all flex items-center gap-2 group"
+                        >
+                            See all
+                            <span className="group-hover:translate-x-1 transition-transform">→</span>
+                        </button>
                     </div>
-                    <button
-                        onClick={() =>
-                            navigate(`/shop${categoryName ? `?category=${categoryName}` : ''}`)
-                        }
-                        className="text-base font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#FFE55C] via-[#D4AF37] to-[#B8941F] hover:opacity-80 transition-all flex items-center gap-2 group"
-                    >
-                        See all
-                        <span className="group-hover:translate-x-1 transition-transform">→</span>
-                    </button>
+                    {/* Underline spanning full width under See all text */}
+                    <div className="h-[3px] w-full bg-gradient-to-r from-[#FFE55C] via-[#D4AF37] to-[#B8941F] rounded-full shadow-lg shadow-[#D4AF37]/30 mt-4" />
                 </div>
+            </div>
+
+            {/* Bottom Divider Under Title */}
+            <div className="h-[2px] bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent opacity-50" />
+
+            {/* Products Content Container */}
+            <div className="py-16">
+                <div className="max-w-[1280px] mx-auto px-6 lg:px-10 relative z-10">
 
                 {/* Desktop Grid - Adjusted for better spacing/alignment */}
                 <div className=" md:block">
@@ -135,6 +159,7 @@ export function ProductSection({
                             </div>
                         )}
                     </div>
+                </div>
                 </div>
             </div>
 
