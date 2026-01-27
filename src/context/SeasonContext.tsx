@@ -25,7 +25,7 @@ export function SeasonProvider({ children }: { children: ReactNode }) {
 
         // Determine seasonal theme
         let season: SeasonType = 'none';
-        if (month === 11 || month === 0) {
+        if (month === 11) {
             // December (11) or January (0) = Winter/Christmas theme
             season = 'winter';
         } else if (month === 1) {
