@@ -37,29 +37,29 @@ export default function App() {
   const navigate = useNavigate();
 
   const handleNavigate = (page: string, payload?: any) => {
-  switch (page) {
-    case 'home':
-      navigate('/');
-      break;
+    switch (page) {
+      case 'home':
+        navigate('/');
+        break;
 
-    case 'shop':
-      navigate('/shop', { state: payload });
-      break;
+      case 'shop':
+        navigate('/shop', { state: payload });
+        break;
 
-    case 'product':
-      if (payload) {
-        navigate(`/product/${payload}`);
-      }
-      break;
+      case 'product':
+        if (payload) {
+          navigate(`/product/${payload}`);
+        }
+        break;
 
-    case 'vendor/dashboard':
-      navigate('/vendor/dashboard');
-      break;
+      case 'vendor/dashboard':
+        navigate('/vendor/dashboard');
+        break;
 
-    default:
-      navigate(`/${page}`);
-  }
-};
+      default:
+        navigate(`/${page}`);
+    }
+  };
 
 
   return (
