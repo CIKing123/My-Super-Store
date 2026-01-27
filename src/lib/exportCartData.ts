@@ -10,7 +10,7 @@ export interface UserPreferenceRecord {
 
 /**
  * Generate CSV data from cart items for user personalization and recommendations
- * CSV format: Product Name, Category, Vendor, Quantity
+ * CSV format: Product Name, Category, Vendor Business Name, Vendor Email, Price, Quantity
  */
 export async function generateCartCSV(
     items: CartItem[],
@@ -18,43 +18,62 @@ export async function generateCartCSV(
     userEmail?: string
 ): Promise<string> {
     if (items.length === 0) {
-        return 'Product Name,Category,Vendor,Quantity\n';
+        return 'Product Name,Category,Vendor Business Name,Vendor Email,Price,Quantity\n';
     }
 
-    const rows: string[] = ['Product Name,Category,Vendor,Quantity'];
+    const rows: string[] = ['Product Name,Category,Vendor Business Name,Vendor Email,Price,Quantity'];
 
     for (const item of items) {
         try {
-            // Fetch vendor business name
-            const { data: vendorData } = await supabase
-                .from('vendors')
-                .select('business_name')
-                .eq('id', item.products?.seller_id || '')
-                .single();
+            // Safely grab seller_id and product_id
+            const sellerId = item.products?.seller_id;
+            const productId = item.product_id;
 
-            // Fetch category - get the first category for this product
-            const { data: categoryData } = await supabase
-                .from('product_categories')
-                .select('categories(name)')
-                .eq('product_id', item.product_id)
-                .limit(1);
+            // Fetch vendor business name and email only if sellerId exists
+            let vendorData: any = null;
+            if (sellerId) {
+                const { data: vData } = await supabase
+                    .from('vendors')
+                    .select('business_name,email')
+                    .eq('id', sellerId)
+                    .maybeSingle();
+                vendorData = vData;
+            }
+
+            // Fetch category - get the first category for this product (only if productId exists)
+            let categoryData: any[] | null = null;
+            if (productId) {
+                const { data: cData } = await supabase
+                    .from('product_categories')
+                    .select('categories(name)')
+                    .eq('product_id', productId)
+                    .limit(1);
+                categoryData = cData;
+            }
 
             const productName = item.products?.name || 'Unknown';
             const category = categoryData?.[0]?.categories?.name || 'Uncategorized';
-            const vendor = vendorData?.business_name || 'Unknown Vendor';
-            const quantity = item.quantity;
+            const businessName = vendorData?.business_name || 'Unknown Vendor';
+            const vendorEmail = vendorData?.email || 'N/A';
+            const priceRaw = item.products?.price ?? 0;
+            const price = typeof priceRaw === 'number' ? priceRaw : Number(priceRaw || 0);
+            const quantity = item.quantity ?? 1;
 
             // Escape product names and categories that might contain commas or quotes
             const escapedName = `"${productName.replace(/"/g, '""')}"`;
             const escapedCategory = `"${category.replace(/"/g, '""')}"`;
-            const escapedVendor = `"${vendor.replace(/"/g, '""')}"`;
+            const escapedBusinessName = `"${businessName.replace(/"/g, '""')}"`;
+            const escapedEmail = `"${vendorEmail.replace(/"/g, '""')}"`;
 
-            rows.push(`${escapedName},${escapedCategory},${escapedVendor},${quantity}`);
+            rows.push(`${escapedName},${escapedCategory},${escapedBusinessName},${escapedEmail},$${price.toFixed(2)},${quantity}`);
         } catch (error) {
             console.error(`Error fetching data for product ${item.product_id}:`, error);
             // Add row with available data
             const escapedName = `"${(item.products?.name || 'Unknown').replace(/"/g, '""')}"`;
-            rows.push(`${escapedName},"Uncategorized","Unknown Vendor",${item.quantity}`);
+            const priceRaw = item.products?.price ?? 0;
+            const price = typeof priceRaw === 'number' ? priceRaw : Number(priceRaw || 0);
+            const quantity = item.quantity ?? 1;
+            rows.push(`${escapedName},"Uncategorized","Unknown Vendor","N/A",$${price.toFixed(2)},${quantity}`);
         }
     }
 
