@@ -17,7 +17,7 @@ interface VendorLayoutProps {
 
 export function VendorLayout({ children }: VendorLayoutProps) {
     const navigate = useNavigate();
-    const { vendor, isVendor } = useVendor();
+    const { vendor } = useVendor();
 
     const handleSignOut = async () => {
         await supabase.auth.signOut();

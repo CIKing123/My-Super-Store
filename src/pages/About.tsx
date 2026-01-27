@@ -10,10 +10,7 @@ import {
   Star,
   Shield,
   Truck,
-  Tv2,
-  Glasses,
   ChevronRight,
-  Construction,
 } from 'lucide-react';
 
 interface AboutProps {

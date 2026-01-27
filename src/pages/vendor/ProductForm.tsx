@@ -2,7 +2,7 @@ import { useState, useEffect, FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
-import { ProductFormData, ProductImage, ProductSpec } from '../../types/vendor';
+import { ProductFormData } from '../../types/vendor';
 import { ImageUploader } from '../../components/vendor/ImageUploader';
 import { SpecsEditor } from '../../components/vendor/SpecsEditor';
 import { CategoryMultiSelect } from '../../components/vendor/CategoryMultiSelect';
@@ -31,6 +31,9 @@ export function ProductForm() {
     const [loading, setLoading] = useState(isEditMode);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [isPriceRange, setIsPriceRange] = useState(false);
+    const [priceRangeMin, setPriceRangeMin] = useState(0);
+    const [priceRangeMax, setPriceRangeMax] = useState(0);
 
     useEffect(() => {
         if (isEditMode && id) {
@@ -64,9 +67,9 @@ export function ProductForm() {
                     description: data.description || '',
                     brand: data.brand || '',
                     published: data.published,
-                    images: (data.product_images || []).sort((a, b) => a.position - b.position),
+                    images: (data.product_images || []).sort((a: any, b: any) => a.position - b.position),
                     specs: data.product_specs || [],
-                    category_ids: (data.product_categories || []).map((pc) => pc.category_id),
+                    category_ids: (data.product_categories || []).map((pc: any) => pc.category_id),
                 });
             }
         } catch (err) {
@@ -371,20 +374,71 @@ export function ProductForm() {
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
                                     Price *
                                 </label>
-                                <div className="relative">
-                                    <span className="absolute left-3 top-2.5 text-gray-500">$</span>
-                                    <input
-                                        type="number"
-                                        value={formData.price}
-                                        onChange={(e) =>
-                                            setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })
-                                        }
-                                        min="0"
-                                        step="0.01"
-                                        required
-                                        className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent"
-                                        placeholder="0.00"
-                                    />
+                                <div className="space-y-3">
+                                    <div className="flex items-center gap-2">
+                                        <input
+                                            type="checkbox"
+                                            id="isPriceRange"
+                                            checked={isPriceRange}
+                                            onChange={(e) => setIsPriceRange(e.target.checked)}
+                                            className="w-4 h-4 cursor-pointer"
+                                        />
+                                        <label htmlFor="isPriceRange" className="text-sm text-gray-600 cursor-pointer">
+                                            Use price range
+                                        </label>
+                                    </div>
+
+                                    {!isPriceRange ? (
+                                        <div className="relative">
+                                            <span className="absolute left-3 top-2.5 text-gray-500">$</span>
+                                            <input
+                                                type="number"
+                                                value={formData.price}
+                                                onChange={(e) =>
+                                                    setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })
+                                                }
+                                                min="0"
+                                                step="0.01"
+                                                required
+                                                className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent"
+                                                placeholder="0.00"
+                                            />
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-2">
+                                            <p>Min Price</p>
+                                            <div className="relative">
+                                                
+                                                <span className="absolute left-3 top-2.5 text-gray-500">$</span>
+                                                
+                                                <input
+                                                    type="number"
+                                                    value={priceRangeMin}
+                                                    onChange={(e) => setPriceRangeMin(parseFloat(e.target.value) || 0)}
+                                                    min="0"
+                                                    step="0.01"
+                                                    className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent"
+                                                    placeholder="Min: 0.00"
+                                                />
+                                            </div>
+
+                                            <p>Max Price</p>
+                                            <div className="relative">
+                                                
+                                                <span className="absolute left-3 top-2.5 text-gray-500">$</span>
+                                                
+                                                <input
+                                                    type="number"
+                                                    value={priceRangeMax}
+                                                    onChange={(e) => setPriceRangeMax(parseFloat(e.target.value) || 0)}
+                                                    min="0"
+                                                    step="0.01"
+                                                    className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent"
+                                                    placeholder="Max: 0.00"
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 

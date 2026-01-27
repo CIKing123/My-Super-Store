@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Heart, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 
 interface Product {
@@ -141,8 +141,8 @@ export function ProductCardCarousel({ product, onProductClick, variant = 'defaul
                   setCurrentImageIndex(index);
                 }}
                 className={`w-1.5 h-1.5 rounded-full transition-all ${index === currentImageIndex
-                    ? 'bg-[#D4AF37] w-3'
-                    : 'bg-white/40 hover:bg-white/60'
+                  ? 'bg-[#D4AF37] w-3'
+                  : 'bg-white/40 hover:bg-white/60'
                   }`}
               />
             ))}

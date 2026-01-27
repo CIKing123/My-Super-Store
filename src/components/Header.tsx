@@ -1,4 +1,4 @@
-import { Search, ShoppingCart, User, Menu, X, Gem, ChevronDown } from 'lucide-react';
+import { ShoppingCart, User, Menu, X, Gem, ChevronDown } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
@@ -62,9 +62,8 @@ export function Header({ cartItemCount }: HeaderProps) {
         <div className="flex justify-between w-full max-w-[1280px] items-center px-4 sm:px-6 md:px-8 lg:px-10 py-5 gap-4 sm:gap-6 md:gap-8">
           {/* Logo Area - Left */}
           <Link to="/" className="flex items-center gap-2 cursor-pointer no-underline flex-shrink-0">
-            <div className={`flex items-center justify-center size-8 rounded-full transition-colors ${
-              isAccountPage ? 'bg-white/10' : 'bg-black'
-            }`}>
+            <div className={`flex items-center justify-center size-8 rounded-full transition-colors ${isAccountPage ? 'bg-white/10' : 'bg-black'
+              }`}>
               <Gem size={20} strokeWidth={2} className={isAccountPage ? 'text-white' : 'text-white'} />
             </div>
             <h2 className={`${textColorClass} text-lg sm:text-xl font-extrabold tracking-tight transition-colors whitespace-nowrap`} style={{ fontFamily: 'Flowmery' }}>My Super Store</h2>
@@ -76,18 +75,17 @@ export function Header({ cartItemCount }: HeaderProps) {
               <Link
                 key={item.name}
                 to={item.path}
-                className={`transition-all text-sm font-semibold tracking-wide no-underline ${
-                  isAccountPage 
-                    ? 'text-white 70 drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] hover:text-white hover:drop-shadow-[0_0_16px_rgba(255,255,255,0.8)]' 
+                className={`transition-all text-sm font-semibold tracking-wide no-underline ${isAccountPage
+                    ? 'text-white 70 drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] hover:text-white hover:drop-shadow-[0_0_16px_rgba(255,255,255,0.8)]'
                     : `${textMutedClass} ${linkHoverClass} text-slate-900 drop-shadow-[0_0_8px_rgba(15,23,42,0.3)] hover:drop-shadow-[0_0_16px_rgba(15,23,42,0.6)]`
-                }`}
+                  }`}
               >
                 {item.name}
               </Link>
             ))}
-            
+
             {/* Shop Dropdown */}
-            <div 
+            <div
               className="relative group"
               onMouseEnter={() => setIsShopDropdownOpen(true)}
               onMouseLeave={() => setIsShopDropdownOpen(false)}
@@ -96,14 +94,13 @@ export function Header({ cartItemCount }: HeaderProps) {
                 Shop
                 <ChevronDown size={16} className={`transition-transform duration-300 ${isShopDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
-              
+
               {/* Dropdown Menu */}
               {isShopDropdownOpen && (
-                <div className={`absolute top-full left-0 mt-2 w-56 rounded-lg shadow-lg z-50 backdrop-blur-md ${
-                  isAccountPage 
-                    ? 'bg-[#0A0A0A]/80 border border-white/10' 
+                <div className={`absolute top-full left-0 mt-2 w-56 rounded-lg shadow-lg z-50 backdrop-blur-md ${isAccountPage
+                    ? 'bg-[#0A0A0A]/80 border border-white/10'
                     : 'bg-white/30 border border-white/20'
-                }`}>
+                  }`}>
                   {shopCategories.map((category) => (
                     <button
                       key={category.value}
@@ -111,11 +108,10 @@ export function Header({ cartItemCount }: HeaderProps) {
                         navigate(`/shop?category=${category.value}`);
                         setIsShopDropdownOpen(false);
                       }}
-                      className={`w-full text-left px-4 py-3 transition-all ${
-                        isAccountPage 
-                          ? 'text-white/70 hover:text-white hover:bg-white/10 first:rounded-t-lg last:rounded-b-lg' 
+                      className={`w-full text-left px-4 py-3 transition-all ${isAccountPage
+                          ? 'text-white/70 hover:text-white hover:bg-white/10 first:rounded-t-lg last:rounded-b-lg'
                           : 'text-slate-900/20 hover:text-slate-900 hover:bg-slate-100/20 first:rounded-t-lg last:rounded-b-lg'
-                      } text-sm font-medium`}
+                        } text-sm font-medium`}
                     >
                       {category.label}
                     </button>
@@ -127,14 +123,14 @@ export function Header({ cartItemCount }: HeaderProps) {
 
           {/* Icons / Actions - Right */}
           <div className="flex items-center gap-3 sm:gap-4 md:gap-5 ml-auto">
- 
-            <button 
+
+            <button
               onClick={() => navigate(user ? '/account' : '/login')}
               className={`flex items-center justify-center size-10 rounded-full ${hoverBgClass} transition-colors ${textColorClass}`}
             >
               <User size={20} strokeWidth={2} />
             </button>
-            <button 
+            <button
               onClick={() => navigate('/cart')}
               className={`flex items-center justify-center size-10 rounded-full ${hoverBgClass} transition-colors ${textColorClass} relative`}
             >
@@ -150,8 +146,8 @@ export function Header({ cartItemCount }: HeaderProps) {
             className=" md:hidden items-center justify-center ml-2 sm:ml-3"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
-            {isMenuOpen ? 
-              <X size={24} className={textColorClass} /> : 
+            {isMenuOpen ?
+              <X size={24} className={textColorClass} /> :
               <Menu size={24} className={textColorClass} />
             }
           </button>
@@ -173,7 +169,7 @@ export function Header({ cartItemCount }: HeaderProps) {
                   {item.name}
                 </Link>
               ))}
-              
+
               {/* Mobile Shop Categories */}
               <div className="border-t border-white/10 pt-4 mt-4">
                 <p className={`${textColorClass} text-sm font-semibold mb-3`}>Shop by Category</p>

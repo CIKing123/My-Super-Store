@@ -37,29 +37,29 @@ export default function App() {
   const navigate = useNavigate();
 
   const handleNavigate = (page: string, payload?: any) => {
-  switch (page) {
-    case 'home':
-      navigate('/');
-      break;
+    switch (page) {
+      case 'home':
+        navigate('/');
+        break;
 
-    case 'shop':
-      navigate('/shop', { state: payload });
-      break;
+      case 'shop':
+        navigate('/shop', { state: payload });
+        break;
 
-    case 'product':
-      if (payload) {
-        navigate(`/product/${payload}`);
-      }
-      break;
+      case 'product':
+        if (payload) {
+          navigate(`/product/${payload}`);
+        }
+        break;
 
-    case 'vendor/dashboard':
-      navigate('/vendor/dashboard');
-      break;
+      case 'vendor/dashboard':
+        navigate('/vendor/dashboard');
+        break;
 
-    default:
-      navigate(`/${page}`);
-  }
-};
+      default:
+        navigate(`/${page}`);
+    }
+  };
 
 
   return (
@@ -75,7 +75,7 @@ export default function App() {
             <main className="grow px-0 sm:px-0 lg:px-0">
               <Routes>
                 {/* Customer Routes */}
-                <Route path="/" element={<Home onNavigate={handleNavigate} />} />
+                <Route path="/" element={<Home />} />
                 <Route path="/shop" element={<Shop onNavigate={handleNavigate} />} />
                 <Route path="/product/:id" element={<ProductDetail />} />
                 <Route path="/cart" element={<Cart onNavigate={handleNavigate} />} />
@@ -83,7 +83,7 @@ export default function App() {
                 <Route path="/order-confirmation" element={<OrderConfirmation />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/account" element={<Account />} />
-                <Route path="/about" element={<About />} />
+                <Route path="/about" element={<About onNavigate={handleNavigate} />} />
 
                 {/* Vendor Routes */}
                 <Route path="/vendor/*" element={
@@ -100,7 +100,7 @@ export default function App() {
                   </VendorLayout>
                 } />
 
-                <Route path="*" element={<Home onNavigate={handleNavigate} />} />
+                <Route path="*" element={<Home />} />
               </Routes>
             </main>
 

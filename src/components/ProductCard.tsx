@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Heart, ChevronLeft, ChevronRight, Package } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Package } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 
 interface Product {
@@ -49,6 +49,12 @@ export function ProductCard({ product, onProductClick, variant = 'default' }: Pr
     setIsAutoRotating(false);
     setImageIndex((prev) => (prev + 1) % images.length);
   };
+
+  // Utility function to truncate text with character limit
+const truncateText = (text: string, maxLength: number): string => {
+  if (text.length <= maxLength) return text;
+  return text.slice(0, maxLength).trim() + '...';
+};
 
   const handleMouseEnter = () => setIsAutoRotating(false);
   const handleMouseLeave = () => setIsAutoRotating(true);
@@ -126,8 +132,8 @@ export function ProductCard({ product, onProductClick, variant = 'default' }: Pr
                     setImageIndex(index);
                   }}
                   className={`w-1 h-1 rounded-full transition-all ${index === imageIndex
-                      ? 'bg-[#D4AF37] w-2'
-                      : 'bg-white/40 hover:bg-white/60'
+                    ? 'bg-[#D4AF37] w-2'
+                    : 'bg-white/40 hover:bg-white/60'
                     }`}
                 />
               ))}
@@ -136,13 +142,13 @@ export function ProductCard({ product, onProductClick, variant = 'default' }: Pr
         </div>
 
         {/* Wishlist Button */}
-       
+
       </div>
 
       {/* Product Info */}
       <div className="product-info">
         <p className="product-category">{product.category}</p>
-        <h3 className="product-name">{product.name}</h3>
+        <h3 className="product-name">{truncateText(product.name, 50)}</h3>
 
         {/* Short Description */}
         {product.short_description && (
@@ -163,10 +169,10 @@ export function ProductCard({ product, onProductClick, variant = 'default' }: Pr
         </div>
 
         {typeof product.price === 'number' && (
-  <div className="product-price">
-    ${product.price.toLocaleString()}
-  </div>
-)}
+          <div className="product-price">
+            ${product.price.toLocaleString()}
+          </div>
+        )}
 
       </div>
     </div>

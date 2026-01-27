@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Check, CreditCard, Truck } from 'lucide-react';
+import { Check, CreditCard, Truck, Download, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
+import { supabase } from '../lib/supabase';
+import { generateCartCSV, generateCSVWithHeader, saveUserPreferenceData, downloadCSVToLocalDisk } from '../lib/exportCartData';
 
 declare global {
     interface Window {
@@ -10,6 +14,8 @@ declare global {
 
 export function Checkout() {
     const navigate = useNavigate();
+    const { items } = useCart();
+    const { user } = useAuth();
     const [step, setStep] = useState(1);
 
     const steps = [
@@ -136,7 +142,24 @@ export function Checkout() {
                             </div>
                             {step === 2 && (
                                 <button
-                                    onClick={() => navigate('/order-confirmation')}
+                                    onClick={async () => {
+                                        try {
+                                            // Generate user preference data
+                                            if (user && items.length > 0) {
+                                                const csvData = await generateCartCSV(items, supabase, user.email);
+                                                const csvWithHeader = generateCSVWithHeader(csvData, user.email);
+                                                
+                                                // Save to localStorage
+                                                saveUserPreferenceData(user.id, user.email || '', csvWithHeader, items);
+                                                
+                                                // Download CSV to local disk
+                                                downloadCSVToLocalDisk(csvWithHeader, user.email);
+                                            }
+                                        } catch (error) {
+                                            console.error('Error saving preference data:', error);
+                                        }
+                                        navigate('/order-confirmation');
+                                    }}
                                     className="btn-primary mt-8 w-full"
                                 >
                                     Place Order

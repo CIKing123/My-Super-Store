@@ -8,6 +8,7 @@ interface Product {
     price: number;
     description: string;
     product_images?: { url: string }[];
+    seller_id?: string;
 }
 
 interface CartItem {
@@ -97,7 +98,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             // Fetch items
             const { data: cartItems } = await supabase
                 .from('cart_items')
-                .select(`*, products ( id, name, price, description, product_images ( url ) )`)
+                .select(`*, products ( id, name, price, description, product_images ( url ), seller_id )`)
                 .eq('cart_id', currentCartId);
 
             setItems(cartItems || []);
