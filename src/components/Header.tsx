@@ -2,6 +2,7 @@ import { ShoppingCart, User, Menu, X, Gem, ChevronDown } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { SearchBar } from './SearchBar';
 
 interface HeaderProps {
   cartItemCount: number;
@@ -76,8 +77,8 @@ export function Header({ cartItemCount }: HeaderProps) {
                 key={item.name}
                 to={item.path}
                 className={`transition-all text-sm font-semibold tracking-wide no-underline ${isAccountPage
-                    ? 'text-white 70 drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] hover:text-white hover:drop-shadow-[0_0_16px_rgba(255,255,255,0.8)]'
-                    : `${textMutedClass} ${linkHoverClass} text-slate-900 drop-shadow-[0_0_8px_rgba(15,23,42,0.3)] hover:drop-shadow-[0_0_16px_rgba(15,23,42,0.6)]`
+                  ? 'text-white 70 drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] hover:text-white hover:drop-shadow-[0_0_16px_rgba(255,255,255,0.8)]'
+                  : `${textMutedClass} ${linkHoverClass} text-slate-900 drop-shadow-[0_0_8px_rgba(15,23,42,0.3)] hover:drop-shadow-[0_0_16px_rgba(15,23,42,0.6)]`
                   }`}
               >
                 {item.name}
@@ -98,8 +99,8 @@ export function Header({ cartItemCount }: HeaderProps) {
               {/* Dropdown Menu */}
               {isShopDropdownOpen && (
                 <div className={`absolute top-full left-0 mt-2 w-56 rounded-lg shadow-lg z-50 backdrop-blur-md ${isAccountPage
-                    ? 'bg-[#0A0A0A]/80 border border-white/10'
-                    : 'bg-white/30 border border-white/20'
+                  ? 'bg-[#0A0A0A]/80 border border-white/10'
+                  : 'bg-white/30 border border-white/20'
                   }`}>
                   {shopCategories.map((category) => (
                     <button
@@ -109,8 +110,8 @@ export function Header({ cartItemCount }: HeaderProps) {
                         setIsShopDropdownOpen(false);
                       }}
                       className={`w-full text-left px-4 py-3 transition-all ${isAccountPage
-                          ? 'text-white/70 hover:text-white hover:bg-white/10 first:rounded-t-lg last:rounded-b-lg'
-                          : 'text-slate-900/20 hover:text-slate-900 hover:bg-slate-100/20 first:rounded-t-lg last:rounded-b-lg'
+                        ? 'text-white/70 hover:text-white hover:bg-white/10 first:rounded-t-lg last:rounded-b-lg'
+                        : 'text-slate-900/20 hover:text-slate-900 hover:bg-slate-100/20 first:rounded-t-lg last:rounded-b-lg'
                         } text-sm font-medium`}
                     >
                       {category.label}
@@ -120,6 +121,11 @@ export function Header({ cartItemCount }: HeaderProps) {
               )}
             </div>
           </nav>
+
+          {/* Search Bar - Desktop based layout */}
+          <div className="hidden md:flex items-center flex-1 max-w-md mx-4">
+            <SearchBar />
+          </div>
 
           {/* Icons / Actions - Right */}
           <div className="flex items-center gap-3 sm:gap-4 md:gap-5 ml-auto">
