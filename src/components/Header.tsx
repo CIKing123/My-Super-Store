@@ -122,11 +122,6 @@ export function Header({ cartItemCount }: HeaderProps) {
             </div>
           </nav>
 
-          {/* Search Bar - Desktop based layout */}
-          <div className="hidden md:flex items-center flex-1 max-w-md mx-4">
-            <SearchBar />
-          </div>
-
           {/* Icons / Actions - Right */}
           <div className="flex items-center gap-3 sm:gap-4 md:gap-5 ml-auto">
 
@@ -160,11 +155,29 @@ export function Header({ cartItemCount }: HeaderProps) {
         </div>
       </div>
 
+      {/* Desktop Search Bar Row - Below Header */}
+      <div className={`hidden md:block w-full border-b ${isAccountPage ? 'border-white/10' : 'border-[#f0f0f0]'}`}>
+        <div className="flex justify-center w-full">
+          <div className="w-full max-w-[1280px] px-4 sm:px-6 md:px-8 lg:px-10 py-3">
+            <div className="flex justify-center">
+              <div className="w-full max-w-2xl">
+                <SearchBar />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Mobile Menu */}
       {isMenuOpen && (
         <div className={menuBgClass}>
           <nav className="flex justify-center w-full">
             <div className="w-full max-w-[1280px] flex flex-col p-6 gap-4 px-6 lg:px-10">
+              {/* Mobile Search Bar */}
+              <div className="mb-2">
+                <SearchBar />
+              </div>
+
               {navItems.map((item) => (
                 <Link
                   key={item.name}
