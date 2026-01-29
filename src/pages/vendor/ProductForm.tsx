@@ -34,6 +34,7 @@ export function ProductForm() {
     const [isPriceRange, setIsPriceRange] = useState(false);
     const [priceRangeMin, setPriceRangeMin] = useState(0);
     const [priceRangeMax, setPriceRangeMax] = useState(0);
+    const [modifier,priceModifier] = useState(0);
 
     useEffect(() => {
         if (isEditMode && id) {

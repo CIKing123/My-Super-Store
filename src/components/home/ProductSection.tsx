@@ -119,12 +119,15 @@ export function ProductSection({
                             ))
                         ) : products.length > 0 ? (
                             products.map((p, i) => (
+                            <div
+                                key={p.id}
+                                className="scale-[0.92] origin-top"
+                            >
                                 <LuxuryProductCard
-                                    key={p.id}
                                     product={p}
                                     delay={i * 0.05}
                                     isTrending={index === 0}
-                                />
+                                /></div>
                             ))
                         ) : (
                             <div className="col-span-full text-center py-12">
