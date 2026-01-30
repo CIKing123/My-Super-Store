@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from './AuthContext';
 
-interface Product {
+export interface Product {
     id: number;
     name: string;
     price: number;
@@ -11,7 +11,7 @@ interface Product {
     seller_id?: string;
 }
 
-interface CartItem {
+export interface CartItem {
     id: string;
     product_id: number;
     quantity: number;

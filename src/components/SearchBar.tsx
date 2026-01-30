@@ -69,6 +69,7 @@ export function SearchBar() {
    */
   const handleSearch = async () => {
     const trimmedQuery = query.trim();
+    navigate(`/shop?search=${encodeURIComponent(trimmedQuery)}`);
 
     if (!trimmedQuery) {
       setIsOpen(false);
@@ -93,7 +94,7 @@ export function SearchBar() {
       await recordCategoryAnalytics(firstCategory.id, firstCategory.name);
 
       // Navigate to shop filtered by category
-      navigate(`/shop?category=${encodeURIComponent(firstCategory.slug)}`);
+      navigate(`/shop?category=${encodeURIComponent(firstCategory.slug)}&search=${encodeURIComponent(query)}`);
       setIsOpen(false);
       setQuery('');
       return;
@@ -105,7 +106,7 @@ export function SearchBar() {
       await incrementProductSearchHitCount(firstProduct.id);
 
       // Navigate to product detail
-      navigate(`/product/${firstProduct.slug}`);
+      navigate(`/product/${firstProduct.slug}?search=${encodeURIComponent(query)}`);
       setIsOpen(false);
       setQuery('');
       return;
@@ -119,6 +120,7 @@ export function SearchBar() {
     if (e.key === 'Enter') {
       e.preventDefault();
       handleSearch();
+      
     }
   };
 
@@ -131,7 +133,7 @@ export function SearchBar() {
       console.error('Failed to increment view count, but navigation will proceed:', error);
     });
 
-    navigate(`/product/${product.slug}`);
+    navigate(`/product/=${encodeURIComponent(product.slug)}`);
     setIsOpen(false);
     setQuery('');
   };

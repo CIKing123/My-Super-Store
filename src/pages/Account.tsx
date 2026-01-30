@@ -193,23 +193,41 @@ export function Account() {
     const handleSaveAddress = async () => {
         try {
             setLoading(true);
-            console.log('[Address] Saving address:', editAddressData);
+            const fullLine1 = [editAddressData.line1, editAddressData.neighborhood].filter(Boolean).join(', ');
+            console.log('[Address] Saving address:', { ...editAddressData, line1: fullLine1 });
 
-            const { error } = await supabase
+            // Check if address exists for user
+            const { data: existingAddress } = await supabase
                 .from('addresses')
-                .insert({
-                    user_id: user!.id,
-                    label: editAddressData.label,
-                    line1: editAddressData.line1,
-                    line2: editAddressData.line2,
-                    neighborhood: editAddressData.neighborhood,
-                    city: editAddressData.city,
-                    state: editAddressData.state,
-                    country: editAddressData.country,
-                    postal_code: editAddressData.postal_code,
-                });
+                .select('id')
+                .eq('user_id', user!.id)
+                .single();
 
-            if (error) throw error;
+            const addressData = {
+                user_id: user!.id,
+                label: editAddressData.label,
+                line1: fullLine1,
+                line2: editAddressData.line2,
+                city: editAddressData.city,
+                state: editAddressData.state,
+                country: editAddressData.country,
+                postal_code: editAddressData.postal_code,
+            };
+
+            if (existingAddress) {
+                // Update existing
+                const { error } = await supabase
+                    .from('addresses')
+                    .update(addressData)
+                    .eq('id', existingAddress.id);
+                if (error) throw error;
+            } else {
+                // Insert new
+                const { error } = await supabase
+                    .from('addresses')
+                    .insert(addressData);
+                if (error) throw error;
+            }
 
             console.log('[Address] Address saved successfully');
             await fetchData();
@@ -523,14 +541,172 @@ export function Account() {
                             )}
 
                             {/* Placeholders for other sections to handle layout */}
-                            {activeSection !== 'orders' && activeSection !== 'profile' && (
-                                <div className="relative overflow-hidden rounded-2xl bg-[#0F0F0F] p-16 text-center border border-dashed border-[#FFC92E]/20">
-                                    <div className="relative z-10">
-                                        <div className="w-16 h-16 bg-[#FFC92E]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                                            <Loader2 size={24} className="text-[#FFC92E] animate-spin-slow" />
+                            {activeSection === 'addresses' && (
+                                <div className="space-y-6">
+                                    <div className="relative overflow-hidden rounded-2xl bg-[#0F0F0F] p-8 border border-[#FFC92E]/20 shadow-lg">
+                                        <div className="absolute top-0 right-0 w-64 h-64 bg-[#FFC92E] rounded-full blur-[100px] opacity-5"></div>
+                                        <div className="relative z-10 max-w-3xl mx-auto">
+                                            <h3 className="text-xl font-bold text-white flex items-center gap-2 mb-8">
+                                                <MapPin size={24} className="text-[#FFC92E]" />
+                                                Delivery Addresses
+                                            </h3>
+
+                                            {/* Address List */}
+                                            {addresses.length > 0 && (
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
+                                                    {addresses.map((addr) => (
+                                                        <div key={addr.id} className="p-4 rounded-xl bg-white/5 border border-white/10 hover:border-[#FFC92E]/30 transition-all group relative overflow-hidden">
+                                                            <div className="absolute top-0 right-0 p-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                <div className="w-2 h-2 rounded-full bg-[#FFC92E] shadow-[0_0_10px_#FFC92E]"></div>
+                                                            </div>
+                                                            <div className="flex justify-between items-start mb-2">
+                                                                <p className="font-bold text-white text-base">{addr.label}</p>
+                                                                <span className="p-1 rounded-full bg-[#FFC92E]/10 text-[#FFC92E]">
+                                                                    <MapPin size={12} />
+                                                                </span>
+                                                            </div>
+                                                            <div className="space-y-1 text-sm text-gray-400">
+                                                                <p className="text-gray-300 font-medium">{addr.line1}</p>
+                                                                {addr.line2 && <p>{addr.line2}</p>}
+                                                                <p>{addr.city}, {addr.state} {addr.postal_code}</p>
+                                                                <p>{addr.country}</p>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+
+                                            {/* Address Form */}
+                                            <div className="bg-white/[0.02] rounded-xl p-6 border border-white/5">
+                                                <h4 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                                                    <Sparkles size={16} className="text-[#FFC92E]" />
+                                                    Add / Update Address
+                                                </h4>
+
+                                                <div className="space-y-6">
+                                                    <div>
+                                                        <label className="block text-gray-500 mb-2 text-[10px] uppercase tracking-widest font-bold">Address Label</label>
+                                                        <input
+                                                            type="text"
+                                                            value={editAddressData.label}
+                                                            onChange={(e) => setEditAddressData({ ...editAddressData, label: e.target.value })}
+                                                            placeholder="e.g., Home, Work"
+                                                            className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-[#FFC92E]/50 transition-colors"
+                                                        />
+                                                    </div>
+
+                                                    <div>
+                                                        <label className="block text-gray-500 mb-2 text-[10px] uppercase tracking-widest font-bold">Address Line 1</label>
+                                                        <input
+                                                            type="text"
+                                                            value={editAddressData.line1}
+                                                            onChange={(e) => setEditAddressData({ ...editAddressData, line1: e.target.value })}
+                                                            className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-[#FFC92E]/50 transition-colors"
+                                                        />
+                                                    </div>
+
+                                                    <div>
+                                                        <label className="block text-gray-500 mb-2 text-[10px] uppercase tracking-widest font-bold">Neighborhood/Region (Added to Line 1)</label>
+                                                        <input
+                                                            type="text"
+                                                            value={editAddressData.neighborhood}
+                                                            onChange={(e) => setEditAddressData({ ...editAddressData, neighborhood: e.target.value })}
+                                                            placeholder="e.g., Shonibare Estate"
+                                                            className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-[#FFC92E]/50 transition-colors"
+                                                        />
+                                                    </div>
+
+                                                    <div>
+                                                        <label className="block text-gray-500 mb-2 text-[10px] uppercase tracking-widest font-bold">Address Line 2 (Optional)</label>
+                                                        <input
+                                                            type="text"
+                                                            value={editAddressData.line2}
+                                                            onChange={(e) => setEditAddressData({ ...editAddressData, line2: e.target.value })}
+                                                            className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-[#FFC92E]/50 transition-colors"
+                                                        />
+                                                    </div>
+
+                                                    <div className="grid grid-cols-2 gap-4">
+                                                        <div>
+                                                            <label className="block text-gray-500 mb-2 text-[10px] uppercase tracking-widest font-bold">City</label>
+                                                            <input
+                                                                type="text"
+                                                                value={editAddressData.city}
+                                                                onChange={(e) => setEditAddressData({ ...editAddressData, city: e.target.value })}
+                                                                className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-[#FFC92E]/50 transition-colors"
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <label className="block text-gray-500 mb-2 text-[10px] uppercase tracking-widest font-bold">State/Province</label>
+                                                            <input
+                                                                type="text"
+                                                                value={editAddressData.state}
+                                                                onChange={(e) => setEditAddressData({ ...editAddressData, state: e.target.value })}
+                                                                className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-[#FFC92E]/50 transition-colors"
+                                                            />
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="grid grid-cols-2 gap-4">
+                                                        <div>
+                                                            <label className="block text-gray-500 mb-2 text-[10px] uppercase tracking-widest font-bold">Country</label>
+                                                            <input
+                                                                type="text"
+                                                                value={editAddressData.country}
+                                                                onChange={(e) => setEditAddressData({ ...editAddressData, country: e.target.value })}
+                                                                className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-[#FFC92E]/50 transition-colors"
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <label className="block text-gray-500 mb-2 text-[10px] uppercase tracking-widest font-bold">Postal Code</label>
+                                                            <input
+                                                                type="text"
+                                                                value={editAddressData.postal_code}
+                                                                onChange={(e) => setEditAddressData({ ...editAddressData, postal_code: e.target.value })}
+                                                                className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-white outline-none focus:border-[#FFC92E]/50 transition-colors"
+                                                            />
+                                                        </div>
+                                                    </div>
+
+                                                    <button
+                                                        onClick={handleGetLocation}
+                                                        disabled={isLoadingLocation}
+                                                        className="w-full py-3 bg-white/5 border border-white/10 hover:border-[#FFC92E]/50 text-white font-bold rounded-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                                                        title="Uses device GPS for accuracy, falls back to IP geolocation"
+                                                    >
+                                                        {isLoadingLocation ? (
+                                                            <>
+                                                                <Loader2 size={18} className="animate-spin" />
+                                                                Getting Location...
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <MapPin size={18} />
+                                                                Use Current Location
+                                                            </>
+                                                        )}
+                                                    </button>
+
+                                                    <button
+                                                        onClick={handleSaveAddress}
+                                                        disabled={loading}
+                                                        className="w-full py-4 bg-gradient-to-r from-[#FFC92E] to-[#DE9D0D] text-black font-bold rounded-lg hover:shadow-[0_0_20px_rgba(255,201,46,0.2)] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                                                    >
+                                                        {loading ? (
+                                                            <>
+                                                                <Loader2 size={18} className="animate-spin" />
+                                                                Saving Address...
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <Sparkles size={18} />
+                                                                Save Address
+                                                            </>
+                                                        )}
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <h3 className="text-lg font-bold text-white mb-2">Coming Soon</h3>
-                                        <p className="text-gray-500">This feature is currently under development.</p>
                                     </div>
                                 </div>
                             )}

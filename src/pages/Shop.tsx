@@ -33,6 +33,10 @@ export function Shop({ onNavigate }: ShopProps) {
   const [priceRange, setPriceRange] = useState<{ min: number; max: number }>({ min: 0, max: 1000000 });
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
+  const [searchTerm, setSearchTerm] = useState('');
+
+  
+
 
   const categories = ['All', 'Cosmetics', 'Construction', 'Furniture', 'Clothing and Fashion', 'Events Tools', 'Electrical Appliances'];
 
@@ -41,14 +45,13 @@ export function Shop({ onNavigate }: ShopProps) {
   }, []);
 
   useEffect(() => {
-    const categoryFromUrl = searchParams.get('category');
+  const categoryFromUrl = searchParams.get('category');
+  const searchFromUrl = searchParams.get('search');
 
-    if (categoryFromUrl) {
-      setSelectedCategory(categoryFromUrl);
-    } else {
-      setSelectedCategory('All');
-    }
-  }, [searchParams]);
+  setSelectedCategory(categoryFromUrl ?? 'All');
+  setSearchTerm(searchFromUrl ?? '');
+}, [searchParams]);
+
 
 
   const fetchProducts = async () => {
@@ -100,6 +103,12 @@ export function Shop({ onNavigate }: ShopProps) {
   const filteredProducts = products
     .filter(p => selectedCategory === 'All' || p.category === selectedCategory)
     .filter(p => p.price >= priceRange.min && p.price <= priceRange.max)
+    .filter(p =>
+      !searchTerm ||
+      p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.short_description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.brand?.toLowerCase().includes(searchTerm.toLowerCase())
+)
     .sort((a, b) => {
       if (sortBy === 'price-low') return a.price - b.price;
       if (sortBy === 'price-high') return b.price - a.price;
@@ -124,7 +133,9 @@ export function Shop({ onNavigate }: ShopProps) {
         <div className="relative z-10 text-center">
           <h1 className="page-title" style={{ fontFamily: "'Oswald', sans-serif" }}>Luxury Collection</h1>
           <p className="page-desc">
-            {filteredProducts.length} exceptional pieces representing the pinnacle of craftsmanship.
+            {searchTerm
+    ? `${filteredProducts.length} results for “${searchTerm}”`
+    : `${filteredProducts.length} exceptional pieces representing the pinnacle of craftsmanship.`}
           </p>
         </div>
       </div>
@@ -143,7 +154,8 @@ export function Shop({ onNavigate }: ShopProps) {
                   searchParams.delete('category');
                   setSearchParams(searchParams);
                 } else {
-                  setSearchParams({ category });
+                  setSearchParams({ category,
+  ...(searchTerm && { search: searchTerm }) });
                 }
               }}
               className={`filter-chip ${selectedCategory === category ? 'active' : ''}`}

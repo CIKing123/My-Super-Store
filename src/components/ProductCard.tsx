@@ -51,10 +51,10 @@ export function ProductCard({ product, onProductClick, variant = 'default' }: Pr
   };
 
   // Utility function to truncate text with character limit
-const truncateText = (text: string, maxLength: number): string => {
-  if (text.length <= maxLength) return text;
-  return text.slice(0, maxLength).trim() + '...';
-};
+  const truncateText = (text: string, maxLength: number): string => {
+    if (text.length <= maxLength) return text;
+    return text.slice(0, maxLength).trim() + '...';
+  };
 
   const handleMouseEnter = () => setIsAutoRotating(false);
   const handleMouseLeave = () => setIsAutoRotating(true);
@@ -89,7 +89,7 @@ const truncateText = (text: string, maxLength: number): string => {
 
           {/* Brand Badge */}
           {product.brand && (
-            <div className="absolute top-2 right-2 bg-black/60 text-[#D4AF37] px-2 py-1 rounded text-xs font-medium backdrop-blur-sm">
+            <div className="absolute top-2 right-2 bg-black/30 text-[#FFD700] px-2 py-1 rounded text-xs font-bold backdrop-blur-sm">
               {product.brand}
             </div>
           )}
@@ -147,26 +147,25 @@ const truncateText = (text: string, maxLength: number): string => {
 
       {/* Product Info */}
       <div className="product-info">
-        <p className="product-category">{product.category}</p>
-        <h3 className="product-name">{truncateText(product.name, 50)}</h3>
+
+        <h3 className="product-name">{truncateText(product.name, 40)}</h3>
 
         {/* Short Description */}
         {product.short_description && (
-          <p className="text-xs text-gray-600 mb-2 line-clamp-2">
+          <p className="text-xs text-white mb-2 line-clamp-2">
             {product.short_description}
           </p>
         )}
 
         {/* SKU and Stock Info */}
-        <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
-          {product.sku && <span>SKU: {product.sku}</span>}
-          {inStock && (
-            <span className="flex items-center gap-1 text-green-600">
-              <Package size={12} />
-              {product.stock} in stock
-            </span>
-          )}
-        </div>
+
+        {inStock && (
+          <span className="product-category">
+            <Package size={12} />
+            {product.stock} in stock
+          </span>
+        )}
+
 
         {typeof product.price === 'number' && (
           <div className="product-price">

@@ -14,8 +14,7 @@ export interface UserPreferenceRecord {
  */
 export async function generateCartCSV(
     items: CartItem[],
-    supabase: any,
-    userEmail?: string
+    supabase: any
 ): Promise<string> {
     if (items.length === 0) {
         return 'Product Name,Category,Vendor Business Name,Vendor Email,Price,Quantity\n';
@@ -90,9 +89,8 @@ export function generateCSVWithHeader(
     timestamp?: Date
 ): string {
     const date = timestamp || new Date();
-    const header = `# User Preference Data\n# Generated: ${date.toISOString()}\n${
-        userEmail ? `# User Email: ${userEmail}\n` : ''
-    }# This file contains product preferences for personalized recommendations\n\n`;
+    const header = `# User Preference Data\n# Generated: ${date.toISOString()}\n${userEmail ? `# User Email: ${userEmail}\n` : ''
+        }# This file contains product preferences for personalized recommendations\n\n`;
 
     return header + csv;
 }

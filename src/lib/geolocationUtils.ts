@@ -101,7 +101,7 @@ export async function reverseGeocode(lat: number, lng: number): Promise<{
     console.log('[ReverseGeocode] Converting coordinates to address...');
 
     const res = await fetch(
-      `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&result_type=street_address|route|locality&language=en&key=${GOOGLE_MAPS_API_KEY}`
+      `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&language=en&key=${GOOGLE_MAPS_API_KEY}`
     );
 
     if (!res.ok) {
@@ -122,11 +122,36 @@ export async function reverseGeocode(lat: number, lng: number): Promise<{
       };
     }
 
-    if (data.results.length === 0) {
+    if (!data.results || data.results.length === 0) {
       throw new Error('No geocoding results');
     }
 
-    const result = data.results[0];
+    // Sort results to find the most accurate one
+    // Priority: ROOFTOP > RANGE_INTERPOLATED > GEOMETRIC_CENTER
+    // Priority: subpremise > premise > street_address > route
+    const result = data.results.sort((a: any, b: any) => {
+      const getScore = (r: any) => {
+        let score = 0;
+        const types = r.types || [];
+        const locationType = r.geometry?.location_type;
+
+        // Base score from location type accuracy
+        if (locationType === 'ROOFTOP') score += 20;
+        else if (locationType === 'RANGE_INTERPOLATED') score += 10;
+        else if (locationType === 'GEOMETRIC_CENTER') score += 5;
+
+        // Bonus for specific address types
+        if (types.includes('subpremise')) score += 5;      // e.g. Apartment, Unit (Very specific)
+        else if (types.includes('premise')) score += 4;    // e.g. Building
+        else if (types.includes('street_address')) score += 3; // Precise street address
+        else if (types.includes('route')) score += 2;          // Street name
+        else if (types.includes('intersection')) score += 1;
+
+        return score;
+      };
+
+      return getScore(b) - getScore(a);
+    })[0];
 
     const getPart = (types: string[]) => {
       const component = result.address_components.find((c: any) =>

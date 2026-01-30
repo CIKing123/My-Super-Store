@@ -34,7 +34,7 @@ export function ProductForm() {
     const [isPriceRange, setIsPriceRange] = useState(false);
     const [priceRangeMin, setPriceRangeMin] = useState(0);
     const [priceRangeMax, setPriceRangeMax] = useState(0);
-    const [modifier,priceModifier] = useState(0);
+
 
     useEffect(() => {
         if (isEditMode && id) {
@@ -409,9 +409,9 @@ export function ProductForm() {
                                         <div className="space-y-2">
                                             <p>Min Price</p>
                                             <div className="relative">
-                                                
+
                                                 <span className="absolute left-3 top-2.5 text-gray-500">$</span>
-                                                
+
                                                 <input
                                                     type="number"
                                                     value={priceRangeMin}
@@ -425,9 +425,9 @@ export function ProductForm() {
 
                                             <p>Max Price</p>
                                             <div className="relative">
-                                                
+
                                                 <span className="absolute left-3 top-2.5 text-gray-500">$</span>
-                                                
+
                                                 <input
                                                     type="number"
                                                     value={priceRangeMax}

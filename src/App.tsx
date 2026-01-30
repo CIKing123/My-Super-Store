@@ -1,6 +1,7 @@
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
+import { MobileBottomNav } from './components/MobileBottomNav';
 import { Home } from './pages/Home';
 import { Shop } from './pages/Shop';
 import { ProductDetail } from './pages/ProductDetail';
@@ -72,7 +73,7 @@ export default function App() {
           <div className="min-h-screen flex flex-col">
             <HeaderWrapper />
 
-            <main className="grow px-0 sm:px-0 lg:px-0">
+            <main className="grow px-0 sm:px-0 lg:px-0 pb-0 md:pb-0 mb-20 md:mb-0">
               <Routes>
                 {/* Customer Routes */}
                 <Route path="/" element={<Home />} />
@@ -105,6 +106,7 @@ export default function App() {
             </main>
 
             <Footer />
+            <MobileBottomNav />
           </div>
         </SeasonProvider>
       </CartProvider>

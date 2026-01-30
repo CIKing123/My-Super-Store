@@ -152,7 +152,7 @@ export function ProductCardCarousel({ product, onProductClick, variant = 'defaul
 
       {/* Product Info */}
       <div className="product-info">
-        <p className="product-category">{product.category}</p>
+        
         <h3 className="product-name">{product.name}</h3>
         <div className="product-price">
           ${product.price.toLocaleString()}

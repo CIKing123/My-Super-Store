@@ -1,15 +1,17 @@
-import { ShoppingCart, User, Menu, X, Gem, ChevronDown } from 'lucide-react';
+import { ShoppingCart, User, Menu, Gem, ChevronDown } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { SearchBar } from './SearchBar';
+import { MobileDrawer } from './MobileDrawer';
+import { MobileSearch } from './MobileSearch';
 
 interface HeaderProps {
   cartItemCount: number;
 }
 
 export function Header({ cartItemCount }: HeaderProps) {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isShopDropdownOpen, setIsShopDropdownOpen] = useState(false);
   const [user, setUser] = useState<any>(null); // eslint-disable-line @typescript-eslint/no-explicit-any
   const location = useLocation();
@@ -55,7 +57,6 @@ export function Header({ cartItemCount }: HeaderProps) {
   const textMutedClass = isAccountPage ? 'text-white/60' : 'text-slate-900/70';
   const hoverBgClass = isAccountPage ? 'hover:bg-white/10' : 'hover:bg-slate-100';
   const linkHoverClass = isAccountPage ? 'hover:text-white' : 'hover:text-black';
-  const menuBgClass = isAccountPage ? 'bg-[#0A0A0A] border-t border-white/10' : 'bg-white/20';
 
   return (
     <header className={headerClass}>
@@ -123,7 +124,7 @@ export function Header({ cartItemCount }: HeaderProps) {
           </nav>
 
           {/* Icons / Actions - Right */}
-          <div className="flex items-center gap-3 sm:gap-4 md:gap-5 ml-auto">
+          <div className="hidden md:flex items-center gap-3 sm:gap-4 md:gap-5 ml-auto">
 
             <button
               onClick={() => navigate(user ? '/account' : '/login')}
@@ -144,14 +145,21 @@ export function Header({ cartItemCount }: HeaderProps) {
 
           {/* Mobile Menu Button - Only on Mobile */}
           <button
-            className=" md:hidden items-center justify-center ml-2 sm:ml-3"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="flex md:hidden items-center justify-center ml-2 sm:ml-3"
+            onClick={() => setIsDrawerOpen(true)}
+            aria-label="Open navigation menu"
           >
-            {isMenuOpen ?
-              <X size={24} className={textColorClass} /> :
-              <Menu size={24} className={textColorClass} />
-            }
+            <Menu size={24} className={textColorClass} />
           </button>
+        </div>
+      </div>
+
+      {/* Mobile Search Bar - Below Header on Mobile Only */}
+      <div className={`md:hidden w-full border-b ${isAccountPage ? 'border-white/10' : 'border-[#f0f0f0]'}`}>
+        <div className="flex justify-center w-full">
+          <div className="w-full max-w-[1280px] px-4 sm:px-6 py-3">
+            <MobileSearch />
+          </div>
         </div>
       </div>
 
@@ -168,47 +176,8 @@ export function Header({ cartItemCount }: HeaderProps) {
         </div>
       </div>
 
-      {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div className={menuBgClass}>
-          <nav className="flex justify-center w-full">
-            <div className="w-full max-w-[1280px] flex flex-col p-6 gap-4 px-6 lg:px-10">
-              {/* Mobile Search Bar */}
-              <div className="mb-2">
-                <SearchBar />
-              </div>
-
-              {navItems.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.path}
-                  onClick={() => setIsMenuOpen(false)}
-                  className={`${textColorClass} ${linkHoverClass} text-lg py-2 transition-colors font-semibold no-underline`}
-                >
-                  {item.name}
-                </Link>
-              ))}
-
-              {/* Mobile Shop Categories */}
-              <div className="border-t border-white/10 pt-4 mt-4">
-                <p className={`${textColorClass} text-sm font-semibold mb-3`}>Shop by Category</p>
-                {shopCategories.map((category) => (
-                  <button
-                    key={category.value}
-                    onClick={() => {
-                      navigate(`/shop?category=${category.value}`);
-                      setIsMenuOpen(false);
-                    }}
-                    className={`w-full text-left px-3 py-2 ${textMutedClass} ${linkHoverClass} transition-colors text-sm font-medium no-underline`}
-                  >
-                    {category.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </nav>
-        </div>
-      )}
+      {/* Mobile Drawer */}
+      <MobileDrawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} />
     </header>
   );
 }
