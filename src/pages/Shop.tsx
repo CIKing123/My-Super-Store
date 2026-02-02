@@ -35,7 +35,7 @@ export function Shop({ onNavigate }: ShopProps) {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchTerm, setSearchTerm] = useState('');
 
-  
+
 
 
   const categories = ['All', 'Cosmetics', 'Construction', 'Furniture', 'Clothing and Fashion', 'Events Tools', 'Electrical Appliances'];
@@ -45,12 +45,12 @@ export function Shop({ onNavigate }: ShopProps) {
   }, []);
 
   useEffect(() => {
-  const categoryFromUrl = searchParams.get('category');
-  const searchFromUrl = searchParams.get('search');
+    const categoryFromUrl = searchParams.get('category');
+    const searchFromUrl = searchParams.get('search');
 
-  setSelectedCategory(categoryFromUrl ?? 'All');
-  setSearchTerm(searchFromUrl ?? '');
-}, [searchParams]);
+    setSelectedCategory(categoryFromUrl ?? 'All');
+    setSearchTerm(searchFromUrl ?? '');
+  }, [searchParams]);
 
 
 
@@ -108,7 +108,7 @@ export function Shop({ onNavigate }: ShopProps) {
       p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.short_description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.brand?.toLowerCase().includes(searchTerm.toLowerCase())
-)
+    )
     .sort((a, b) => {
       if (sortBy === 'price-low') return a.price - b.price;
       if (sortBy === 'price-high') return b.price - a.price;
@@ -134,8 +134,8 @@ export function Shop({ onNavigate }: ShopProps) {
           <h1 className="page-title" style={{ fontFamily: "'Oswald', sans-serif" }}>Luxury Collection</h1>
           <p className="page-desc">
             {searchTerm
-    ? `${filteredProducts.length} results for “${searchTerm}”`
-    : `${filteredProducts.length} exceptional pieces representing the pinnacle of craftsmanship.`}
+              ? `${filteredProducts.length} results for “${searchTerm}”`
+              : `${filteredProducts.length} exceptional pieces representing the pinnacle of craftsmanship.`}
           </p>
         </div>
       </div>
@@ -154,8 +154,10 @@ export function Shop({ onNavigate }: ShopProps) {
                   searchParams.delete('category');
                   setSearchParams(searchParams);
                 } else {
-                  setSearchParams({ category,
-  ...(searchTerm && { search: searchTerm }) });
+                  setSearchParams({
+                    category,
+                    ...(searchTerm && { search: searchTerm })
+                  });
                 }
               }}
               className={`filter-chip ${selectedCategory === category ? 'active' : ''}`}
@@ -256,7 +258,7 @@ export function Shop({ onNavigate }: ShopProps) {
       {/* Products Grid */}
       <div className="grid grid-cols-4 gap-6">
         {filteredProducts.map((product) => (
-          <div className='glass-border' key={product.id}>
+          <div key={product.id}>
             <ProductCard
               product={product}
               onProductClick={(id) => onNavigate('product', id)}

@@ -692,7 +692,7 @@ h6 {
 }
 
 .product-info {
-    background-color: #0F0F0F;
+    background-color: #000000;
     padding: 1.5rem;
     flex-grow: 1;
     display: flex;
@@ -701,7 +701,7 @@ h6 {
 
 .product-category {
     background: linear-gradient(135deg, rgba(255, 248, 225, 0.329) 0%, rgba(255, 236, 179, 0.329) 100%);
-    color: #01ff5e;
+    color: #bbff01;
     margin-bottom: 0.5rem;
     padding: 0.2rem 0.6rem;
     font-size: 0.65rem;

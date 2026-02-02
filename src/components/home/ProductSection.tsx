@@ -110,59 +110,59 @@ export function ProductSection({
             <div className="py-16">
                 <div className="max-w-[1280px] mx-auto px-6 lg:px-10 relative z-10">
 
-                {/* Desktop Grid - Adjusted for better spacing/alignment */}
-                <div className=" md:block">
-                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-6 lg:gap-8">
-                        {loading ? (
-                            Array.from({ length: productsPerSection }).map((_, i) => (
-                                <SkeletonLoader key={i} />
-                            ))
-                        ) : products.length > 0 ? (
-                            products.map((p, i) => (
-                            <div
-                                key={p.id}
-                                className="scale-[0.92] origin-top"
-                            >
-                                <LuxuryProductCard
-                                    product={p}
-                                    delay={i * 0.05}
-                                    isTrending={index === 0}
-                                /></div>
-                            ))
-                        ) : (
-                            <div className="col-span-full text-center py-12">
-                                <p className="text-[#B8941F] text-lg">No products found</p>
-                            </div>
-                        )}
+                    {/* Desktop Grid - Adjusted for better spacing/alignment */}
+                    <div className=" md:block">
+                        <div className="grid grid-cols-8 md:grid-cols-12 lg:grid-cols-6 gap-2 lg:gap-3">
+                            {loading ? (
+                                Array.from({ length: productsPerSection }).map((_, i) => (
+                                    <SkeletonLoader key={i} />
+                                ))
+                            ) : products.length > 0 ? (
+                                products.map((p, i) => (
+                                    <div
+                                        key={p.id}
+                                        className="scale-[0.88] origin-top"
+                                    >
+                                        <LuxuryProductCard
+                                            product={p}
+                                            delay={i * 0.05}
+                                            isTrending={index === 0}
+                                        /></div>
+                                ))
+                            ) : (
+                                <div className="col-span-full text-center py-12">
+                                    <p className="text-[#B8941F] text-lg">No products found</p>
+                                </div>
+                            )}
+                        </div>
                     </div>
-                </div>
 
-                {/* Mobile Horizontal Carousel */}
-                <div className="md:hidden overflow-x-auto scrollbar-hide pb-4 -mx-6 px-6">
-                    <div className="flex gap-4 min-w-min">
-                        {loading ? (
-                            Array.from({ length: productsPerSection }).map((_, i) => (
-                                <div key={i} className="w-[70vw] sm:w-[50vw] flex-shrink-0">
-                                    <SkeletonLoader />
+                    {/* Mobile Horizontal Carousel */}
+                    <div className="md:hidden overflow-x-auto scrollbar-hide pb-4 -mx-6 px-6">
+                        <div className="flex gap-4 min-w-min">
+                            {loading ? (
+                                Array.from({ length: productsPerSection }).map((_, i) => (
+                                    <div key={i} className="w-[70vw] sm:w-[50vw] flex-shrink-0">
+                                        <SkeletonLoader />
+                                    </div>
+                                ))
+                            ) : products.length > 0 ? (
+                                products.map((p, i) => (
+                                    <div key={p.id} className="w-[70vw] sm:w-[50vw] flex-shrink-0">
+                                        <LuxuryProductCard
+                                            product={p}
+                                            delay={i * 0.05}
+                                            isTrending={index === 0}
+                                        />
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="w-full text-center py-12">
+                                    <p className="text-[#B8941F]">No products found</p>
                                 </div>
-                            ))
-                        ) : products.length > 0 ? (
-                            products.map((p, i) => (
-                                <div key={p.id} className="w-[70vw] sm:w-[50vw] flex-shrink-0">
-                                    <LuxuryProductCard
-                                        product={p}
-                                        delay={i * 0.05}
-                                        isTrending={index === 0}
-                                    />
-                                </div>
-                            ))
-                        ) : (
-                            <div className="w-full text-center py-12">
-                                <p className="text-[#B8941F]">No products found</p>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
-                </div>
                 </div>
             </div>
 
