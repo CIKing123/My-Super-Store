@@ -1,7 +1,7 @@
 import { X, ChevronRight, ChevronDown } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
-
+import { useSwipe } from '../hooks/TouchSwipe';
 interface MobileDrawerProps {
     isOpen: boolean;
     onClose: () => void;
@@ -26,6 +26,24 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
     const drawerRef = useRef<HTMLDivElement>(null);
     const [touchStartX, setTouchStartX] = useState(0);
     const [isShopExpanded, setIsShopExpanded] = useState(false);
+    const swipeHandlers = useSwipe({
+        onSwipe: (direction) => {
+            switch (direction) {
+                case 'left':
+                    navigate('/next');
+                    break;
+                case 'right':
+                    navigate('/previous');
+                    break;
+                case 'up':
+                    navigate('/home');
+                    break;
+                case 'down':
+                    navigate('/home');
+                    break;
+            }
+        }
+    });
 
     const shopCategories = [
         { label: 'All Products', value: 'All' },
@@ -133,7 +151,7 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
     return (
         <>
             {/* Backdrop overlay */}
-            <div
+            <div {...swipeHandlers}
                 className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-opacity duration-300"
                 aria-hidden="true"
             />

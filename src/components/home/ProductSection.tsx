@@ -111,7 +111,7 @@ export function ProductSection({
                 <div className="max-w-[1280px] mx-auto px-6 lg:px-10 relative z-10">
 
                     {/* Desktop Grid - Adjusted for better spacing/alignment */}
-                    <div className=" md:block">
+                    <div className="hidden md:block">
                         <div className="grid grid-cols-8 md:grid-cols-12 lg:grid-cols-6 gap-2 lg:gap-3">
                             {loading ? (
                                 Array.from({ length: productsPerSection }).map((_, i) => (
