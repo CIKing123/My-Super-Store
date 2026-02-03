@@ -63,18 +63,18 @@ export function ProductSection({
 
     return (
         <section
-            className={`bg-gradient-to-b ${bgGradient} relative overflow-hidden`}
+            className={`bg-gradient-to-b ${bgGradient} relative overflow-hidden max-w-[4000px]`}
         >
             {/* Decorative gold accent elements */}
-            <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-gradient-to-br from-[#FFE55C]/10 to-[#D4AF37]/5 rounded-full filter blur-3xl -z-10" />
-            <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-gradient-to-tl from-[#D4AF37]/5 to-[#FFE55C]/10 rounded-full filter blur-3xl -z-10" />
+            <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-br from-[#FFE55C]/10 to-[#D4AF37]/5 rounded-full filter blur-3xl -z-10" />
+            <div className="absolute bottom-0 right-0 w-full h-[500px] bg-gradient-to-tl from-[#D4AF37]/5 to-[#FFE55C]/10 rounded-full filter blur-3xl -z-10" />
 
             {/* Top gold divider line */}
-            <div className="h-[2px] bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent opacity-50" />
+            <div className="h-[2px] bg-gradient-to-r w-full from-transparent via-[#D4AF37] to-transparent opacity-50" />
 
             {/* Title Header with Black Background - Full Width */}
             <div className="bg-black px-6 lg:px-10 py-6 border-t-2 border-[#D4AF37] relative">
-                <div className="max-w-[1280px] mx-auto">
+                <div className="max-w-[4000px] mx-auto">
                     <div className="flex justify-between items-start gap-4">
                         <div className="flex items-center gap-4">
                             {/* Icon with gold glow effect */}
@@ -92,7 +92,7 @@ export function ProductSection({
                             onClick={() =>
                                 navigate(`/shop${categoryName ? `?category=${categoryName}` : ''}`)
                             }
-                            className="text-base font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#FFE55C] via-[#D4AF37] to-[#B8941F] hover:opacity-80 transition-all flex items-center gap-2 group"
+                            className="text-base font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#FFE55C] via-[#D4AF37] to-[#B8941F] hover:opacity-80 transition-all flex items-right gap-2 group"
                         >
                             See all
                             <span className="group-hover:translate-x-1 transition-transform">→</span>
