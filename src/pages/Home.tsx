@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { LuxuryCategoryCard } from '../components/home/LuxuryCategoryCard';
 import { ProductSection } from '../components/home/ProductSection';
+import { HeroCarousel } from '../components/home/HeroCarousel';
 
 // Keep the Product interface here for data fetching typing, or move to a types file
 interface Product {
@@ -206,48 +207,34 @@ export function Home() {
       `}</style>
 
       {/* ================= LUXURY HERO BANNER ================= */}
-      <section className="relative w-full h-[480px] bg-gradient-to-br from-[#0F0F0F] via-[#1A1A1A] to-[#0F0F0F] overflow-hidden group">
-        {/* Background image with luxury overlay */}
-        <div className="absolute inset-0">
-          <img
-            src="https://via.placeholder.com/1600x600"
-            alt="Hero Ad"
-            className="w-full h-full object-cover opacity-30 group-hover:opacity-40 transition-opacity duration-700"
-          />
-        </div>
-
-        {/* Premium luxury gradient overlays */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0F0F0F]/90 via-[#1A1A1A]/70 to-[#0F0F0F]/90" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#FFE55C]/10 via-transparent to-[#D4AF37]/5" />
-
-        {/* Animated gold accent lights */}
-        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-[#FFE55C] rounded-full mix-blend-screen filter blur-[100px] opacity-10 group-hover:opacity-20 transition-opacity duration-700" />
-        <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-[#D4AF37] rounded-full mix-blend-screen filter blur-[100px] opacity-10 group-hover:opacity-20 transition-opacity duration-700" />
+      <section className="relative w-full h-[400px] sm:h-[450px] md:h-[500px] lg:h-[550px] xl:h-[600px] bg-gradient-to-br from-[#0F0F0F] via-[#1A1A1A] to-[#0F0F0F] overflow-hidden group">
+        {/* Auto-sliding carousel background */}
+        <HeroCarousel />
 
         {/* Content */}
-        <div className="absolute inset-0 flex items-center px-8 lg:px-16 z-10">
+        <div className="absolute inset-0 flex items-start sm:items-center px-3 py-4 sm:px-6 md:px-8 lg:px-16 z-10">
           <div
-            className="max-w-2xl"
+            className="w-full max-w-[280px] sm:max-w-md md:max-w-lg lg:max-w-2xl bg-black/40 backdrop-blur-sm p-3 sm:p-4 md:p-6 lg:p-8 rounded-lg md:rounded-xl lg:rounded-2xl"
             style={{ animation: 'slideUp 0.8s ease-out' }}
           >
-            <div className="inline-block mb-6">
-              <span className="text-[#FFE55C] text-sm font-extrabold uppercase tracking-widest bg-[rgba(212,175,55,0.1)] px-4 py-2 rounded-full border border-[rgba(212,175,55,0.3)]">
-                ✨ Premium Collection
+            <div className="inline-block mb-2 sm:mb-3 md:mb-4 lg:mb-6">
+              <span className="text-[10px] sm:text-xs md:text-sm font-bold sm:font-extrabold uppercase tracking-wider sm:tracking-widest bg-[rgba(212,175,55,0.25)] px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 rounded-full border border-[rgba(212,175,55,0.6)] shadow-md">
+                ✨ Premium
               </span>
             </div>
-            <h1 className="text-6xl lg:text-7xl mb-6 leading-tight text-white font-extrabold" style={{ fontFamily: 'dosis' }}>
-              Discover <span className="bg-gradient-to-r from-[#FFE55C] via-[#D4AF37] to-[#B8941F] bg-clip-text text-transparent">Luxury</span>
+            <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl xl:text-7xl mb-2 sm:mb-3 md:mb-4 lg:mb-6 leading-tight text-white font-extrabold" style={{ fontFamily: 'dosis', textShadow: '2px 2px 8px rgba(0,0,0,0.8)' }}>
+              Discover <span className="bg-gradient-to-r from-[#FFE55C] via-[#D4AF37] to-[#B8941F] bg-clip-text text-transparent" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)' }}>Luxury</span>
             </h1>
-            <p className="text-xl text-[#D0D0D0] mb-10 leading-relaxed opacity-90">
-              Explore our curated collection of premium products. Every item selected for quality, style, and elegance.
+            <p className="hidden sm:block text-sm md:text-base lg:text-lg xl:text-xl text-white mb-4 md:mb-6 lg:mb-8 xl:mb-10 leading-relaxed" style={{ textShadow: '1px 1px 4px rgba(0,0,0,0.8)' }}>
+              Explore our curated collection of premium products.
             </p>
             <button
               onClick={() => navigate('/shop')}
-              className="relative group/btn inline-block"
+              className="relative group/btn inline-block w-full"
             >
-              <div className="absolute -inset-1 bg-gradient-to-r from-[#FFE55C] via-[#D4AF37] to-[#B8941F] rounded-[14px] opacity-50 group-hover/btn:opacity-100 blur transition duration-500 group-hover/btn:duration-200" />
-              <div className="relative bg-gradient-to-r from-[#FFE55C] via-[#D4AF37] to-[#B8941F] text-[#050505] px-10 py-4 rounded-[12px] font-extrabold text-lg hover:shadow-[0_20px_40px_rgba(212,175,55,0.4)] transition-all duration-300 transform hover:scale-105 active:scale-95">
-                Start Shopping Now
+              <div className="absolute -inset-0.5 sm:-inset-1 bg-gradient-to-r from-[#FFE55C] via-[#D4AF37] to-[#B8941F] rounded-lg sm:rounded-xl opacity-50 group-hover/btn:opacity-100 blur transition duration-500 group-hover/btn:duration-200" />
+              <div className="relative bg-gradient-to-r from-[#FFE55C] via-[#D4AF37] to-[#B8941F] text-[#050505] px-4 py-2 sm:px-5 sm:py-2.5 md:px-8 md:py-3 lg:px-10 lg:py-4 rounded-lg sm:rounded-xl font-extrabold text-xs sm:text-sm md:text-base lg:text-lg hover:shadow-[0_10px_30px_rgba(212,175,55,0.4)] sm:hover:shadow-[0_20px_40px_rgba(212,175,55,0.4)] transition-all duration-300 transform hover:scale-105 active:scale-95 text-center">
+                Shop Now
               </div>
             </button>
           </div>
