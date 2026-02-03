@@ -284,15 +284,6 @@ h6 {
     }
 }
 
-@media (max-width: 480px) {
-
-    .grid-cols-3,
-    .grid-cols-5,
-    .grid-cols-4 {
-        grid-template-columns: 0.5fr;
-    }
-}
-
 
 
 /* Spacing Utilities */

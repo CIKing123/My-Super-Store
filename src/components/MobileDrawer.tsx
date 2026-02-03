@@ -1,6 +1,7 @@
 import { X, ChevronRight, ChevronDown } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useSwipe } from '../hooks/TouchSwipe';
 interface MobileDrawerProps {
     isOpen: boolean;
@@ -146,13 +147,16 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
         onClose();
     };
 
-    if (!isOpen) return null;
+    // if (!isOpen) return null; // Removed to allow animation
 
-    return (
+    return createPortal(
         <>
             {/* Backdrop overlay */}
-            <div {...swipeHandlers}
-                className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-opacity duration-300"
+            <div
+                {...swipeHandlers}
+                className={`fixed inset-0 bg-black/40 backdrop-blur-sm z-[99998] transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                    }`}
+                onClick={onClose}
                 aria-hidden="true"
             />
 
@@ -162,66 +166,67 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
                 role="dialog"
                 aria-label="Navigation menu"
                 aria-modal="true"
-                className={`fixed left-0 top-0 h-full w-[80%] max-w-[320px] bg-white/95 backdrop-blur-lg shadow-2xl z-50 transform transition-transform duration-300 ease-out ${isOpen ? 'translate-x-0' : '-translate-x-full'
+                className={`fixed left-0 top-0 h-full w-[85%] max-w-[320px] bg-white shadow-2xl z-[99999] transform transition-transform duration-500 cubic-bezier(0.32,0.72,0,1) border-r border-slate-100 ${isOpen ? 'translate-x-0' : '-translate-x-full'
                     }`}
                 onTouchStart={handleTouchStart}
                 onTouchEnd={handleTouchEnd}
             >
                 {/* Header with close button */}
-                <div className="flex items-center justify-between p-6 border-b border-slate-200">
-                    <h2 className="text-xl font-bold text-slate-900">Menu</h2>
+                <div className="flex items-center justify-between p-8 border-b border-black/5">
+                    <h2 className="text-3xl font-serif font-bold text-slate-900 tracking-tight">Menu</h2>
                     <button
                         onClick={onClose}
                         aria-label="Close menu"
-                        className="flex items-center justify-center size-10 rounded-full hover:bg-slate-100 transition-colors text-slate-900"
+                        className="flex items-center justify-center size-10 rounded-full hover:bg-black/5 transition-colors text-slate-900"
                     >
-                        <X size={24} />
+                        <X size={24} strokeWidth={1.5} />
                     </button>
                 </div>
 
-                {/* Horizontal scrollable menu */}
-                <nav className="p-6">
-                    <div className="flex flex-col gap-2">
+                {/* Vertical Menu */}
+                <nav className="p-8 overflow-y-auto h-[calc(100%-180px)]">
+                    <div className="flex flex-col gap-6">
                         {navItems.map((item) => (
-                            <div key={item.name}>
+                            <div key={item.name} className="group">
                                 {item.hasSubmenu ? (
                                     <>
                                         <button
                                             onClick={() => setIsShopExpanded(!isShopExpanded)}
-                                            className={`w-full flex items-center justify-between px-4 py-3 rounded-lg transition-all font-semibold ${location.pathname === item.path
-                                                ? 'bg-slate-900 text-white'
-                                                : 'text-slate-700 hover:bg-slate-100'
+                                            className={`w-full flex items-center justify-between text-2xl transition-all duration-300 py-2 border-l-4 ${location.pathname === item.path || isShopExpanded
+                                                    ? 'border-[#D4AF37] text-[#D4AF37] font-serif font-medium pl-4 bg-[#D4AF37]/5'
+                                                    : 'border-transparent text-slate-800 font-serif pl-4 hover:text-[#D4AF37] hover:pl-6'
                                                 }`}
                                         >
                                             <span>{item.name}</span>
                                             {isShopExpanded ? (
-                                                <ChevronDown size={20} className="transition-transform" />
+                                                <ChevronDown size={24} className="text-[#D4AF37]" />
                                             ) : (
-                                                <ChevronRight size={20} className="transition-transform" />
+                                                <ChevronRight size={24} className="opacity-50 group-hover:opacity-100 group-hover:text-[#D4AF37] transition-all" />
                                             )}
                                         </button>
 
                                         {/* Shop categories submenu */}
-                                        {isShopExpanded && (
-                                            <div className="ml-4 mt-2 flex flex-col gap-1 border-l-2 border-slate-200 pl-4">
+                                        <div className={`grid transition-all duration-300 ease-in-out overflow-hidden ${isShopExpanded ? 'grid-rows-[1fr] opacity-100 mt-2' : 'grid-rows-[0fr] opacity-0 mt-0'
+                                            }`}>
+                                            <div className="min-h-0 flex flex-col gap-3 py-2 pl-8">
                                                 {shopCategories.map((category) => (
                                                     <button
                                                         key={category.value}
                                                         onClick={() => handleCategoryClick(category.value)}
-                                                        className="text-left px-3 py-2 rounded-lg text-sm text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+                                                        className="text-left text-lg text-slate-500 hover:text-[#D4AF37] transition-colors py-1 font-medium font-serif"
                                                     >
                                                         {category.label}
                                                     </button>
                                                 ))}
                                             </div>
-                                        )}
+                                        </div>
                                     </>
                                 ) : (
                                     <button
                                         onClick={() => handleNavigation(item.path)}
-                                        className={`w-full text-left px-4 py-3 rounded-lg transition-all font-semibold ${location.pathname === item.path
-                                            ? 'bg-slate-900 text-white'
-                                            : 'text-slate-700 hover:bg-slate-100'
+                                        className={`w-full text-left text-2xl transition-all duration-300 font-serif py-2 border-l-4 ${location.pathname === item.path
+                                                ? 'border-[#D4AF37] text-[#D4AF37] font-medium pl-4 bg-[#D4AF37]/5'
+                                                : 'border-transparent text-slate-800 pl-4 hover:text-[#D4AF37] hover:pl-6'
                                             }`}
                                     >
                                         {item.name}
@@ -232,11 +237,15 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
                     </div>
                 </nav>
 
-                {/* Swipe hint */}
-                <div className="absolute bottom-8 left-0 right-0 text-center">
-                    <p className="text-xs text-slate-400">Swipe left or press ESC to close</p>
+                {/* Footer / Swipe Hint */}
+                <div className="absolute bottom-0 left-0 right-0 p-8 bg-linear-to-t from-white/50 to-transparent">
+                    <div className="flex flex-col items-center gap-2">
+                        <div className="w-12 h-1 bg-slate-200 rounded-full mb-2"></div>
+                        <p className="text-[10px] uppercase tracking-widest text-slate-400 font-medium">Swipe left to close</p>
+                    </div>
                 </div>
             </div>
-        </>
+        </>,
+        document.body
     );
 }
