@@ -72,7 +72,7 @@ export function Header({ cartItemCount }: HeaderProps) {
           </Link>
 
           {/* Desktop Nav Links - Between Logo and Icons */}
-          <nav style={{ display: window.innerWidth >= 768 ? 'flex' : 'none', gap: '24px', marginLeft: '48px' }} className="items-center relative">
+          <nav className="hidden md:flex items-center relative gap-6 ml-12">
             {navItems.map((item) => (
               <Link
                 key={item.name}
