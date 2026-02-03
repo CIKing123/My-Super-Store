@@ -142,13 +142,13 @@ export function ProductSection({
                         <div className="flex gap-4 min-w-min">
                             {loading ? (
                                 Array.from({ length: productsPerSection }).map((_, i) => (
-                                    <div key={i} className="w-[70vw] sm:w-[50vw] flex-shrink-0">
+                                    <div key={i} className="w-[50vw] sm:w-[50vw] flex-shrink-0">
                                         <SkeletonLoader />
                                     </div>
                                 ))
                             ) : products.length > 0 ? (
                                 products.map((p, i) => (
-                                    <div key={p.id} className="w-[70vw] sm:w-[50vw] flex-shrink-0">
+                                    <div key={p.id} className="w-[50vw] sm:w-[50vw] flex-shrink-0">
                                         <LuxuryProductCard
                                             product={p}
                                             delay={i * 0.05}

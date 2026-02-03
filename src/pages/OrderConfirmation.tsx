@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { CheckCircle, Loader2, AlertCircle, RefreshCw, Package, CreditCard, MapPin } from 'lucide-react';
-import { Link, useSearchParams, useNavigate } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { ImageWithFallback } from '../components/figma/ImageWithFallback';
 
@@ -53,7 +53,6 @@ interface Address {
 
 export function OrderConfirmation() {
     const [searchParams] = useSearchParams();
-    const navigate = useNavigate();
 
     const orderIdParam = searchParams.get('order_id'); // legacy / direct flow
     const reference = searchParams.get('reference'); // Paystack redirect: reference=...
@@ -64,7 +63,6 @@ export function OrderConfirmation() {
     const [orderItems, setOrderItems] = useState<(OrderItem & { product?: Product })[]>([]);
     const [payment, setPayment] = useState<Payment | null>(null);
     const [shippingAddress, setShippingAddress] = useState<Address | null>(null);
-    const [billingAddress, setBillingAddress] = useState<Address | null>(null);
     const [isPolling, setIsPolling] = useState(false);
 
     const fetchOrderData = useCallback(async () => {
@@ -98,7 +96,6 @@ export function OrderConfirmation() {
                     setOrderItems([]);
                     setPayment(null);
                     setShippingAddress(null);
-                    setBillingAddress(null);
                     setLoading(false);
                     return;
                 }
@@ -176,17 +173,6 @@ export function OrderConfirmation() {
                     .eq('id', orderData.shipping_address_id)
                     .maybeSingle();
                 if (!shippingErr && shippingData) setShippingAddress(shippingData);
-            }
-
-            if (orderData.billing_address_id) {
-                const { data: billingData, error: billingErr } = await supabase
-                    .from('addresses')
-                    .select('*')
-                    .eq('id', orderData.billing_address_id)
-                    .maybeSingle();
-                if (!billingErr && billingData) setBillingAddress(billingData);
-            } else {
-                setBillingAddress(null);
             }
 
             setError(null);

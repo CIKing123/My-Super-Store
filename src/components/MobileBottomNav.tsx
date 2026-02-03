@@ -11,8 +11,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
  * - Safe area padding for iOS devices
  * - Glass morphism design
  */
-type SwipeDir = 'left' | 'right' | 'up' | 'down'
-
 
 
 export function MobileBottomNav() {

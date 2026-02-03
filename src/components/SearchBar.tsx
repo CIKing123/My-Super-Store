@@ -120,7 +120,7 @@ export function SearchBar() {
     if (e.key === 'Enter') {
       e.preventDefault();
       handleSearch();
-      
+
     }
   };
 
@@ -133,7 +133,7 @@ export function SearchBar() {
       console.error('Failed to increment view count, but navigation will proceed:', error);
     });
 
-    navigate(`/product/=${encodeURIComponent(product.slug)}`);
+    navigate(`/product/${encodeURIComponent(product.id)}`);
     setIsOpen(false);
     setQuery('');
   };
