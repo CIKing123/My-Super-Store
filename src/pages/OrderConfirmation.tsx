@@ -37,6 +37,7 @@ interface Payment {
     currency: string;
     status: string;
     created_at: string;
+    order_id?: string;
 }
 
 interface Address {
@@ -52,93 +53,140 @@ interface Address {
 
 export function OrderConfirmation() {
     const [searchParams] = useSearchParams();
-    const { } = useNavigate();
-    const orderId = searchParams.get('order_id');
+    const navigate = useNavigate();
+
+    const orderIdParam = searchParams.get('order_id'); // legacy / direct flow
+    const reference = searchParams.get('reference'); // Paystack redirect: reference=...
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [order, setOrder] = useState<Order | null>(null);
-    const [orderItems, setOrderItems] = useState<(OrderItem & { product: Product })[]>([]);
+    const [orderItems, setOrderItems] = useState<(OrderItem & { product?: Product })[]>([]);
     const [payment, setPayment] = useState<Payment | null>(null);
     const [shippingAddress, setShippingAddress] = useState<Address | null>(null);
-    const [, setBillingAddress] = useState<Address | null>(null);
+    const [billingAddress, setBillingAddress] = useState<Address | null>(null);
     const [isPolling, setIsPolling] = useState(false);
 
-    // Fetch order data
     const fetchOrderData = useCallback(async () => {
-        if (!orderId) {
-            setError('No order ID provided');
-            setLoading(false);
-            return;
-        }
+        setLoading(true);
+        setError(null);
 
         try {
+            // Determine the order id: direct param or via payment reference lookup
+            let resolvedOrderId: string | null = null;
+
+            if (orderIdParam) {
+                resolvedOrderId = orderIdParam;
+            } else if (reference) {
+                // Try to find payment by provider_payment_id (provider_payment_id stores Paystack reference)
+                const { data: paymentData, error: paymentErr } = await supabase
+                    .from('payments')
+                    .select('order_id, status, provider_payment_id, amount, currency, created_at')
+                    .eq('provider_payment_id', reference)
+                    .maybeSingle();
+
+                if (paymentErr) {
+                    console.warn('Payment lookup error:', paymentErr);
+                }
+
+                if (paymentData && paymentData.order_id) {
+                    resolvedOrderId = paymentData.order_id;
+                    setPayment(paymentData as Payment);
+                } else {
+                    // No payment yet — clear states and return. Polling will try again.
+                    setOrder(null);
+                    setOrderItems([]);
+                    setPayment(null);
+                    setShippingAddress(null);
+                    setBillingAddress(null);
+                    setLoading(false);
+                    return;
+                }
+            } else {
+                setError('No order reference provided in the URL.');
+                setLoading(false);
+                return;
+            }
+
             // Fetch order
             const { data: orderData, error: orderError } = await supabase
                 .from('orders')
                 .select('*')
-                .eq('id', orderId)
-                .single();
+                .eq('id', resolvedOrderId)
+                .maybeSingle();
 
-            if (orderError) throw new Error('Order not found');
+            if (orderError) throw new Error('Order fetch failed');
+            if (!orderData) {
+                setError('Order not found');
+                setLoading(false);
+                return;
+            }
             setOrder(orderData);
 
             // Fetch order items
             const { data: itemsData, error: itemsError } = await supabase
                 .from('order_items')
                 .select('id, quantity, unit_price, product_id')
-                .eq('order_id', orderId);
+                .eq('order_id', resolvedOrderId);
 
             if (itemsError) throw new Error('Failed to load order items');
 
-            // Fetch products for order items
-            const productIds = itemsData.map(item => item.product_id);
-            const { data: productsData, error: productsError } = await supabase
-                .from('products')
-                .select('id, name, slug, product_images(url)')
-                .in('id', productIds);
-
-            if (productsError) throw new Error('Failed to load product details');
+            // Fetch products for order items (if any)
+            const productIds = (itemsData || []).map((item: any) => item.product_id).filter(Boolean);
+            let productsData: Product[] = [];
+            if (productIds.length > 0) {
+                const { data: prods, error: productsError } = await supabase
+                    .from('products')
+                    .select('id, name, slug, product_images(url)')
+                    .in('id', productIds);
+                if (productsError) {
+                    console.warn('Failed to load product details', productsError);
+                } else {
+                    productsData = prods || [];
+                }
+            }
 
             // Combine order items with product data
-            const combinedItems = itemsData.map(item => ({
+            const combinedItems = (itemsData || []).map((item: any) => ({
                 ...item,
-                product: productsData.find(p => p.id === item.product_id)!
+                product: productsData.find(p => p.id === item.product_id)
             }));
             setOrderItems(combinedItems);
 
-            // Fetch payment
-            const { data: paymentData, error: paymentError } = await supabase
-                .from('payments')
-                .select('*')
-                .eq('order_id', orderId)
-                .single();
+            // If payment wasn't already set from reference lookup, try fetching by order_id
+            if (!payment) {
+                const { data: paymentData2, error: paymentErr2 } = await supabase
+                    .from('payments')
+                    .select('*')
+                    .eq('order_id', resolvedOrderId)
+                    .maybeSingle();
 
-            if (paymentError) {
-                console.warn('Payment not found yet:', paymentError);
-            } else {
-                setPayment(paymentData);
+                if (paymentErr2) {
+                    console.warn('Payment not found yet:', paymentErr2);
+                } else if (paymentData2) {
+                    setPayment(paymentData2);
+                }
             }
 
-            // Fetch addresses if they exist
+            // Fetch shipping & billing addresses (do independently)
             if (orderData.shipping_address_id) {
-                const { data: shippingData } = await supabase
+                const { data: shippingData, error: shippingErr } = await supabase
                     .from('addresses')
                     .select('*')
                     .eq('id', orderData.shipping_address_id)
-                    .single();
-                if (shippingData) setShippingAddress(shippingData);
+                    .maybeSingle();
+                if (!shippingErr && shippingData) setShippingAddress(shippingData);
             }
 
-            if (orderData.billing_address_id && orderData.billing_address_id !== orderData.shipping_address_id) {
-                const { data: billingData } = await supabase
+            if (orderData.billing_address_id) {
+                const { data: billingData, error: billingErr } = await supabase
                     .from('addresses')
                     .select('*')
                     .eq('id', orderData.billing_address_id)
-                    .single();
-                if (billingData) setBillingAddress(billingData);
-            } else if (orderData.billing_address_id === orderData.shipping_address_id) {
-                setBillingAddress(shippingAddress);
+                    .maybeSingle();
+                if (!billingErr && billingData) setBillingAddress(billingData);
+            } else {
+                setBillingAddress(null);
             }
 
             setError(null);
@@ -148,16 +196,23 @@ export function OrderConfirmation() {
         } finally {
             setLoading(false);
         }
-    }, [orderId, shippingAddress]);
+    }, [orderIdParam, reference, payment]);
 
-    // Initial fetch
+    // Initial fetch on mount and when params change
     useEffect(() => {
         fetchOrderData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [fetchOrderData]);
 
-    // Polling effect - runs when order status is pending
+    // Polling effect:
+    // Poll while:
+    // - We have an order and it's not paid, OR
+    // - We have a reference and no order yet (waiting for webhook to create payment/order)
     useEffect(() => {
-        if (!order || order.status === 'paid') {
+        const shouldPoll =
+            (!!order && order.status !== 'paid') || (!!reference && !order);
+
+        if (!shouldPoll) {
             setIsPolling(false);
             return;
         }
@@ -165,17 +220,17 @@ export function OrderConfirmation() {
         setIsPolling(true);
         const interval = setInterval(() => {
             fetchOrderData();
-        }, 3000); // Poll every 3 seconds
+        }, 3000);
 
         return () => clearInterval(interval);
-    }, [order, fetchOrderData]);
+    }, [order, reference, fetchOrderData]);
 
-    // Manual refresh handler
     const handleRefresh = () => {
         setLoading(true);
         fetchOrderData();
     };
 
+    // UI rendering
     if (loading && !order) {
         return (
             <div className="section flex items-center justify-center min-h-[60vh]">
@@ -184,13 +239,13 @@ export function OrderConfirmation() {
         );
     }
 
-    if (error || !orderId) {
+    if (error || (!order && !loading)) {
         return (
             <div className="section">
                 <div className="card-black p-16 text-center max-w-2xl mx-auto">
                     <AlertCircle size={64} className="mx-auto mb-6 text-red-500" />
                     <h2 className="text-2xl font-serif text-white mb-4">Order Not Found</h2>
-                    <p className="text-muted mb-8">{error || 'Invalid order ID'}</p>
+                    <p className="text-muted mb-8">{error || 'Invalid order reference'}</p>
                     <Link to="/cart" className="btn-primary no-underline">
                         Return to Cart
                     </Link>
@@ -200,7 +255,7 @@ export function OrderConfirmation() {
     }
 
     const isPaid = order?.status === 'paid';
-    const isPending = order?.status === 'pending';
+    const isPending = order?.status === 'pending' || (!order && !!reference);
 
     return (
         <div className="section relative">
@@ -223,12 +278,11 @@ export function OrderConfirmation() {
                     <p className="text-gray-400 text-lg mb-2">
                         {isPaid
                             ? 'Thank you for your purchase. Your order has been confirmed.'
-                            : 'Please complete your payment in the Paystack window.'
-                        }
+                            : 'Please complete your payment in the Paystack window.'}
                     </p>
 
                     <p className="text-muted">
-                        Order ID: <span className="text-[var(--gold-primary)] font-mono">{order?.id.slice(0, 8).toUpperCase()}</span>
+                        Order ID: <span className="text-[var(--gold-primary)] font-mono">{order?.id?.slice(0, 8).toUpperCase() ?? '—'}</span>
                     </p>
 
                     {isPolling && (
