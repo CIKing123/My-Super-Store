@@ -255,7 +255,7 @@ export function Home() {
       </section>
 
       {/* ================= LUXURY CATEGORY GRID ================= */}
-      <section className="w-full  mx-auto ">
+      <section className="w-full max-w-[4000px]  mx-auto ">
         {/* Top gold divider */}
         <div className="h-[4px] bg-gradient-to-r  from-[rgba(95,82,17,0.71)] via-[#D4AF37] to-[rgba(46,38,0,0.94)] opacity-50 mb-20" />
 
@@ -291,8 +291,8 @@ export function Home() {
       </section>
 
       {/* ================= LUXURY MID-PAGE PROMOTIONAL BANNER ================= */}
-      <section className="w-full bg-gradient-to-b from-[rgba(255,229,92,0.05)] via-white to-[rgba(212,175,55,0.03)] py-12 border-y border-[rgba(212,175,55,0.2)]">
-        <div className="max-w-[1280px] mx-auto px-6 lg:px-10">
+      <section className="w-full bg-gradient-to-b max-w-[4000px] from-[rgba(255,229,92,0.05)] via-white to-[rgba(212,175,55,0.03)] py-12 border-y border-[rgba(212,175,55,0.2)]">
+        <div className=" mx-auto px-6 lg:px-10">
           <div className="relative rounded-[24px] overflow-hidden group cursor-pointer border-2 border-[rgba(212,175,55,0.3)] hover:border-[rgba(212,175,55,0.8)] transition-all duration-500">
             <img
               src="https://via.placeholder.com/1400x300"
