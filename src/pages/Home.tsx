@@ -255,9 +255,9 @@ export function Home() {
       </section>
 
       {/* ================= LUXURY CATEGORY GRID ================= */}
-      <section className="w-full max-w-screen-2xl mx-auto ">
+      <section className="w-full  mx-auto ">
         {/* Top gold divider */}
-        <div className="h-[4px] bg-gradient-to-r from-[rgba(95,82,17,0.71)] via-[#D4AF37] to-[rgba(46,38,0,0.94)] opacity-50 mb-20" />
+        <div className="h-[4px] bg-gradient-to-r  from-[rgba(95,82,17,0.71)] via-[#D4AF37] to-[rgba(46,38,0,0.94)] opacity-50 mb-20" />
 
         <div className="relative mb-20 bg-black py-12 px-6 lg:px-10 ">
           <h2 style={{ fontFamily: 'revert' }} className="text-5xl md:text-6xl lg:text-7xl font-extrabold bg-gradient-to-r from-[#FFE55C] via-[#D4AF37] to-[#B8941F] bg-clip-text text-transparent" >
