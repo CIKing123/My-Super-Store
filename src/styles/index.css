@@ -626,6 +626,7 @@ h6 {
 }
 
 .product-category {
+    width: fit-content;
     background: linear-gradient(135deg, rgba(255, 248, 225, 0.329) 0%, rgba(255, 236, 179, 0.329) 100%);
     color: #fcfcfc;
     margin-bottom: 0.5rem;
