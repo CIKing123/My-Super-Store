@@ -23,7 +23,7 @@ export function OrderList() {
         try {
             setLoading(true);
 
-            // Query order_items filtered by vendor_id, only for paid orders
+            // Step 1: Query order_items filtered by vendor_id, only for paid orders
             let query = supabase
                 .from('order_items')
                 .select(`
@@ -43,8 +43,7 @@ export function OrderList() {
                         placed_at,
                         updated_at,
                         user_id,
-                        shipping_address_id,
-                        shipping_address:addresses(*)
+                        shipping_address_id
                     )
                 `)
                 .eq('vendor_id', vendor.id)
@@ -55,8 +54,24 @@ export function OrderList() {
 
             if (error) throw error;
 
-            // Get unique order IDs to fetch payments
+            // Get unique order IDs and address IDs
             const orderIds = [...new Set(data?.map((item: any) => item.orders.id) || [])];
+            const addressIds = [...new Set(data?.map((item: any) => item.orders.shipping_address_id).filter(Boolean) || [])];
+
+            // Step 2: Fetch addresses using address IDs
+            let addressesData: any[] = [];
+            if (addressIds.length > 0) {
+                const { data: addresses, error: addressError } = await supabase
+                    .from('addresses')
+                    .select('*')
+                    .in('id', addressIds);
+
+                if (addressError) {
+                    console.error('Error fetching addresses:', addressError);
+                } else {
+                    addressesData = addresses || [];
+                }
+            }
 
             // Fetch payments for all orders
             const { data: paymentsData, error: paymentsError } = await supabase
@@ -68,17 +83,20 @@ export function OrderList() {
                 console.error('Error fetching payments:', paymentsError);
             }
 
-            // Group order items by order_id and attach payments
+            // Group order items by order_id and attach payments and addresses
             const ordersMap = new Map<string, OrderWithDetails>();
 
             data?.forEach((item: any) => {
                 const orderId = item.orders.id;
 
                 if (!ordersMap.has(orderId)) {
+                    const shippingAddress = addressesData.find(addr => addr.id === item.orders.shipping_address_id);
+
                     ordersMap.set(orderId, {
                         ...item.orders,
                         order_items: [],
                         payments: paymentsData?.filter(p => p.order_id === orderId) || [],
+                        shipping_address: shippingAddress || null,
                     });
                 }
 
