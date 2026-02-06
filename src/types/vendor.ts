@@ -83,6 +83,7 @@ export interface OrderItem {
     id: string;
     order_id: string;
     product_id: string;
+    vendor_id: string | null;
     quantity: number;
     unit_price: number;
     created_at: string;
@@ -98,6 +99,17 @@ export interface Address {
     state: string | null;
     country: string | null;
     postal_code: string | null;
+    created_at: string;
+}
+
+export interface Payment {
+    id: string;
+    order_id: string;
+    provider: string;
+    provider_payment_id: string | null;
+    amount: number;
+    currency: string;
+    status: string;
     created_at: string;
 }
 
@@ -172,7 +184,10 @@ export interface ProductWithDetails extends Product {
 
 export interface OrderWithDetails extends Order {
     order_items?: Array<OrderItem & {
-        products?: Product;
+        products?: Product & {
+            product_images?: ProductImage[];
+        };
     }>;
     shipping_address?: Address;
+    payments?: Payment[];
 }

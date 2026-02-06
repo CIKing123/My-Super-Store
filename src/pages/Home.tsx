@@ -207,7 +207,7 @@ export function Home() {
       `}</style>
 
       {/* ================= LUXURY HERO BANNER ================= */}
-      <section className="relative w-full h-[400px] sm:h-[450px] md:h-[500px] lg:h-[550px] xl:h-[600px] bg-gradient-to-br from-[#0F0F0F] via-[#1A1A1A] to-[#0F0F0F] overflow-hidden group">
+      <section className="relative w-full h-[400px] sm:h-[450px] md:h-[550px] lg:h-[650px] xl:h-[700px] 2xl:h-[750px] bg-gradient-to-br from-[#0F0F0F] via-[#1A1A1A] to-[#0F0F0F] overflow-hidden group">
         {/* Auto-sliding carousel background */}
         <HeroCarousel />
 

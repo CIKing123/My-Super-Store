@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Loader2, Package, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { Loader2, Package, Clock, CheckCircle, XCircle, Copy, CreditCard } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useVendor } from '../../hooks/useVendor';
 import { OrderWithDetails } from '../../types/vendor';
@@ -9,6 +9,7 @@ export function OrderList() {
     const [orders, setOrders] = useState<OrderWithDetails[]>([]);
     const [loading, setLoading] = useState(true);
     const [filterStatus, setFilterStatus] = useState<string>('all');
+    const [copiedOrderId, setCopiedOrderId] = useState<string | null>(null);
 
     useEffect(() => {
         if (vendor) {
@@ -22,45 +23,52 @@ export function OrderList() {
         try {
             setLoading(true);
 
-            // First, get vendor's product IDs
-            const { data: products, error: productsError } = await supabase
-                .from('products')
-                .select('id')
-                .eq('seller_id', vendor.id);
-
-            if (productsError) throw productsError;
-
-            const productIds = products?.map((p) => p.id) || [];
-
-            if (productIds.length === 0) {
-                setOrders([]);
-                return;
-            }
-
-            // Build query for order_items with vendor's products
+            // Query order_items filtered by vendor_id, only for paid orders
             let query = supabase
                 .from('order_items')
                 .select(`
-          *,
-          products(id, name, price),
-          orders!inner(
-            id,
-            status,
-            total_amount,
-            currency,
-            placed_at,
-            updated_at,
-            shipping_address:addresses(*)
-          )
-        `)
-                .in('product_id', productIds)
+                    *,
+                    products(
+                        id, 
+                        name, 
+                        price,
+                        sku,
+                        product_images ( url, position )
+                    ),
+                    orders!inner(
+                        id,
+                        status,
+                        total_amount,
+                        currency,
+                        placed_at,
+                        updated_at,
+                        user_id,
+                        shipping_address_id,
+                        shipping_address:addresses(*)
+                    )
+                `)
+                .eq('vendor_id', vendor.id)
+                .eq('orders.status', 'paid')
                 .order('created_at', { ascending: false });
 
             const { data, error } = await query;
 
             if (error) throw error;
 
-            // Group order items by order_id
+            // Get unique order IDs to fetch payments
+            const orderIds = [...new Set(data?.map((item: any) => item.orders.id) || [])];
+
+            // Fetch payments for all orders
+            const { data: paymentsData, error: paymentsError } = await supabase
+                .from('payments')
+                .select('*')
+                .in('order_id', orderIds);
+
+            if (paymentsError) {
+                console.error('Error fetching payments:', paymentsError);
+            }
+
+            // Group order items by order_id and attach payments
             const ordersMap = new Map<string, OrderWithDetails>();
 
             data?.forEach((item: any) => {
@@ -70,6 +78,7 @@ export function OrderList() {
                     ordersMap.set(orderId, {
                         ...item.orders,
                         order_items: [],
+                        payments: paymentsData?.filter(p => p.order_id === orderId) || [],
                     });
                 }
 
@@ -83,8 +92,8 @@ export function OrderList() {
 
             let ordersList = Array.from(ordersMap.values());
 
-            // Apply status filter
-            if (filterStatus !== 'all') {
+            // Apply status filter if needed (though we only fetch paid orders)
+            if (filterStatus !== 'all' && filterStatus !== 'paid') {
                 ordersList = ordersList.filter((order) => order.status === filterStatus);
             }
 
@@ -134,6 +143,34 @@ export function OrderList() {
         }
     };
 
+    const copyShippingAddress = async (address: any, orderId: string) => {
+        if (!address) return;
+
+        const formattedAddress = `${address.line1 || ''}${address.line2 ? '\n' + address.line2 : ''}\n${address.city || ''}, ${address.state || ''} ${address.postal_code || ''}\n${address.country || ''}`;
+
+        try {
+            await navigator.clipboard.writeText(formattedAddress);
+            setCopiedOrderId(orderId);
+            setTimeout(() => setCopiedOrderId(null), 2000);
+        } catch (err) {
+            console.error('Failed to copy address:', err);
+        }
+    };
+
+    const getPaymentStatusColor = (status: string) => {
+        switch (status.toLowerCase()) {
+            case 'success':
+            case 'paid':
+                return 'bg-green-100 text-green-800';
+            case 'pending':
+                return 'bg-yellow-100 text-yellow-800';
+            case 'failed':
+                return 'bg-red-100 text-red-800';
+            default:
+                return 'bg-gray-100 text-gray-800';
+        }
+    };
+
     return (
         <div className="max-w-7xl mx-auto px-4 py-8">
             {/* Header */}
@@ -152,8 +189,8 @@ export function OrderList() {
                             key={status}
                             onClick={() => setFilterStatus(status)}
                             className={`px-4 py-2 rounded-lg font-medium transition whitespace-nowrap ${filterStatus === status
-                                    ? 'bg-[#D4AF37] text-black'
-                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                ? 'bg-[#D4AF37] text-black'
+                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                 }`}
                         >
                             {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -217,12 +254,30 @@ export function OrderList() {
                                 {order.order_items?.map((item) => (
                                     <div
                                         key={item.id}
-                                        className="flex items-center justify-between py-2 px-3 bg-gray-50 rounded-lg"
+                                        className="flex items-center gap-4 py-2 px-3 bg-gray-50 rounded-lg"
                                     >
+                                        {/* Product Image */}
+                                        {item.products?.product_images?.[0]?.url ? (
+                                            <img
+                                                src={item.products.product_images[0].url}
+                                                alt={item.products.name || 'Product'}
+                                                className="w-16 h-16 object-cover rounded flex-shrink-0"
+                                            />
+                                        ) : (
+                                            <div className="w-16 h-16 bg-gray-200 rounded flex-shrink-0 flex items-center justify-center">
+                                                <Package className="text-gray-400" size={24} />
+                                            </div>
+                                        )}
+
                                         <div className="flex-1">
                                             <p className="font-medium text-gray-900">
                                                 {item.products?.name || 'Unknown Product'}
                                             </p>
+                                            {item.products?.sku && (
+                                                <p className="text-xs text-gray-500">
+                                                    SKU: {item.products.sku}
+                                                </p>
+                                            )}
                                             <p className="text-sm text-gray-600">
                                                 Quantity: {item.quantity} × ${item.unit_price.toFixed(2)}
                                             </p>
@@ -234,19 +289,70 @@ export function OrderList() {
                                 ))}
                             </div>
 
+                            {/* Payment Information */}
+                            {order.payments && order.payments.length > 0 && (
+                                <div className="pt-4 border-t border-gray-200 mb-4">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <CreditCard className="text-gray-600" size={18} />
+                                        <h4 className="font-medium text-gray-900">Payment Information</h4>
+                                    </div>
+                                    {order.payments.map((payment) => (
+                                        <div key={payment.id} className="bg-gray-50 rounded-lg p-3 space-y-2">
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-sm text-gray-600">Provider</span>
+                                                <span className="text-sm font-medium text-gray-900 capitalize">
+                                                    {payment.provider}
+                                                </span>
+                                            </div>
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-sm text-gray-600">Status</span>
+                                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPaymentStatusColor(payment.status)}`}>
+                                                    {payment.status.toUpperCase()}
+                                                </span>
+                                            </div>
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-sm text-gray-600">Amount</span>
+                                                <span className="text-sm font-semibold text-gray-900">
+                                                    {payment.currency} {payment.amount.toFixed(2)}
+                                                </span>
+                                            </div>
+                                            {payment.provider_payment_id && (
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-sm text-gray-600">Transaction ID</span>
+                                                    <span className="text-xs font-mono text-gray-700">
+                                                        {payment.provider_payment_id.slice(0, 20)}...
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
                             {/* Shipping Address */}
                             {order.shipping_address && (
                                 <div className="pt-4 border-t border-gray-200">
-                                    <h4 className="font-medium text-gray-900 mb-2">Shipping Address</h4>
-                                    <p className="text-sm text-gray-600">
-                                        {order.shipping_address.line1}
-                                        {order.shipping_address.line2 && `, ${order.shipping_address.line2}`}
-                                        <br />
-                                        {order.shipping_address.city}, {order.shipping_address.state}{' '}
-                                        {order.shipping_address.postal_code}
-                                        <br />
-                                        {order.shipping_address.country}
-                                    </p>
+                                    <div className="flex items-center justify-between mb-2">
+                                        <h4 className="font-medium text-gray-900">Shipping Address</h4>
+                                        <button
+                                            onClick={() => copyShippingAddress(order.shipping_address, order.id)}
+                                            className="flex items-center gap-1 px-3 py-1 text-sm text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
+                                        >
+                                            <Copy size={14} />
+                                            {copiedOrderId === order.id ? 'Copied!' : 'Copy'}
+                                        </button>
+                                    </div>
+                                    <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg">
+                                        <p className="text-gray-900">{order.shipping_address.line1}</p>
+                                        {order.shipping_address.line2 && (
+                                            <p className="text-gray-900">{order.shipping_address.line2}</p>
+                                        )}
+                                        <p className="text-gray-900">
+                                            {order.shipping_address.city}, {order.shipping_address.state}{' '}
+                                            {order.shipping_address.postal_code}
+                                        </p>
+                                        <p className="text-gray-900">{order.shipping_address.country}</p>
+                                    </div>
                                 </div>
                             )}
                         </div>

@@ -19,7 +19,17 @@ export async function searchProductsAndCategories(
     // Search products - only published ones
     const { data: products, error: productError } = await supabase
       .from('products')
-      .select('id, name, slug, price, short_description, view_count, search_hit_count, published')
+      .select(`
+        id, 
+        name, 
+        slug, 
+        price, 
+        short_description, 
+        view_count, 
+        search_hit_count, 
+        published,
+        product_images ( url, alt_text, position )
+      `)
       .eq('published', true)
       .or(`name.ilike.%${trimmedQuery}%,slug.ilike.%${trimmedQuery}%`)
       .limit(10);
@@ -40,7 +50,10 @@ export async function searchProductsAndCategories(
     }
 
     return {
-      products: (products || []) as SearchProduct[],
+      products: (products || []).map((p: any) => ({
+        ...p,
+        image_url: p.product_images?.sort((a: any, b: any) => a.position - b.position)[0]?.url || null
+      })) as SearchProduct[],
       categories: (categories || []) as SearchCategory[]
     };
   } catch (error) {

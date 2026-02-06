@@ -229,10 +229,18 @@ export function SearchBar() {
                       className="w-full text-left px-4 py-3 hover:bg-slate-100 transition-colors border-b border-slate-100 last:border-b-0"
                     >
                       <div className="flex gap-3 items-start">
-                        {/* Product Image Placeholder */}
-                        <div className="h-12 w-12 bg-slate-200 rounded flex-shrink-0 flex items-center justify-center text-xs text-slate-500">
-                          Image
-                        </div>
+                        {/* Product Image */}
+                        {product.image_url ? (
+                          <img
+                            src={product.image_url}
+                            alt={product.name}
+                            className="h-12 w-12 bg-slate-200 rounded object-cover flex-shrink-0"
+                          />
+                        ) : (
+                          <div className="h-12 w-12 bg-slate-200 rounded flex-shrink-0 flex items-center justify-center text-xs text-slate-500">
+                            Image
+                          </div>
+                        )}
 
                         {/* Product Info */}
                         <div className="flex-1 min-w-0">
