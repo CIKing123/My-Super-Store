@@ -23,48 +23,82 @@ export function OrderList() {
         try {
             setLoading(true);
 
-            // Step 1: Query order_items filtered by vendor_id, only for paid orders
-            let query = supabase
+            console.log('Fetching orders for vendor:', vendor.id);
+
+            // Step 1: Get order_items for this vendor (simple query, no joins)
+            const { data: orderItems, error: orderItemsError } = await supabase
                 .from('order_items')
-                .select(`
-                    *,
-                    products(
-                        id, 
-                        name, 
-                        price,
-                        sku,
-                        product_images ( url, position )
-                    ),
-                    orders!inner(
-                        id,
-                        status,
-                        total_amount,
-                        currency,
-                        placed_at,
-                        updated_at,
-                        user_id,
-                        shipping_address_id
-                    )
-                `)
-                .eq('vendor_id', vendor.id)
-                .eq('orders.status', 'paid')
-                .order('created_at', { ascending: false });
+                .select('*')
+                .eq('vendor_id', vendor.id);
 
-            const { data, error } = await query;
+            console.log('Step 1 - Order items:', { orderItems, error: orderItemsError });
 
-            if (error) throw error;
+            if (orderItemsError) throw orderItemsError;
 
-            // Get unique order IDs and address IDs
-            const orderIds = [...new Set(data?.map((item: any) => item.orders.id) || [])];
-            const addressIds = [...new Set(data?.map((item: any) => item.orders.shipping_address_id).filter(Boolean) || [])];
+            if (!orderItems || orderItems.length === 0) {
+                console.warn('No order items found for vendor:', vendor.id);
+                setOrders([]);
+                return;
+            }
 
-            // Step 2: Fetch addresses using address IDs
+            // Get unique order IDs from order items
+            const orderIds = [...new Set(orderItems.map(item => item.order_id).filter(Boolean))];
+            console.log('Order IDs from order_items:', orderIds);
+
+            if (orderIds.length === 0) {
+                setOrders([]);
+                return;
+            }
+
+            // Step 2: Get orders by IDs, filter to 'paid' status
+            const { data: ordersData, error: ordersError } = await supabase
+                .from('orders')
+                .select('*')
+                .in('id', orderIds)
+                .eq('status', 'paid');
+
+            console.log('Step 2 - Orders:', { ordersData, error: ordersError });
+
+            if (ordersError) throw ordersError;
+
+            if (!ordersData || ordersData.length === 0) {
+                console.warn('No paid orders found');
+                setOrders([]);
+                return;
+            }
+
+            // Get product IDs from order items
+            const productIds = [...new Set(orderItems.map(item => item.product_id).filter(Boolean))];
+
+            // Step 3: Get products with images
+            let productsData: any[] = [];
+            if (productIds.length > 0) {
+                const { data: products, error: productsError } = await supabase
+                    .from('products')
+                    .select('id, name, price, sku, product_images(url, position)')
+                    .in('id', productIds);
+
+                console.log('Step 3 - Products:', { products, error: productsError });
+
+                if (productsError) {
+                    console.error('Error fetching products:', productsError);
+                } else {
+                    productsData = products || [];
+                }
+            }
+
+            // Get address IDs from orders
+            const addressIds = [...new Set(ordersData.map(order => order.shipping_address_id).filter(Boolean))];
+
+            // Step 4: Get addresses
             let addressesData: any[] = [];
             if (addressIds.length > 0) {
                 const { data: addresses, error: addressError } = await supabase
                     .from('addresses')
                     .select('*')
                     .in('id', addressIds);
+
+                console.log('Step 4 - Addresses:', { addresses, error: addressError });
 
                 if (addressError) {
                     console.error('Error fetching addresses:', addressError);
@@ -73,48 +107,54 @@ export function OrderList() {
                 }
             }
 
-            // Fetch payments for all orders
+            // Step 5: Get payments
             const { data: paymentsData, error: paymentsError } = await supabase
                 .from('payments')
                 .select('*')
-                .in('order_id', orderIds);
+                .in('order_id', orderIds.map(id => id as string));
+
+            console.log('Step 5 - Payments:', { paymentsData, error: paymentsError });
 
             if (paymentsError) {
                 console.error('Error fetching payments:', paymentsError);
             }
 
-            // Group order items by order_id and attach payments and addresses
+            // Step 6: Combine all data
             const ordersMap = new Map<string, OrderWithDetails>();
 
-            data?.forEach((item: any) => {
-                const orderId = item.orders.id;
+            // First, create order entries from paid orders
+            ordersData.forEach((order: any) => {
+                const shippingAddress = addressesData.find(addr => addr.id === order.shipping_address_id);
 
-                if (!ordersMap.has(orderId)) {
-                    const shippingAddress = addressesData.find(addr => addr.id === item.orders.shipping_address_id);
+                ordersMap.set(order.id, {
+                    ...order,
+                    order_items: [],
+                    payments: paymentsData?.filter(p => p.order_id === order.id) || [],
+                    shipping_address: shippingAddress || null,
+                });
+            });
 
-                    ordersMap.set(orderId, {
-                        ...item.orders,
-                        order_items: [],
-                        payments: paymentsData?.filter(p => p.order_id === orderId) || [],
-                        shipping_address: shippingAddress || null,
+            // Then, add order items to their respective orders
+            orderItems.forEach((item: any) => {
+                const order = ordersMap.get(item.order_id);
+                if (order) {
+                    const product = productsData.find(p => p.id === item.product_id);
+                    order.order_items = order.order_items || [];
+                    order.order_items.push({
+                        ...item,
+                        products: product || null,
                     });
                 }
-
-                const order = ordersMap.get(orderId)!;
-                order.order_items = order.order_items || [];
-                order.order_items.push({
-                    ...item,
-                    products: item.products,
-                });
             });
 
             let ordersList = Array.from(ordersMap.values());
 
-            // Apply status filter if needed (though we only fetch paid orders)
+            // Apply status filter if needed
             if (filterStatus !== 'all' && filterStatus !== 'paid') {
                 ordersList = ordersList.filter((order) => order.status === filterStatus);
             }
 
+            console.log('Final orders list:', ordersList.length, ordersList);
             setOrders(ordersList);
         } catch (err) {
             console.error('Error fetching orders:', err);
