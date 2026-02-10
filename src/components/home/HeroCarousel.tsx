@@ -9,12 +9,12 @@ interface CarouselSlide {
 }
 
 const slides: CarouselSlide[] = [
-    { id: 1, image: '/assets/hero/cosmetics.png', alt: 'Premium Cosmetics Collection', category: 'Cosmetics' },
-    { id: 2, image: '/assets/hero/construction.png', alt: 'Construction Tools & Equipment', category: 'Construction' },
-    { id: 3, image: '/assets/hero/furniture.png', alt: 'Luxury Furniture Showroom', category: 'Furniture' },
-    { id: 4, image: '/assets/hero/fashion.png', alt: 'Fashion & Clothing Collection', category: 'Fashion' },
-    { id: 5, image: '/assets/hero/events.png', alt: 'Event Tools & Equipment', category: 'Events' },
-    { id: 6, image: '/assets/hero/electrical.png', alt: 'Electrical Appliances', category: 'Electrical' },
+    { id: 1, image: '../assets/hero/Cosmetics.jpg', alt: 'Premium Cosmetics Collection', category: 'Cosmetics' },
+    { id: 2, image: '../assets/hero/construction_materials.png', alt: 'Construction Tools & Equipment', category: 'Construction' },
+    { id: 3, image: '../assets/hero/Furniture.jpg', alt: 'Luxury Furniture Showroom', category: 'Furniture' },
+    { id: 4, image: '../assets/hero/fashion.jpg', alt: 'Fashion & Clothing Collection', category: 'Fashion' },
+    { id: 5, image: '../assets/hero/events.jpg', alt: 'Event Tools & Equipment', category: 'Events' },
+    { id: 6, image: '../assets/hero/Electric gadgets.jpg', alt: 'Electrical Appliances', category: 'Electrical' },
 ];
 
 const AUTO_SLIDE_INTERVAL = 5000; // 5 seconds
@@ -104,21 +104,20 @@ export function HeroCarousel() {
             {slides.map((slide, index) => (
                 <div
                     key={slide.id}
-                    className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out bg-gradient-to-br from-[#0F0F0F] via-[#1A1A1A] to-[#0F0F0F] ${index === currentSlide ? 'opacity-100' : 'opacity-0'
-                        }`}
-                    style={{ pointerEvents: index === currentSlide ? 'auto' : 'none' }}
-                >
-                    <img
-                        src={slide.image}
-                        alt={slide.alt}
-                        className="absolute inset-0 w-full h-full object-contain"
-                        style={{
-                            objectFit: 'contain',
-                            objectPosition: 'center center'
-                        }}
-                        loading={index === 0 ? 'eager' : 'lazy'}
-                    />
-                </div>
+                    className={`absolute h-[20px] inset-0  transition-opacity duration-1000 ease-in-out bg-gradient-to-br from-[#0F0F0F] via-[#1A1A1A] to-[#0F0F0F] ${
+                index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
+            }`}
+            style={{ pointerEvents: index === currentSlide ? 'auto' : 'none' }}
+        >
+                <img
+                    src={slide.image}
+                    alt={slide.alt}
+                    className="relative inset-0 w-full h-[30px] object-cover object-fit"
+                    loading={index === 0 ? 'eager' : 'lazy'}
+                    decoding="async"
+                    fetchPriority={index === 0 ? 'high' : 'auto'}
+                />
+                 </div>
             ))}
 
             {/* Navigation arrows */}

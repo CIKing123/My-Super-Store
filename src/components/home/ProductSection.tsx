@@ -139,7 +139,7 @@ export function ProductSection({
 
                     {/* Mobile Horizontal Carousel */}
                     <div className="md:hidden overflow-x-auto scrollbar-hide pb-4 -mx-6 px-6">
-                        <div className="flex gap-4 min-w-min">
+                        <div className="flex gap-4 sm:gap-9 md:gap-9 min-w-min">
                             {loading ? (
                                 Array.from({ length: productsPerSection }).map((_, i) => (
                                     <div key={i} className="w-[50vw] sm:w-[50vw] flex-shrink-0">
