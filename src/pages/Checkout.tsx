@@ -403,17 +403,17 @@ export function Checkout() {
                                 <button
                                     onClick={handlePaystackPayment}
                                     disabled={processingPayment || !shippingAddress}
-                                    className="group relative overflow-hidden bg-black border border-[#FFC92E]/30 hover:border-[#FFC92E] text-white py-8 px-6 rounded-xl flex flex-col items-center justify-center gap-4 transition-all duration-500 hover:shadow-[0_0_30px_rgba(255,201,46,0.2)] hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:border-[#FFC92E]/30"
+                                    className="group relative overflow-hidden bg-black border-[4px] border-[#FFC92E]/20 hover:border-[#FFC92E] text-white py-5 px-6 rounded-xl flex flex-col items-center justify-center gap-3 transition-all duration-700 hover:shadow-[0_0_40px_rgba(255,201,46,0.6),0_0_80px_rgba(255,201,46,0.2)] hover:scale-[1.05] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                                 >
                                     <div className="absolute inset-0 bg-gradient-to-r from-[#FFC92E]/0 via-[#FFC92E]/5 to-[#FFC92E]/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
 
-                                    <div className="p-4 rounded-full bg-[#FFC92E]/10 group-hover:bg-[#FFC92E]/20 transition-colors duration-300">
-                                        <Wallet className="text-[#FFC92E]" size={32} />
+                                    <div className="p-3 rounded-full bg-[#FFC92E]/10 group-hover:bg-[#FFC92E]/20 transition-colors duration-300">
+                                        <Wallet className="text-[#FFC92E]" size={28} />
                                     </div>
 
                                     <div className="flex flex-col items-center gap-1 z-10">
-                                        <span className="text-gray-300 font-medium tracking-wide uppercase text-sm">Pay with Paystack</span>
-                                        <span className="text-white font-bold text-2xl font-serif tracking-wider">
+                                        <span className="text-gray-400 font-medium tracking-wide uppercase text-[10px]">Pay with Paystack</span>
+                                        <span className="text-white font-bold text-xl font-serif tracking-wider">
                                             ₦{subtotal.toLocaleString()}
                                         </span>
                                     </div>
@@ -423,17 +423,17 @@ export function Checkout() {
                                 <button
                                     onClick={handleStripePayment}
                                     disabled={processingPayment || !shippingAddress}
-                                    className="group relative overflow-hidden bg-black border border-[#FFC92E]/30 hover:border-[#FFC92E] text-white py-8 px-6 rounded-xl flex flex-col items-center justify-center gap-4 transition-all duration-500 hover:shadow-[0_0_30px_rgba(255,201,46,0.2)] hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:border-[#FFC92E]/30"
+                                    className="group relative overflow-hidden bg-black border-[4px] border-[#FFC92E]/20 hover:border-[#FFC92E] text-white py-5 px-6 rounded-xl flex flex-col items-center justify-center gap-3 transition-all duration-700 hover:shadow-[0_0_40px_rgba(255,201,46,0.6),0_0_80px_rgba(255,201,46,0.2)] hover:scale-[1.05] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                                 >
                                     <div className="absolute inset-0 bg-gradient-to-r from-[#FFC92E]/0 via-[#FFC92E]/5 to-[#FFC92E]/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
 
-                                    <div className="p-4 rounded-full bg-[#FFC92E]/10 group-hover:bg-[#FFC92E]/20 transition-colors duration-300">
-                                        <CreditCard className="text-[#FFC92E]" size={32} />
+                                    <div className="p-3 rounded-full bg-[#FFC92E]/10 group-hover:bg-[#FFC92E]/20 transition-colors duration-300">
+                                        <CreditCard className="text-[#FFC92E]" size={28} />
                                     </div>
 
                                     <div className="flex flex-col items-center gap-1 z-10">
-                                        <span className="text-gray-300 font-medium tracking-wide uppercase text-sm">Pay with Stripe</span>
-                                        <span className="text-white font-bold text-2xl font-serif tracking-wider">
+                                        <span className="text-gray-400 font-medium tracking-wide uppercase text-[10px]">Pay with Stripe</span>
+                                        <span className="text-white font-bold text-xl font-serif tracking-wider">
                                             ₦{subtotal.toLocaleString()}
                                         </span>
                                     </div>
