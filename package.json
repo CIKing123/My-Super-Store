@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@stripe/stripe-js": "^8.7.0",
     "@supabase/supabase-js": "^2.87.3",
     "@tailwindcss/vite": "^4.1.18",
     "lucide-react": "^0.344.0",
