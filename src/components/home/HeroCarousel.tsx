@@ -104,20 +104,19 @@ export function HeroCarousel() {
             {slides.map((slide, index) => (
                 <div
                     key={slide.id}
-                    className={`absolute h-[20px] inset-0  transition-opacity duration-1000 ease-in-out bg-gradient-to-br from-[#0F0F0F] via-[#1A1A1A] to-[#0F0F0F] ${
-                index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
-            }`}
-            style={{ pointerEvents: index === currentSlide ? 'auto' : 'none' }}
-        >
-                <img
-                    src={slide.image}
-                    alt={slide.alt}
-                    className="relative inset-0 w-full h-[30px] object-cover object-fit"
-                    loading={index === 0 ? 'eager' : 'lazy'}
-                    decoding="async"
-                    fetchPriority={index === 0 ? 'high' : 'auto'}
-                />
-                 </div>
+                    className={`absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out bg-gradient-to-br from-[#0F0F0F] via-[#1A1A1A] to-[#0F0F0F] ${index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
+                        }`}
+                    style={{ pointerEvents: index === currentSlide ? 'auto' : 'none' }}
+                >
+                    <img
+                        src={slide.image}
+                        alt={slide.alt}
+                        className="absolute inset-0 w-full h-full object-cover object-center"
+                        loading={index === 0 ? 'eager' : 'lazy'}
+                        decoding="async"
+                        fetchPriority={index === 0 ? 'high' : 'auto'}
+                    />
+                </div>
             ))}
 
             {/* Navigation arrows */}

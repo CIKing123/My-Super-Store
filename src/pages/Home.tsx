@@ -1,9 +1,10 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { LuxuryCategoryCard } from '../components/home/LuxuryCategoryCard';
-import { ProductSection } from '../components/home/ProductSection';
+
 import { HeroCarousel } from '../components/home/HeroCarousel';
+import { AutoScrollProductSection } from '../components/home/AutoScrollProductSection';
 
 // Keep the Product interface here for data fetching typing, or move to a types file
 interface Product {
@@ -39,7 +40,13 @@ export function Home() {
   const [fashionProducts, setFashionProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const recommendedSeedRef = useRef(Math.random());
-  // Removed categoryCarouselIndex state and ref as it's now handled internally by LuxuryCategoryCard
+
+  // Memoize a random product for the Promo Banner
+  const promoProduct = useMemo(() => {
+    if (allProducts.length === 0) return null;
+    const randomIndex = Math.floor(Math.random() * allProducts.length);
+    return allProducts[randomIndex];
+  }, [allProducts]);
 
   // Fetch products
   const fetchAllProducts = async () => {
@@ -206,55 +213,126 @@ export function Home() {
         }
       `}</style>
 
-      {/* ================= LUXURY HERO BANNER ================= */}
-      <section className="relative w-full h-[400px] sm:h-[450px] md:h-[550px] lg:h-[650px] xl:h-[700px] 2xl:h-[750px] bg-gradient-to-br from-[#0F0F0F] via-[#1A1A1A] to-[#0F0F0F] overflow-hidden group">
-        {/* Auto-sliding carousel background */}
-        <HeroCarousel />
+      {/* ================= DESKTOP 3-COLUMN GRID (lg+) / MOBILE STACK ================= */}
+      <div className="w-full lg:grid lg:grid-cols-12 lg:gap-4 lg:px-4 lg:py-4">
 
-        {/* Content */}
-        <div className="absolute inset-0 flex items-start sm:items-center px-3 py-4 sm:px-6 md:px-8 lg:px-16 z-10">
-          <div
-            className="w-full max-w-[280px] sm:max-w-md md:max-w-lg lg:max-w-2xl bg-black/40 backdrop-blur-sm p-3 sm:p-4 md:p-6 lg:p-8 rounded-lg md:rounded-xl lg:rounded-2xl"
-            style={{ animation: 'slideUp 0.8s ease-out' }}
-          >
-            <div className="inline-block mb-2 sm:mb-3 md:mb-4 lg:mb-6">
-              <span className="text-[10px] sm:text-xs md:text-sm font-bold sm:font-extrabold uppercase tracking-wider sm:tracking-widest bg-[rgba(212,175,55,0.25)] px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 rounded-full border border-[rgba(212,175,55,0.6)] shadow-md">
-                ✨ Premium
-              </span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl xl:text-7xl mb-2 sm:mb-3 md:mb-4 lg:mb-6 leading-tight text-white font-extrabold" style={{ fontFamily: 'dosis', textShadow: '2px 2px 8px rgba(0,0,0,0.8)' }}>
-              Discover <span className="bg-gradient-to-r from-[#FFE55C] via-[#D4AF37] to-[#B8941F] bg-clip-text text-transparent" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)' }}>Luxury</span>
-            </h1>
-            <p className="hidden sm:block text-sm md:text-base lg:text-lg xl:text-xl text-white mb-4 md:mb-6 lg:mb-8 xl:mb-10 leading-relaxed" style={{ textShadow: '1px 1px 4px rgba(0,0,0,0.8)' }}>
-              Explore our curated collection of premium products.
-            </p>
-            <button
-              onClick={() => navigate('/shop')}
-              className="relative group/btn inline-block w-full"
+        {/* LEFT COLUMN: Hero Carousel - 50% on desktop */}
+        <section className="relative w-full h-[400px] sm:h-[450px] md:h-[550px] lg:col-span-6 lg:h-[600px] bg-gradient-to-br from-[#0F0F0F] via-[#1A1A1A] to-[#0F0F0F] overflow-hidden group lg:rounded-2xl">
+          {/* Auto-sliding carousel background */}
+          <HeroCarousel />
+
+          {/* Content */}
+          <div className="absolute inset-0 flex items-start sm:items-center px-3 py-4 sm:px-6 md:px-8 lg:px-6 z-10">
+            <div
+              className="w-full max-w-[280px] sm:max-w-md md:max-w-lg lg:max-w-xl bg-black/40 backdrop-blur-sm p-3 sm:p-4 md:p-6 lg:p-6 rounded-lg md:rounded-xl lg:rounded-2xl"
+              style={{ animation: 'slideUp 0.8s ease-out' }}
             >
-              <div className="absolute -inset-0.5 sm:-inset-1 bg-gradient-to-r from-[#FFE55C] via-[#D4AF37] to-[#B8941F] rounded-lg sm:rounded-xl opacity-50 group-hover/btn:opacity-100 blur transition duration-500 group-hover/btn:duration-200" />
-              <div className="relative bg-gradient-to-r from-[#FFE55C] via-[#D4AF37] to-[#B8941F] text-[#050505] px-4 py-2 sm:px-5 sm:py-2.5 md:px-8 md:py-3 lg:px-10 lg:py-4 rounded-lg sm:rounded-xl font-extrabold text-xs sm:text-sm md:text-base lg:text-lg hover:shadow-[0_10px_30px_rgba(212,175,55,0.4)] sm:hover:shadow-[0_20px_40px_rgba(212,175,55,0.4)] transition-all duration-300 transform hover:scale-105 active:scale-95 text-center">
-                Shop Now
+              <div className="inline-block mb-2 sm:mb-3 md:mb-4 lg:mb-4">
+                <span className="text-[10px] sm:text-xs md:text-sm font-bold sm:font-extrabold uppercase tracking-wider sm:tracking-widest bg-[rgba(212,175,55,0.25)] px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 rounded-full border border-[rgba(212,175,55,0.6)] shadow-md">
+                  ✨ Premium
+                </span>
               </div>
-            </button>
+              <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-4xl xl:text-5xl mb-2 sm:mb-3 md:mb-4 lg:mb-3 leading-tight text-white font-extrabold" style={{ fontFamily: 'dosis', textShadow: '2px 2px 8px rgba(0,0,0,0.8)' }}>
+                Discover <span className="bg-gradient-to-r from-[#FFE55C] via-[#D4AF37] to-[#B8941F] bg-clip-text text-transparent" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)' }}>Luxury</span>
+              </h1>
+              <p className="hidden sm:block text-sm md:text-base lg:text-sm xl:text-base text-white mb-4 md:mb-6 lg:mb-4 leading-relaxed" style={{ textShadow: '1px 1px 4px rgba(0,0,0,0.8)' }}>
+                Explore our curated collection of premium products.
+              </p>
+              <button
+                onClick={() => navigate('/shop')}
+                className="relative group/btn inline-block w-full"
+              >
+                <div className="absolute -inset-0.5 sm:-inset-1 bg-gradient-to-r from-[#FFE55C] via-[#D4AF37] to-[#B8941F] rounded-lg sm:rounded-xl opacity-50 group-hover/btn:opacity-100 blur transition duration-500 group-hover/btn:duration-200" />
+                <div className="relative bg-gradient-to-r from-[#FFE55C] via-[#D4AF37] to-[#B8941F] text-[#050505] px-4 py-2 sm:px-5 sm:py-2.5 md:px-8 md:py-3 lg:px-6 lg:py-2.5 rounded-lg sm:rounded-xl font-extrabold text-xs sm:text-sm md:text-base lg:text-sm hover:shadow-[0_10px_30px_rgba(212,175,55,0.4)] sm:hover:shadow-[0_20px_40px_rgba(212,175,55,0.4)] transition-all duration-300 transform hover:scale-105 active:scale-95 text-center">
+                  Shop Now
+                </div>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* MIDDLE COLUMN: Promo Banner - 25% on desktop */}
+        <section className="w-full bg-gradient-to-b from-[rgba(255,229,92,0.05)] via-white to-[rgba(212,175,55,0.03)] py-6 lg:py-0 lg:col-span-3 border-y lg:border-0 border-[rgba(212,175,55,0.2)] mt-4 lg:mt-0">
+          <div className="mx-auto px-6 lg:px-2 h-full flex items-center">
+            {promoProduct ? (
+              <div
+                className="relative rounded-[24px] lg:rounded-2xl overflow-hidden group cursor-pointer border-2 border-[rgba(212,175,55,0.3)] hover:border-[rgba(212,175,55,0.8)] transition-all duration-500 w-full"
+                onClick={() => navigate(`/product/${promoProduct.id}`)}
+              >
+                <img
+                  src={promoProduct.image}
+                  alt={promoProduct.name}
+                  className="w-full lg:h-[600px] object-cover rounded-[22px] lg:rounded-xl group-hover:scale-110 transition-transform duration-700 brightness-95 group-hover:brightness-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80 group-hover:to-black/60 transition-all duration-500 rounded-[22px] lg:rounded-xl" />
+                <div className="absolute bottom-4 left-4 right-4 z-10">
+                  <h3 className="text-white font-extrabold text-lg truncate shadow-black drop-shadow-md">
+                    {promoProduct.name}
+                  </h3>
+                  <p className="text-[#D4AF37] font-bold text-sm">
+                    ${promoProduct.price.toFixed(2)}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="w-full lg:h-[600px] bg-slate-100 animate-pulse rounded-[22px] lg:rounded-xl" />
+            )}
+          </div>
+        </section>
+
+        {/* RIGHT COLUMN: Hot Categories - 25% on desktop */}
+        <div className="lg:col-span-3 mt-4 lg:mt-0 lg:h-[600px] flex flex-col">
+
+          {/* Hot Categories */}
+          <div className="w-full flex-1 flex flex-col lg:overflow-hidden">
+            <div className="mb-4 lg:mb-3 flex-shrink-0">
+              <h2 className="text-2xl lg:text-xl font-extrabold bg-gradient-to-r from-[#FFE55C] via-[#D4AF37] to-[#B8941F] bg-clip-text text-transparent flex items-center gap-2">
+                🔥 Hot Categories
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-2 gap-3 lg:gap-2 lg:overflow-y-auto lg:pr-2 scrollbar-hide">
+              {loading ? (
+                Array.from({ length: 8 }).map((_, i) => (
+                  <div key={i} className="rounded-[16px] h-32 lg:h-24 bg-slate-100 animate-pulse flex-shrink-0" />
+                ))
+              ) : categories.filter(cat => allProducts.some(p => p.category === cat.name && p.image && p.image.trim() !== '')).length > 0 ? (
+                categories
+                  .filter(cat => allProducts.some(p => p.category === cat.name && p.image && p.image.trim() !== ''))
+                  .map((cat) => (
+                    <LuxuryCategoryCard
+                      key={cat.id}
+                      category={cat}
+                      products={allProducts}
+                    />
+                  ))
+              ) : (
+                <p className="col-span-full text-slate-500 text-sm">No categories found</p>
+              )}
+            </div>
           </div>
         </div>
-      </section>
 
-      {/* ================= LUXURY CATEGORY GRID ================= */}
-      <section className="w-full max-w-[4000px]  mx-auto ">
+        {/* Featured Products - Two-Row Auto-scrolling Carousel - Desktop only */}
+        {trendingProducts.length > 0 && (
+          <div className="hidden lg:block lg:col-span-12 mt-4">
+            <AutoScrollProductSection title="⭐ Featured Products" products={trendingProducts} />
+          </div>
+        )}
+      </div>
+
+      {/* ================= FULL-WIDTH CATEGORY CAROUSEL (Mobile Featured Categories) ================= */}
+      <section className="lg:hidden w-full max-w-[4000px] mx-auto mt-8">
         {/* Top gold divider */}
-        <div className="h-[4px] bg-gradient-to-r  from-[rgba(95,82,17,0.71)] via-[#D4AF37] to-[rgba(46,38,0,0.94)] opacity-50 mb-20" />
+        <div className="h-[4px] bg-gradient-to-r from-[rgba(95,82,17,0.71)] via-[#D4AF37] to-[rgba(46,38,0,0.94)] opacity-50 mb-20" />
 
-        <div className="relative mb-20 bg-black py-12 px-6 lg:px-10 ">
-          <h2 style={{ fontFamily: 'revert' }} className="text-5xl md:text-6xl lg:text-7xl font-extrabold bg-gradient-to-r from-[#FFE55C] via-[#D4AF37] to-[#B8941F] bg-clip-text text-transparent" >
+        <div className="relative mb-20 bg-black py-12 px-6 lg:px-10">
+          <h2 style={{ fontFamily: 'revert' }} className="text-5xl md:text-6xl lg:text-7xl font-extrabold bg-gradient-to-r from-[#FFE55C] via-[#D4AF37] to-[#B8941F] bg-clip-text text-transparent">
             Shop by Category
           </h2>
 
-          <div className="h-[4px]  w-48 bg-gradient-to-r from-[#FFE55C] via-[#D4AF37] to-[#B8941F] rounded-full mt-6 shadow-lg shadow-[#D4AF37]/40 " />
+          <div className="h-[4px] w-48 bg-gradient-to-r from-[#FFE55C] via-[#D4AF37] to-[#B8941F] rounded-full mt-6 shadow-lg shadow-[#D4AF37]/40" />
         </div>
-
-
 
         <div className="py-16 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
           {loading ? (
@@ -277,69 +355,25 @@ export function Home() {
         </div>
       </section>
 
-      {/* ================= LUXURY MID-PAGE PROMOTIONAL BANNER ================= */}
-      <section className="w-full bg-gradient-to-b max-w-[4000px] from-[rgba(255,229,92,0.05)] via-white to-[rgba(212,175,55,0.03)] py-12 border-y border-[rgba(212,175,55,0.2)]">
-        <div className=" mx-auto px-6 lg:px-10">
-          <div className="relative rounded-[24px] overflow-hidden group cursor-pointer border-2 border-[rgba(212,175,55,0.3)] hover:border-[rgba(212,175,55,0.8)] transition-all duration-500">
-            <img
-              src="https://via.placeholder.com/1400x300"
-              alt="Mid Ad"
-              className="w-full rounded-[22px] group-hover:scale-110 transition-transform duration-700 brightness-95 group-hover:brightness-105"
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#D4AF37]/40 via-transparent to-[#D4AF37]/30 group-hover:from-[#D4AF37]/60 group-hover:via-[#D4AF37]/20 group-hover:to-[#D4AF37]/50 transition-all duration-500 rounded-[22px]" />
-          </div>
-        </div>
-      </section>
-
       {/* ================= TRENDING PRODUCTS ================= */}
-      {trendingProducts.length > 0 && (
-        <ProductSection
-          title="🔥 Trending Products"
-          products={trendingProducts}
-          index={0}
-          loading={loading}
-          productsPerSection={PRODUCTS_PER_SECTION}
-        />
-      )}
+      <div className="mt-8 px-4">
+        <AutoScrollProductSection title="🔥 Trending Products" products={trendingProducts} />
+      </div>
 
       {/* ================= RECOMMENDED FOR YOU ================= */}
-      {recommendedProducts.length > 0 && (
-        <ProductSection
-          title="💎 Recommended For You"
-
-          products={recommendedProducts}
-          index={1}
-          loading={loading}
-          productsPerSection={PRODUCTS_PER_SECTION}
-
-        />
-      )}
+      <div className="mt-8 px-4">
+        <AutoScrollProductSection title="💎 Recommended For You" products={recommendedProducts} />
+      </div>
 
       {/* ================= ELECTRONICS PICKS ================= */}
-      {electronicsProducts.length > 0 && (
-        <ProductSection
-          title="⚡ Electronics Picks"
-          products={electronicsProducts}
-          categoryName="Electrical Appliances"
-          index={2}
-          loading={loading}
-          productsPerSection={PRODUCTS_PER_SECTION}
-
-        />
-      )}
+      <div className="mt-8 px-4">
+        <AutoScrollProductSection title="⚡ Electronics Picks" products={electronicsProducts} />
+      </div>
 
       {/* ================= FASHION ESSENTIALS ================= */}
-      {fashionProducts.length > 0 && (
-        <ProductSection
-          title="👗 Fashion Essentials"
-          products={fashionProducts}
-          categoryName="Clothing and Fashion"
-          index={3}
-          loading={loading}
-          productsPerSection={PRODUCTS_PER_SECTION}
-
-        />
-      )}
+      <div className="mt-8 px-4 mb-8">
+        <AutoScrollProductSection title="👗 Fashion Essentials" products={fashionProducts} />
+      </div>
 
       {/* ================= LUXURY FULL WIDTH AD ================= */}
       <section className="w-full py-20 bg-gradient-to-b from-[#0F0F0F] via-[#1A1A1A] to-[#0F0F0F] relative overflow-hidden group">

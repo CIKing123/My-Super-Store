@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Loader2, MapPin, ShoppingBag, AlertCircle, X } from 'lucide-react';
+import { Loader2, MapPin, ShoppingBag, AlertCircle, X, CreditCard, Wallet } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -110,18 +110,14 @@ export function Checkout() {
         fetchData();
     }, [user, navigate]);
 
-    // Calculate totals
+    // Calculate subtotal only (fees calculated on backend)
     const subtotal = cartItems.reduce((sum, item) => {
         const price = item.products?.price || item.price_at_time;
         return sum + (price * item.quantity);
     }, 0);
 
-    const shipping = subtotal > 50000 ? 0 : 5000; // Free shipping over ₦50,000
-    const tax = subtotal * 0.08; // 8% tax
-    const total = subtotal + shipping + tax;
-
     // Handle Paystack payment
-    const handlePayment = async () => {
+    const handlePaystackPayment = async () => {
         if (!user) {
             setError('Please log in to continue');
             return;
@@ -189,6 +185,98 @@ export function Checkout() {
 
             // Open Paystack in a new tab
             window.open(data.authorization_url, '_blank');
+
+        } catch (err) {
+            console.error('Payment error:', err);
+            setError(err instanceof Error ? err.message : 'Failed to initialize payment');
+        } finally {
+            setProcessingPayment(false);
+        }
+    };
+
+    // Handle Stripe payment
+    const handleStripePayment = async () => {
+        if (!user) {
+            setError('Please log in to continue');
+            return;
+        }
+
+        // Check if address exists
+        if (!shippingAddress) {
+            setShowAddressModal(true);
+            return;
+        }
+
+        setProcessingPayment(true);
+        setError(null);
+
+        try {
+            // Build items array for Edge Function
+            const items = cartItems.map(item => ({
+                product_id: item.products.id,
+                quantity: item.quantity,
+                price: item.products.price || item.price_at_time
+            }));
+
+            // Get user email from user_profiles
+            const { data: profileData } = await supabase
+                .from('user_profiles')
+                .select('email')
+                .eq('user_id', user.id)
+                .single();
+
+            const userEmail = profileData?.email || user.email;
+
+            // Prepare success and cancel URLs
+            const baseUrl = window.location.origin;
+            const success_url = `${baseUrl}/order-confirmation?session_id={CHECKOUT_SESSION_ID}`;
+            const cancel_url = `${baseUrl}/checkout`;
+
+            console.log('Calling Stripe with:', {
+                user_id: user.id,
+                email: userEmail,
+                items_count: items.length,
+                success_url,
+                cancel_url
+            });
+
+            // Call Stripe Edge Function
+            const response = await fetch(
+                'https://hoieogginmsfmoarubuu.supabase.co/functions/v1/create-stripe-payment',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+                    },
+                    body: JSON.stringify({
+                        user_id: user.id,
+                        email: userEmail,
+                        currency: 'NGN',
+                        items: items,
+                        shipping_address_id: shippingAddress.id,
+                        billing_address_id: shippingAddress.id,
+                        success_url: success_url,
+                        cancel_url: cancel_url
+                    })
+                }
+            );
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Stripe API error:', errorData);
+                throw new Error(errorData.error || 'Payment initialization failed');
+            }
+
+            const data = await response.json();
+            console.log('Stripe response:', data);
+
+            if (!data.checkout_url) {
+                throw new Error('Invalid response from payment service');
+            }
+
+            // Redirect to Stripe Checkout (don't navigate to order confirmation yet)
+            window.location.href = data.checkout_url;
 
         } catch (err) {
             console.error('Payment error:', err);
@@ -306,28 +394,59 @@ export function Checkout() {
                             </div>
                         </div>
 
-                        {/* Payment Button */}
-                        <button
-                            onClick={handlePayment}
-                            disabled={processingPayment || !shippingAddress}
-                            className="btn-primary w-full text-lg py-4 flex items-center justify-center gap-3"
-                            style={{
-                                background: processingPayment ? 'rgba(212, 175, 55, 0.3)' : undefined,
-                                cursor: processingPayment || !shippingAddress ? 'not-allowed' : 'pointer'
-                            }}
-                        >
-                            {processingPayment ? (
-                                <>
-                                    <Loader2 className="animate-spin" size={24} />
-                                    <span>Processing...</span>
-                                </>
-                            ) : (
-                                <>
-                                    <span>Pay with Paystack</span>
-                                    <span className="font-bold">₦{total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                </>
+                        {/* Payment Buttons */}
+                        <div className="space-y-4">
+                            <h3 className="text-xl font-serif text-[var(--gold-primary)] mb-4">Choose Payment Method</h3>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {/* Paystack Button */}
+                                <button
+                                    onClick={handlePaystackPayment}
+                                    disabled={processingPayment || !shippingAddress}
+                                    className="group relative overflow-hidden bg-black border border-[#FFC92E]/30 hover:border-[#FFC92E] text-white py-8 px-6 rounded-xl flex flex-col items-center justify-center gap-4 transition-all duration-500 hover:shadow-[0_0_30px_rgba(255,201,46,0.2)] hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:border-[#FFC92E]/30"
+                                >
+                                    <div className="absolute inset-0 bg-gradient-to-r from-[#FFC92E]/0 via-[#FFC92E]/5 to-[#FFC92E]/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+
+                                    <div className="p-4 rounded-full bg-[#FFC92E]/10 group-hover:bg-[#FFC92E]/20 transition-colors duration-300">
+                                        <Wallet className="text-[#FFC92E]" size={32} />
+                                    </div>
+
+                                    <div className="flex flex-col items-center gap-1 z-10">
+                                        <span className="text-gray-300 font-medium tracking-wide uppercase text-sm">Pay with Paystack</span>
+                                        <span className="text-white font-bold text-2xl font-serif tracking-wider">
+                                            ₦{subtotal.toLocaleString()}
+                                        </span>
+                                    </div>
+                                </button>
+
+                                {/* Stripe Button */}
+                                <button
+                                    onClick={handleStripePayment}
+                                    disabled={processingPayment || !shippingAddress}
+                                    className="group relative overflow-hidden bg-black border border-[#FFC92E]/30 hover:border-[#FFC92E] text-white py-8 px-6 rounded-xl flex flex-col items-center justify-center gap-4 transition-all duration-500 hover:shadow-[0_0_30px_rgba(255,201,46,0.2)] hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:border-[#FFC92E]/30"
+                                >
+                                    <div className="absolute inset-0 bg-gradient-to-r from-[#FFC92E]/0 via-[#FFC92E]/5 to-[#FFC92E]/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+
+                                    <div className="p-4 rounded-full bg-[#FFC92E]/10 group-hover:bg-[#FFC92E]/20 transition-colors duration-300">
+                                        <CreditCard className="text-[#FFC92E]" size={32} />
+                                    </div>
+
+                                    <div className="flex flex-col items-center gap-1 z-10">
+                                        <span className="text-gray-300 font-medium tracking-wide uppercase text-sm">Pay with Stripe</span>
+                                        <span className="text-white font-bold text-2xl font-serif tracking-wider">
+                                            ₦{subtotal.toLocaleString()}
+                                        </span>
+                                    </div>
+                                </button>
+                            </div>
+
+                            {processingPayment && (
+                                <div className="flex items-center justify-center gap-2 text-[var(--gold-primary)] py-4">
+                                    <Loader2 className="animate-spin" size={20} />
+                                    <span>Processing payment...</span>
+                                </div>
                             )}
-                        </button>
+                        </div>
                     </div>
 
                     {/* Order Summary Sidebar */}
@@ -339,29 +458,18 @@ export function Checkout() {
                                     <span>Subtotal ({cartItems.length} items)</span>
                                     <span className="text-white">₦{subtotal.toLocaleString()}</span>
                                 </div>
-                                <div className="flex justify-between">
-                                    <span>Shipping</span>
-                                    <span className="text-white">{shipping === 0 ? 'Free' : `₦${shipping.toLocaleString()}`}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                    <span>Tax (8%)</span>
-                                    <span className="text-white">₦{tax.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                </div>
-                                <div className="border-t border-white/10 pt-4 flex justify-between text-white font-bold text-lg">
-                                    <span>Total</span>
-                                    <span className="text-[var(--gold-primary)]">
-                                        ₦{total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                    </span>
+                                <div className="border-t border-white/10 pt-4 mt-4">
+                                    <p className="text-xs text-muted mb-2">Fees calculated at checkout</p>
+                                    <div className="flex justify-between text-white font-bold text-lg">
+                                        <span>Subtotal</span>
+                                        <span className="text-[var(--gold-primary)]">
+                                            ₦{subtotal.toLocaleString()}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
 
-                            {subtotal < 50000 && (
-                                <div className="mt-6 p-4 border border-[rgba(222,157,13,0.3)] text-center">
-                                    <p className="text-muted text-sm">
-                                        Add <span style={{ color: 'var(--gold-solid)' }}>₦{(50000 - subtotal).toLocaleString()}</span> more for free shipping
-                                    </p>
-                                </div>
-                            )}
+
                         </div>
                     </div>
                 </div>
