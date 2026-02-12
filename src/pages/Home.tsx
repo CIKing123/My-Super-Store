@@ -35,6 +35,7 @@ export function Home() {
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [trendingProducts, setTrendingProducts] = useState<Product[]>([]);
+  const [seasonalProducts, setSeasonalProducts] = useState<Product[]>([]);
   const [recommendedProducts, setRecommendedProducts] = useState<Product[]>([]);
   const [electronicsProducts, setElectronicsProducts] = useState<Product[]>([]);
   const [fashionProducts, setFashionProducts] = useState<Product[]>([]);
@@ -119,6 +120,12 @@ export function Home() {
       .sort((a, b) => (b.view_count || 0) - (a.view_count || 0))
       .slice(0, PRODUCTS_PER_SECTION);
     setTrendingProducts(trending);
+
+    // Seasonal: duplicate of trending (same logic)
+    const seasonal = [...productsWithImages]
+      .sort((a, b) => (b.view_count || 0) - (a.view_count || 0))
+      .slice(0, PRODUCTS_PER_SECTION);
+    setSeasonalProducts(seasonal);
 
     // Recommended: randomized with session seed
     const seed = recommendedSeedRef.current;
@@ -317,6 +324,94 @@ export function Home() {
         {trendingProducts.length > 0 && (
           <div className="hidden lg:block lg:col-span-12 mt-4">
             <AutoScrollProductSection title="⭐ Featured Products" products={trendingProducts} />
+          </div>
+        )}
+
+        {/* ================= SEASONAL PRODUCTS WITH SALES BANNER ================= */}
+        {seasonalProducts.length > 0 && (
+          <div className="lg:col-span-12 mt-4 w-full bg-white border border-slate-200 rounded-lg p-4 shadow-sm">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-xl font-extrabold bg-gradient-to-r from-[#FFE55C] via-[#D4AF37] to-[#B8941F] bg-clip-text text-transparent">
+                🎉 Seasonal Products
+              </h2>
+            </div>
+
+            <div className="flex flex-col lg:flex-row gap-4">
+              {/* Carousel - Left side, takes more space */}
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-col gap-4 overflow-hidden py-2">
+                  {/* Row 1 - Scroll Left */}
+                  <div className="relative w-full overflow-hidden">
+                    <div className="flex gap-4 animate-scroll w-max hover:pause">
+                      {[...seasonalProducts, ...seasonalProducts, ...seasonalProducts].map((product, index) => (
+                        <div
+                          key={`seasonal-row1-${product.id}-${index}`}
+                          onClick={() => navigate(`/product/${product.id}`)}
+                          className="flex-shrink-0 w-[220px] bg-white border border-slate-100 rounded-xl p-3 cursor-pointer hover:shadow-lg hover:border-[#D4AF37]/30 transition-all duration-300 group"
+                        >
+                          <div className="relative aspect-square mb-3 overflow-hidden rounded-lg bg-slate-50">
+                            <img
+                              src={product.image}
+                              alt={product.name}
+                              className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
+                            />
+                          </div>
+                          <h3 className="text-sm font-bold text-slate-800 truncate mb-1">{product.name}</h3>
+                          <div className="flex items-center justify-between">
+                            <p className="text-base font-extrabold text-[#D4AF37]">${product.price.toFixed(2)}</p>
+                            <span className="text-[10px] uppercase font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
+                              {product.category}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Row 2 - Scroll Right (Reverse) */}
+                  <div className="relative w-full overflow-hidden">
+                    <div className="flex gap-4 animate-scroll-reverse w-max hover:pause">
+                      {[...seasonalProducts].reverse().concat([...seasonalProducts].reverse()).concat([...seasonalProducts].reverse()).map((product, index) => (
+                        <div
+                          key={`seasonal-row2-${product.id}-${index}`}
+                          onClick={() => navigate(`/product/${product.id}`)}
+                          className="flex-shrink-0 w-[220px] bg-white border border-slate-100 rounded-xl p-3 cursor-pointer hover:shadow-lg hover:border-[#D4AF37]/30 transition-all duration-300 group"
+                        >
+                          <div className="relative aspect-square mb-3 overflow-hidden rounded-lg bg-slate-50">
+                            <img
+                              src={product.image}
+                              alt={product.name}
+                              className="w-30% h-20% object-contain group-hover:scale-110 transition-transform duration-500"
+                            />
+                          </div>
+                          <h3 className="text-sm font-bold text-slate-800 truncate mb-1">{product.name}</h3>
+                          <div className="flex items-center justify-between">
+                            <p className="text-base font-extrabold text-[#D4AF37]">${product.price.toFixed(2)}</p>
+                            <span className="text-[10px] uppercase font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">
+                              {product.category}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Flash Sales Banner - Right side */}
+              <div className="flex-shrink-0 w-20% lg:w-[280px] relative rounded-xl overflow-hidden border-2 border-[rgba(212,175,55,0.3)] hover:border-[rgba(212,175,55,0.8)] transition-all duration-500 group cursor-pointer" style={{ minHeight: '300px' }}>
+                <img
+                  src="https://via.placeholder.com/300x400?text=FLASH+SALES"
+                  alt="Flash Sales & Offers"
+                  className="w-full h-full object-cover rounded-xl group-hover:scale-110 transition-transform duration-700 brightness-90 group-hover:brightness-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/70 group-hover:to-black/50 transition-all duration-500 rounded-xl flex items-end justify-start p-4" />
+                <div className="absolute bottom-4 left-4 right-4 z-10 text-white">
+                  <p className="text-xs font-bold opacity-90 uppercase tracking-wider">Flash</p>
+                  <h3 className="text-xl font-extrabold text-[#FFE55C]">Sales</h3>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>
