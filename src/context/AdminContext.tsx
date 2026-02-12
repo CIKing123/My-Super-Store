@@ -1,82 +1,108 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { useAuth } from './AuthContext';
+import { AdminUser, AdminRole, AdminPermission } from '../types/admin';
 
 interface AdminContextType {
-  isAdmin: boolean;
-  adminUser: any | null;
-  loading: boolean;
-  hasPermission: (permission: string) => boolean;
+    isAdmin: boolean;
+    adminUser: AdminUser | null;
+    adminRole: AdminRole | null;
+    permissions: AdminPermission[];
+    loading: boolean;
+    hasPermission: (permission: AdminPermission) => boolean;
+    checkAdminAccess: () => boolean;
 }
 
-const AdminContext = createContext<AdminContextType | undefined>(undefined);
+const AdminContext = createContext<AdminContextType>({
+    isAdmin: false,
+    adminUser: null,
+    adminRole: null,
+    permissions: [],
+    loading: true,
+    hasPermission: () => false,
+    checkAdminAccess: () => false,
+});
 
 export function AdminProvider({ children }: { children: React.ReactNode }) {
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [adminUser, setAdminUser] = useState<any | null>(null);
-  const [loading, setLoading] = useState(true);
+    const { user } = useAuth();
+    const [adminUser, setAdminUser] = useState<AdminUser | null>(null);
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [adminRole, setAdminRole] = useState<AdminRole | null>(null);
+    const [permissions, setPermissions] = useState<AdminPermission[]>([]);
+    const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    checkAdminStatus();
-  }, []);
+    useEffect(() => {
+        const checkAdminStatus = async () => {
+            if (!user) {
+                setIsAdmin(false);
+                setAdminUser(null);
+                setAdminRole(null);
+                setPermissions([]);
+                setLoading(false);
+                return;
+            }
 
-  const checkAdminStatus = async () => {
-    try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+            try {
+                const { data, error } = await supabase
+                    .from('admin_users')
+                    .select('*')
+                    .eq('user_id', user.id)
+                    .single();
 
-      if (!user) {
-        setIsAdmin(false);
-        setAdminUser(null);
-        setLoading(false);
-        return;
-      }
+                if (error && error.code !== 'PGRST116') {
+                    throw error;
+                }
 
-      // Check if user is admin in the admins table
-      const { data, error } = await supabase
-        .from('admins')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
+                if (data) {
+                    setAdminUser(data);
+                    setIsAdmin(true);
+                    setAdminRole(data.role);
+                    setPermissions(data.permissions || []);
+                } else {
+                    setIsAdmin(false);
+                    setAdminUser(null);
+                    setAdminRole(null);
+                    setPermissions([]);
+                }
+            } catch (error) {
+                console.error('Error checking admin status:', error);
+                setIsAdmin(false);
+                setAdminUser(null);
+                setPermissions([]);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-      if (!error && data) {
-        setIsAdmin(true);
-        setAdminUser(data);
-      } else {
-        setIsAdmin(false);
-        setAdminUser(null);
-      }
-    } catch (error) {
-      console.error('Error checking admin status:', error);
-      setIsAdmin(false);
-      setAdminUser(null);
-    } finally {
-      setLoading(false);
-    }
-  };
+        checkAdminStatus();
+    }, [user]);
 
-  const hasPermission = (permission: string): boolean => {
-    if (!isAdmin || !adminUser) return false;
+    const hasPermission = (permission: AdminPermission): boolean => {
+        if (!isAdmin) return false;
+        
+        // Super admins have all permissions
+        if (adminRole === AdminRole.SUPER_ADMIN) return true;
+        
+        return permissions.includes(permission);
+    };
 
-    // Check if user has the specific permission
-    const permissions = adminUser.permissions || [];
-    return permissions.includes(permission);
-  };
+    const checkAdminAccess = (): boolean => {
+        return isAdmin;
+    };
 
-  const value: AdminContextType = {
-    isAdmin,
-    adminUser,
-    loading,
-    hasPermission,
-  };
-
-  return <AdminContext.Provider value={value}>{children}</AdminContext.Provider>;
+    return (
+        <AdminContext.Provider value={{
+            isAdmin,
+            adminUser,
+            adminRole,
+            permissions,
+            loading,
+            hasPermission,
+            checkAdminAccess,
+        }}>
+            {children}
+        </AdminContext.Provider>
+    );
 }
 
-export function useAdmin(): AdminContextType {
-  const context = useContext(AdminContext);
-  if (context === undefined) {
-    throw new Error('useAdmin must be used within an AdminProvider');
-  }
-  return context;
-}
+export const useAdmin = () => useContext(AdminContext);

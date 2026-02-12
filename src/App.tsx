@@ -12,6 +12,7 @@ import { Login } from './pages/Login';
 import { Account } from './pages/Account';
 import { About } from './pages/About';
 import { AuthProvider } from './context/AuthContext';
+import { AdminProvider } from './context/AdminContext';
 import { CartProvider, useCart } from './context/CartContext';
 import { SeasonProvider } from './context/SeasonContext';
 
@@ -27,6 +28,15 @@ import { ProductForm } from './pages/vendor/ProductForm';
 import { ProductDetail as VendorProductDetail } from './pages/vendor/ProductDetail';
 import { OrderList } from './pages/vendor/OrderList';
 import { VendorProfile } from './pages/vendor/VendorProfile';
+
+// Admin Dashboard Imports
+import { AdminDashboard } from './pages/admin/AdminDashboard';
+import { AdminUsers } from './pages/admin/AdminUsers';
+import { AdminProducts } from './pages/admin/AdminProducts';
+import { AdminVendors } from './pages/admin/AdminVendors';
+import { AdminOrders } from './pages/admin/AdminOrders';
+import { AdminCategories } from './pages/admin/AdminCategories';
+import { AdminSettings } from './pages/admin/AdminSettings';
 
 // Header Wrapper to use Cart Context
 const HeaderWrapper = () => {
@@ -65,13 +75,14 @@ export default function App() {
 
   return (
     <AuthProvider>
-      <CartProvider>
-        <SeasonProvider>
-          <SeasonalOverlay />
-          <GreetingModal />
-          <GlobalNotifications />
-          <div className="min-h-screen flex flex-col">
-            <HeaderWrapper />
+      <AdminProvider>
+        <CartProvider>
+          <SeasonProvider>
+            <SeasonalOverlay />
+            <GreetingModal />
+            <GlobalNotifications />
+            <div className="min-h-screen flex flex-col">
+              <HeaderWrapper />
 
             <main className="grow px-0 sm:px-0 lg:px-0 pb-0 md:pb-0 mb-20 md:mb-0">
               <Routes>
@@ -101,6 +112,15 @@ export default function App() {
                   </VendorLayout>
                 } />
 
+                {/* Admin Routes */}
+                <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                <Route path="/admin/users" element={<AdminUsers />} />
+                <Route path="/admin/products" element={<AdminProducts />} />
+                <Route path="/admin/vendors" element={<AdminVendors />} />
+                <Route path="/admin/orders" element={<AdminOrders />} />
+                <Route path="/admin/categories" element={<AdminCategories />} />
+                <Route path="/admin/settings" element={<AdminSettings />} />
+
                 <Route path="*" element={<Home />} />
               </Routes>
             </main>
@@ -110,6 +130,7 @@ export default function App() {
           </div>
         </SeasonProvider>
       </CartProvider>
+      </AdminProvider>
     </AuthProvider>
   );
 }
