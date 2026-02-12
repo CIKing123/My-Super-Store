@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Loader2, MapPin, ShoppingBag, AlertCircle, X, CreditCard, Wallet } from 'lucide-react';
+import { Loader2, MapPin, ShoppingBag, AlertCircle, X, CreditCard, Wallet, Globe } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -30,6 +30,18 @@ interface CartItem {
     };
 }
 
+interface ExchangeRates {
+    base: string;
+    results: Record<string, number>;
+    updated: string;
+}
+
+// Payment method to currency mappings
+const PAYMENT_CURRENCY_MAP: Record<string, string[]> = {
+    paystack: ['NGN', 'GHS', 'ZAR', 'KES', 'USD'], // Paystack supported currencies
+    stripe: ['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'JPY', 'CHF', 'CNY', 'INR', 'BRL'], // Stripe primary supported
+};
+
 export function Checkout() {
     const navigate = useNavigate();
     const { } = useCart();
@@ -39,12 +51,50 @@ export function Checkout() {
     const [processingPayment, setProcessingPayment] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [showAddressModal, setShowAddressModal] = useState(false);
+    const [selectedCurrency, setSelectedCurrency] = useState<string>('USD');
+    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'paystack' | 'stripe' | null>(null);
+    const [exchangeRates, setExchangeRates] = useState<ExchangeRates | null>(null);
 
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
     const [shippingAddress, setShippingAddress] = useState<Address | null>(null);
     const [, setCartId] = useState<string | null>(null);
 
-    // Fetch cart data and address on mount
+    // Currency symbol mapping
+    const currencySymbols: Record<string, string> = {
+        USD: '$',
+        EUR: '€',
+        GBP: '£',
+        JPY: '¥',
+        NGN: '₦',
+        CAD: 'C$',
+        AUD: 'A$',
+        CHF: 'CHF',
+        CNY: '¥',
+        INR: '₹',
+        BRL: 'R$',
+        MXN: '$',
+        ZAR: 'R',
+    };
+
+    // Helper function to format currency
+    const formatCurrency = (amount: number, currency: string = selectedCurrency) => {
+        const symbol = currencySymbols[currency] || currency;
+        
+        // Handle large numbers (for currencies like VND, JPY)
+        if (amount > 10000) {
+            return `${symbol}${Math.round(amount).toLocaleString()}`;
+        }
+        return `${symbol}${amount.toFixed(2)}`;
+    };
+
+    // Helper function to convert USD to selected currency
+    const convertPrice = (usdAmount: number, targetCurrency: string = selectedCurrency) => {
+        if (!exchangeRates || targetCurrency === 'USD') return usdAmount;
+        const rate = exchangeRates.results[targetCurrency];
+        return usdAmount * rate;
+    };
+
+    // Fetch cart data, address, and exchange rates on mount
     useEffect(() => {
         const fetchData = async () => {
             if (!user) {
@@ -56,6 +106,11 @@ export function Checkout() {
             setError(null);
 
             try {
+                // Fetch exchange rates
+                const ratesResponse = await fetch('/exchange-rates.json');
+                const rates: ExchangeRates = await ratesResponse.json();
+                setExchangeRates(rates);
+
                 // Fetch user's cart
                 const { data: cartData, error: cartError } = await supabase
                     .from('carts')
@@ -116,6 +171,8 @@ export function Checkout() {
         return sum + (price * item.quantity);
     }, 0);
 
+    const convertedSubtotal = convertPrice(subtotal, selectedCurrency);
+
     // Handle Paystack payment
     const handlePaystackPayment = async () => {
         if (!user) {
@@ -129,6 +186,7 @@ export function Checkout() {
             return;
         }
 
+        setSelectedPaymentMethod('paystack');
         setProcessingPayment(true);
         setError(null);
 
@@ -149,7 +207,7 @@ export function Checkout() {
 
             const userEmail = profileData?.email || user.email;
 
-            // Call Edge Function to create payment
+            // Call Edge Function to create payment - backend handles currency conversion
             const response = await fetch(
                 'https://hoieogginmsfmoarubuu.supabase.co/functions/v1/super-endpoint',
                 {
@@ -161,7 +219,7 @@ export function Checkout() {
                     body: JSON.stringify({
                         user_id: user.id,
                         email: userEmail,
-                        currency: 'NGN',
+                        currency: 'USD',
                         items: items,
                         shipping_address_id: shippingAddress.id,
                         billing_address_id: shippingAddress.id
@@ -207,6 +265,7 @@ export function Checkout() {
             return;
         }
 
+        setSelectedPaymentMethod('stripe');
         setProcessingPayment(true);
         setError(null);
 
@@ -240,7 +299,7 @@ export function Checkout() {
                 cancel_url
             });
 
-            // Call Stripe Edge Function
+            // Call Stripe Edge Function - backend handles currency conversion
             const response = await fetch(
                 'https://hoieogginmsfmoarubuu.supabase.co/functions/v1/create-stripe-payment',
                 {
@@ -252,7 +311,7 @@ export function Checkout() {
                     body: JSON.stringify({
                         user_id: user.id,
                         email: userEmail,
-                        currency: 'NGN',
+                        currency: 'USD',
                         items: items,
                         shipping_address_id: shippingAddress.id,
                         billing_address_id: shippingAddress.id,
@@ -312,7 +371,27 @@ export function Checkout() {
     return (
         <div className="section relative">
             <div className="max-w-6xl mx-auto">
-                <h1 className="page-title mb-12" style={{ fontFamily: "'Oswald', sans-serif" }}>Checkout</h1>
+                <div className="flex items-center justify-between mb-12">
+                    <h1 className="page-title" style={{ fontFamily: "'Oswald', sans-serif" }}>Checkout</h1>
+                    
+                    {/* Currency Selector - For display purposes only */}
+                    <div className="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-lg border border-[var(--gold-primary)]/20 hover:border-[var(--gold-primary)]/50 transition-colors">
+                        <Globe size={20} className="text-[var(--gold-primary)]" />
+                        <select
+                            value={selectedCurrency}
+                            onChange={(e) => setSelectedCurrency(e.target.value)}
+                            className="bg-transparent text-white outline-none cursor-pointer text-sm font-medium"
+                        >
+                            {exchangeRates && Object.keys(exchangeRates.results)
+                                .sort()
+                                .map((currency) => (
+                                    <option key={currency} value={currency} className="bg-gray-900 text-white">
+                                        {currency}
+                                    </option>
+                                ))}
+                        </select>
+                    </div>
+                </div>
 
                 {error && (
                     <div className="mb-8 p-4 bg-red-900/20 border border-red-500/50 rounded-lg flex items-start gap-3">
@@ -382,11 +461,11 @@ export function Checkout() {
                                             <h4 className="text-white font-semibold mb-1">{item.products?.name}</h4>
                                             <p className="text-muted text-sm">Quantity: {item.quantity}</p>
                                             <p className="text-[var(--gold-primary)] font-semibold">
-                                                ₦{((item.products?.price || item.price_at_time) * item.quantity).toLocaleString()}
+                                                {formatCurrency(convertPrice((item.products?.price || item.price_at_time) * item.quantity, selectedCurrency), selectedCurrency)}
                                             </p>
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-white">₦{(item.products?.price || item.price_at_time).toLocaleString()}</p>
+                                            <p className="text-white">{formatCurrency(convertPrice(item.products?.price || item.price_at_time, selectedCurrency), selectedCurrency)}</p>
                                             <p className="text-muted text-sm">each</p>
                                         </div>
                                     </div>
@@ -414,7 +493,7 @@ export function Checkout() {
                                     <div className="flex flex-col items-center gap-1 z-10">
                                         <span className="text-gray-400 font-medium tracking-wide uppercase text-[10px]">Pay with Paystack</span>
                                         <span className="text-white font-bold text-xl font-serif tracking-wider">
-                                            ₦{subtotal.toLocaleString()}
+                                            {formatCurrency(convertedSubtotal, selectedCurrency)}
                                         </span>
                                     </div>
                                 </button>
@@ -434,7 +513,7 @@ export function Checkout() {
                                     <div className="flex flex-col items-center gap-1 z-10">
                                         <span className="text-gray-400 font-medium tracking-wide uppercase text-[10px]">Pay with Stripe</span>
                                         <span className="text-white font-bold text-xl font-serif tracking-wider">
-                                            ₦{subtotal.toLocaleString()}
+                                            {formatCurrency(convertedSubtotal, selectedCurrency)}
                                         </span>
                                     </div>
                                 </button>
@@ -456,14 +535,14 @@ export function Checkout() {
                             <div className="space-y-4 text-gray-400">
                                 <div className="flex justify-between">
                                     <span>Subtotal ({cartItems.length} items)</span>
-                                    <span className="text-white">₦{subtotal.toLocaleString()}</span>
+                                    <span className="text-white">{formatCurrency(convertedSubtotal, selectedCurrency)}</span>
                                 </div>
                                 <div className="border-t border-white/10 pt-4 mt-4">
                                     <p className="text-xs text-muted mb-2">Fees calculated at checkout</p>
                                     <div className="flex justify-between text-white font-bold text-lg">
                                         <span>Subtotal</span>
                                         <span className="text-[var(--gold-primary)]">
-                                            ₦{subtotal.toLocaleString()}
+                                            {formatCurrency(convertedSubtotal, selectedCurrency)}
                                         </span>
                                     </div>
                                 </div>
